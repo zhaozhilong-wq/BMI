@@ -4,6 +4,7 @@ import android.app.Activity
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.TextView
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
@@ -147,6 +148,47 @@ class InputActivity : AppCompatActivity() {
         }
 
         //绑定点击事件
+        binding.lb.setOnClickListener {
+            binding.lb.alpha = 1f
+            binding.kg.alpha = 0.3f
+            //weight换算并回显
+        }
+        binding.kg.setOnClickListener {
+            binding.kg.alpha = 1f
+            binding.lb.alpha = 0.3f
+            //weight换算并回显
+        }
+        binding.ftin.setOnClickListener {
+            binding.ftin.alpha = 1f
+            binding.cm.alpha = 0.3f
+            binding.heightFtInput.visibility= View.VISIBLE
+            binding.heightInInput.visibility= View.VISIBLE
+            binding.heightInput.visibility= View.GONE
+            //height换算并回显
+        }
+        binding.cm.setOnClickListener {
+            binding.cm.alpha = 1f
+            binding.ftin.alpha = 0.3f
+            binding.heightFtInput.visibility= View.GONE
+            binding.heightInInput.visibility= View.GONE
+            binding.heightInput.visibility= View.VISIBLE
+            //height换算并回显
+        }
+        binding.maleContainer.setOnClickListener {
+            binding.maleContainer.alpha = 1f
+            binding.femaleContainer.alpha = 0.3f
+            binding.maleTick.visibility = View.VISIBLE
+            binding.femaleTick.visibility = View.GONE
+            //保存性别选择
+        }
+        binding.femaleContainer.setOnClickListener {
+            binding.femaleContainer.alpha = 1f
+            binding.maleContainer.alpha = 0.3f
+            binding.femaleTick.visibility = View.VISIBLE
+            binding.maleTick.visibility = View.GONE
+            //保存性别选择
+        }
+
 
     }
 
