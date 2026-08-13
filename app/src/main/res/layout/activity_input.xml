@@ -10,6 +10,7 @@
     android:background="#EAEAEE">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/top"
         android:layout_width="match_parent"
         android:layout_height="58dp"
         app:layout_constraintTop_toTopOf="parent">
@@ -38,5 +39,322 @@
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+    
+    <TextView
+        android:layout_width="56.5dp"
+        android:layout_height="wrap_content"
+        android:text="Weight"
+        android:textSize="14sp"
+        android:letterSpacing="-0.01"
+        android:textColor="#000000"
+        android:gravity="right|top"
+        app:layout_constraintStart_toStartOf="@id/weightInput"
+        android:layout_marginStart="52dp"
+        app:layout_constraintBottom_toTopOf="@id/weightInput"
+        android:layout_marginBottom="15dp"
+        android:fontFamily="@font/montserrat_regular"/>
+
+    <TextView
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:text="Height"
+        android:textSize="14sp"
+        android:letterSpacing="-0.01"
+        android:textColor="#000000"
+        android:gravity="right|top"
+        app:layout_constraintStart_toStartOf="@id/heightContainer"
+        android:layout_marginStart="56dp"
+        app:layout_constraintBottom_toTopOf="@id/heightContainer"
+        android:layout_marginBottom="15dp"
+        android:fontFamily="@font/montserrat_regular"/>
+
+
+
+
+    
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="36dp"
+        app:layout_constraintTop_toBottomOf="@id/weightInput"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toStartOf="@id/weightInput"
+        android:background="@drawable/rectangle1"
+
+        >
+
+        <TextView
+            android:id="@+id/lb"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="lb"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:fontFamily="@font/montserrat_extrabold"
+            android:background="@drawable/rectangle2"
+            android:alpha="1"/>
+        <TextView
+            android:id="@+id/kg"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="kg"
+            android:textColor="#000000"
+            android:gravity="center"
+            android:fontFamily="@font/montserrat_extrabold"
+            android:background="@drawable/rectangle2"
+            android:alpha="0.3"/>
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/weightInput"
+        android:layout_width="0dp"
+        android:layout_height="68dp"
+        android:text="141.50"
+        android:textSize="30sp"
+        android:letterSpacing="-0.01"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:fontFamily="@font/montserrat_extrabold"
+        android:background="@drawable/rectangle"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        app:layout_constraintTop_toBottomOf="@id/top"
+        android:layout_marginTop="51dp"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="20dp"
+        app:layout_constraintEnd_toStartOf="@id/heightContainer"
+        app:layout_constraintHorizontal_weight="1"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/heightContainer"
+        android:layout_width="0dp"
+        android:layout_height="68dp"
+        app:layout_constraintTop_toTopOf="@id/weightInput"
+        app:layout_constraintStart_toEndOf="@id/weightInput"
+        android:layout_marginStart="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintHorizontal_weight="1"
+        >
+
+        <EditText
+            android:id="@+id/heightInput"
+            android:layout_width="0dp"
+            android:layout_height="68dp"
+            android:text="141.50"
+            android:textSize="30sp"
+            android:letterSpacing="-0.01"
+            android:textColor="#000000"
+            android:gravity="center"
+            android:fontFamily="@font/montserrat_extrabold"
+            android:background="@drawable/rectangle"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="gone"/>
+
+        <EditText
+            android:id="@+id/heightInInput"
+            android:layout_width="0dp"
+            android:layout_height="68dp"
+            android:text="8''"
+            android:textSize="30sp"
+            android:textColor="#000000"
+            android:gravity="center"
+            android:fontFamily="@font/montserrat_extrabold"
+            android:background="@drawable/rectangle4"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/heightFtInput"
+            android:layout_marginStart="5.5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="169"/>
+
+        <EditText
+            android:id="@+id/heightFtInput"
+            android:layout_width="0dp"
+            android:layout_height="68dp"
+            android:background="@drawable/rectangle3"
+            android:fontFamily="@font/montserrat_extrabold"
+            android:gravity="center"
+            android:text="5'"
+            android:textColor="#000000"
+            android:textSize="30sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/heightInInput"
+            app:layout_constraintHorizontal_weight="140"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="36dp"
+        app:layout_constraintTop_toBottomOf="@id/heightContainer"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toStartOf="@id/heightContainer"
+        android:background="@drawable/rectangle1"
+
+        >
+
+        <TextView
+            android:id="@+id/ftin"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="ft·in"
+            android:textColor="#000000"
+            android:gravity="center"
+            android:fontFamily="@font/montserrat_extrabold"
+            android:background="@drawable/rectangle2"
+            android:alpha="1"/>
+        <TextView
+            android:id="@+id/cm"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="cm"
+            android:textColor="#000000"
+            android:gravity="center"
+            android:fontFamily="@font/montserrat_extrabold"
+            android:background="@drawable/rectangle2"
+            android:alpha="0.3"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="35dp"
+        android:layout_height="wrap_content"
+        android:text="Time"
+        android:textSize="14sp"
+        android:letterSpacing="-0.01"
+        android:textColor="#000000"
+        android:gravity="right|top"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top"
+        android:layout_marginTop="195dp"
+        android:fontFamily="@font/montserrat_regular"/>
+    
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:background="@drawable/rectangle5"
+        app:layout_constraintTop_toBottomOf="@id/top"
+        android:layout_marginTop="227dp"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="20dp"
+        app:layout_constraintEnd_toStartOf="@+id/timeSlot"
+        android:textSize="20sp"
+        android:letterSpacing="-0.01"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:text="July 30,2021"
+        android:fontFamily="@font/montserrat_extrabold"
+        />
+
+    <TextView
+        android:id="@+id/timeSlot"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:background="@drawable/rectangle5"
+        app:layout_constraintTop_toBottomOf="@id/top"
+        android:layout_marginTop="227dp"
+        app:layout_constraintStart_toEndOf="@+id/date"
+        android:layout_marginStart="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="20dp"
+        android:textSize="20sp"
+        android:letterSpacing="-0.01"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:text="Afternoon"
+        android:fontFamily="@font/montserrat_extrabold"/>
+
+    <TextView
+        android:layout_width="28dp"
+        android:layout_height="wrap_content"
+        android:text="Age"
+        android:textSize="14sp"
+        android:letterSpacing="-0.01"
+        android:textColor="#000000"
+        android:gravity="right|top"
+        app:layout_constraintStart_toStartOf="@id/date"
+        android:layout_marginStart="158.5dp"
+        app:layout_constraintEnd_toEndOf="@id/timeSlot"
+        android:layout_marginEnd="148.5dp"
+        app:layout_constraintTop_toBottomOf="@id/top"
+        android:layout_marginTop="317dp"
+        android:fontFamily="@font/montserrat_regular"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/agePicker"
+        android:layout_width="0dp"
+        android:layout_height="72dp"
+        android:background="@drawable/rectangle6"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="25dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="15dp"
+        app:layout_constraintTop_toBottomOf="@id/top"
+        android:layout_marginTop="349dp"
+        android:clipToPadding="false"
+        android:overScrollMode="never"/>
+
+    <ImageView
+        android:layout_width="15dp"
+        android:layout_height="11dp"
+        app:layout_constraintStart_toStartOf="@id/agePicker"
+        app:layout_constraintEnd_toEndOf="@id/agePicker"
+        app:layout_constraintBottom_toBottomOf="@id/agePicker"
+        android:src="@drawable/age_pointer"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="90dp"
+        android:id="@+id/maleContainer"
+        android:background="@drawable/rectangle7"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="25dp"
+        app:layout_constraintEnd_toStartOf="@id/femaleContainer"
+        app:layout_constraintTop_toBottomOf="@id/agePicker"
+        android:layout_marginTop="15dp">
+        
+        <ImageView
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/male"/>
+        
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="90dp"
+        android:id="@+id/femaleContainer"
+        android:background="@drawable/rectangle7"
+        app:layout_constraintStart_toEndOf="@id/maleContainer"
+        android:layout_marginStart="15dp"
+        app:layout_constraintTop_toBottomOf="@id/agePicker"
+        android:layout_marginTop="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="15dp">
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
