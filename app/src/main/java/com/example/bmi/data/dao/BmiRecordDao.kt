@@ -1,11 +1,35 @@
 package com.example.bmi.data.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
 import androidx.room.Query
+import com.example.bmi.data.entity.BmiRecord
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BmiRecordDao {
     @Query("SELECT COUNT(*) FROM bmi_records")
     fun getCount(): Flow<Int>
+
+    @Insert
+    suspend fun insert(record: BmiRecord)
+
+    @Query("SELECT * FROM bmi_records ORDER BY dateTime DESC")
+    fun getAllRecords(): Flow<List<BmiRecord>>
+
+    @Query("""
+        SELECT * FROM bmi_records
+        ORDER BY dateTime DESC
+        LIMIT 1
+    """)
+    fun getLatestRecord(): Flow<BmiRecord?>
+
+    @Query("SELECT * FROM bmi_records WHERE id = :id")
+    suspend fun getById(id: Long): BmiRecord?
+
+    @Delete
+    suspend fun delete(record: BmiRecord)
+
+
 }

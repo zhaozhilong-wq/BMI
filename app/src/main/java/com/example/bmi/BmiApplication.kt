@@ -1,6 +1,7 @@
 package com.example.bmi
 
 import android.app.Application
+import com.example.bmi.di.appModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -16,7 +17,7 @@ class BmiApplication : Application() {
 
         startKoin {
             androidContext(this@BmiApplication)
-//            modules(appModule)
+            modules(appModule)
         }
     }
 }
