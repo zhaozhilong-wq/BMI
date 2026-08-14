@@ -129,13 +129,22 @@ class InputActivity : AppCompatActivity() {
             if (!isWeightKg) {
                 return@setOnClickListener
             }
+
+
+            var lb = kgToLb(weightKg)
+
+            if(lb<2){
+                lb=2.0
+            }else if (lb>551)
+                lb=551.0
+
             isWeightKg = false
 
             if (!weightChanged) {
                 setWeightText("140.00")
             } else {
                 setWeightText(
-                    String.format("%.2f", kgToLb(weightKg))
+                    String.format("%.2f", lb)
                 )
             }
         }
@@ -146,6 +155,10 @@ class InputActivity : AppCompatActivity() {
             if (isWeightKg) {
                 return@setOnClickListener
             }
+
+            if(weightKg<1) weightKg=1.0
+            else if (weightKg>250) weightKg=250.0
+
             isWeightKg = true
             if (!weightChanged) {
                 setWeightText("65.00")
@@ -474,7 +487,6 @@ class InputActivity : AppCompatActivity() {
         isUpdatingWeightInput = true
 
         binding.weightInput.setText(value)
-        binding.weightInput.setSelection(value.length)
 
         isUpdatingWeightInput = false
     }
@@ -510,9 +522,6 @@ class InputActivity : AppCompatActivity() {
 
         binding.heightInput.setText(value)
 
-        binding.heightInput.setSelection(
-            value.length
-        )
 
         isUpdatingHeightInput = false
     }
@@ -527,12 +536,6 @@ class InputActivity : AppCompatActivity() {
         )
         binding.heightInInput.setText(
             inches.toString()
-        )
-        binding.heightFtInput.setSelection(
-            binding.heightFtInput.text.length
-        )
-        binding.heightInInput.setSelection(
-            binding.heightInInput.text.length
         )
         isUpdatingHeightInput = false
     }
