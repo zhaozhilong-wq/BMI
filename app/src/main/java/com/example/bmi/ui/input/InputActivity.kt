@@ -348,23 +348,23 @@ class InputActivity : AppCompatActivity() {
         val layoutManager = LinearLayoutManager(
             this,
             RecyclerView.HORIZONTAL,
-            false
+            false//最后一个false意思是不反向排列
         )
         binding.agePicker.layoutManager = layoutManager
-        binding.agePicker.post {
-            // 每个数字的实际宽度：47dp
+        binding.agePicker.post {//等RecyclerView完成当前这一轮布局之后，再执行里面的代码。view当前可能还没完成测量和布局
+            // 每个数字的实际宽度
             val itemWidth =
-                (55 * resources.displayMetrics.density).toInt()
+                (55 * resources.displayMetrics.density).toInt()//这个只是为了计算下面的sidepadding
             // 每个 item 左右各 9dp
             val sidePadding =
                 (binding.agePicker.width - itemWidth) / 2
-            binding.agePicker.setPadding(
+            binding.agePicker.setPadding(//设置最左中最右两边的padding
                 sidePadding,
                 0,
                 sidePadding,
                 0
             )
-            val snapHelper = OneItemSnapHelper()
+            val snapHelper = OneItemSnapHelper()//滚动停止，让当前item居中
             val adapter = AgePickerAdapter(
                 ages = ages
             ) { position ->
@@ -402,7 +402,7 @@ class InputActivity : AppCompatActivity() {
             binding.agePicker.adapter = adapter
             snapHelper.attachToRecyclerView(
                 binding.agePicker
-            )
+            )//绑定snaphelper和adapter
             val initialPosition = 25 - 2
             layoutManager.scrollToPosition(
                 initialPosition
@@ -410,11 +410,11 @@ class InputActivity : AppCompatActivity() {
             binding.agePicker.post {
                 snapHelper.snapToCenter(
                     binding.agePicker
-                )
+                )//设置初始位置并让他居中
                 updateSelectedItem(
                     binding.agePicker,
                     layoutManager,
-                    snapHelper
+                    snapHelper//更新选中的颜色
                 )
             }
             //滑动监听

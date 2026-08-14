@@ -45,17 +45,17 @@ class SplashActivity : AppCompatActivity() {
             insets
         }
 
-        binding.pointer.doOnLayout {
+        binding.pointer.doOnLayout {//等这个View完成layout后，再执行里面的代码
             binding.pointer.pivotX = binding.pointer.width / 2f
             binding.pointer.pivotY = binding.pointer.height * 19f / 23f
             binding.pointer.rotation = 0f
-        }
+        }//设置指针旋转中心x,y坐标
 
         binding.dial.alpha = 0f
-        binding.title.alpha = 0f
+        binding.title.alpha = 0f//初始化透明度
 
         binding.dial.translationY = dpToPx(20f)
-        binding.title.translationY = dpToPx(20f)
+        binding.title.translationY = dpToPx(20f)//初始化位移，
 
 
         startSplashAnimation()
@@ -65,18 +65,18 @@ class SplashActivity : AppCompatActivity() {
         return dp * resources.displayMetrics.density
     }
 
-    private fun createEnterAnimation(): AnimatorSet {
+    private fun createEnterAnimation(): AnimatorSet {//返回的是动画集合
 
         val interpolator = PathInterpolator(
             0.25f,
             0f,
             0.1f,
             0.1f
-        )
+        )//设置动画速度
 
         val dialMove = ObjectAnimator.ofFloat(
             binding.dial,
-            View.TRANSLATION_Y,
+            View.TRANSLATION_Y,//设置位移
             dpToPx(100f),
             0f
         ).apply {
@@ -96,7 +96,7 @@ class SplashActivity : AppCompatActivity() {
 
         val dialAlpha = ObjectAnimator.ofFloat(
             binding.dial,
-            View.ALPHA,
+            View.ALPHA,//透明度从0-1
             0f,
             1f
         ).apply {
@@ -106,13 +106,13 @@ class SplashActivity : AppCompatActivity() {
         val titleAlpha = ObjectAnimator.ofFloat(
             binding.title,
             View.ALPHA,
-            0f,
+            0f,//透明度从0-1
             1f
         ).apply {
             duration = 1000L
         }
         return AnimatorSet().apply {
-            playTogether(
+            playTogether(//同时开始
                 dialMove,
                 titleMove,
                 dialAlpha,
@@ -125,7 +125,7 @@ class SplashActivity : AppCompatActivity() {
     private fun createPointerToYellow(): ObjectAnimator {
         return ObjectAnimator.ofFloat(
             binding.pointer,
-            View.ROTATION,
+            View.ROTATION,//从0-25度旋转
             0f,
             25f
         ).apply {
@@ -143,7 +143,7 @@ class SplashActivity : AppCompatActivity() {
         return ObjectAnimator.ofFloat(
             binding.pointer,
             View.ROTATION,
-            25f,
+            25f,//从25到-25旋转
             -25f
         ).apply {
             duration = 1000L
@@ -163,15 +163,15 @@ class SplashActivity : AppCompatActivity() {
                 createEnterAnimation(),
                 createPointerToYellow()
             )
-        }
+        }//第一阶段动画
 
         val secondStage = createPointerToGreen()
         AnimatorSet().apply {
             playSequentially(
                 firstStage,
                 secondStage
-            )
-            addListener(
+            )//第二阶段动画，sequentially是上个结束下个才开始
+            addListener(//动画监听器,监听结束后要干什么
                 object : AnimatorListenerAdapter() {
 
                     override fun onAnimationEnd(animation: Animator) {

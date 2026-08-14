@@ -11,14 +11,14 @@ class OneItemSnapHelper : LinearSnapHelper() {
         layoutManager: RecyclerView.LayoutManager,
         velocityX: Int,
         velocityY: Int
-    ): Int {
+    ): Int {//设置手指滑动以后，停在哪
 
         if (layoutManager !is LinearLayoutManager) {
             return RecyclerView.NO_POSITION
         }
 
         val currentView =
-            findSnapView(layoutManager)
+            findSnapView(layoutManager)//找到最中间位置的view
                 ?: return RecyclerView.NO_POSITION
 
         val currentPosition =
@@ -37,7 +37,7 @@ class OneItemSnapHelper : LinearSnapHelper() {
             else -> 1
         }
 
-        val targetPosition = when {
+        val targetPosition = when {//判断方向
             velocityX > 0 -> {
                 currentPosition + moveCount
             }
@@ -51,13 +51,13 @@ class OneItemSnapHelper : LinearSnapHelper() {
             }
         }
 
-        return targetPosition.coerceIn(
+        return targetPosition.coerceIn(//防止越界
             0,
             layoutManager.itemCount - 1
         )
     }
 
-    fun snapToCenter(recyclerView: RecyclerView) {
+    fun snapToCenter(recyclerView: RecyclerView) {//将选中的item平滑滚动到屏幕中心
 
         val layoutManager =
             recyclerView.layoutManager
@@ -68,14 +68,14 @@ class OneItemSnapHelper : LinearSnapHelper() {
                 ?: return
 
         val distances =
-            calculateDistanceToFinalSnap(
+            calculateDistanceToFinalSnap(//计算需要移动的距离
                 layoutManager,
                 snapView
             ) ?: return
 
-        if (distances[0] != 0 || distances[1] != 0) {
+        if (distances[0] != 0 || distances[1] != 0) {//判断是否真的需要移动
 
-            recyclerView.smoothScrollBy(
+            recyclerView.smoothScrollBy(//执行平滑移动
                 distances[0],
                 distances[1]
             )
