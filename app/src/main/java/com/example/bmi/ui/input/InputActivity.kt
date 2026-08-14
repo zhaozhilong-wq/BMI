@@ -3,13 +3,17 @@ package com.example.bmi.ui.input
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
+import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper
@@ -17,6 +21,7 @@ import com.example.bmi.R
 import com.example.bmi.databinding.ActivityInputBinding
 import java.util.Calendar
 
+private const val LB_TO_KG = 0.45359237
 class InputActivity : AppCompatActivity() {
     private lateinit var binding: ActivityInputBinding
 
@@ -50,6 +55,47 @@ class InputActivity : AppCompatActivity() {
         "Night"
     )
 
+
+    private var weightKg = 0.0//后台一直只保存kg，需要lb时换算一下就行
+
+    private var isMale = true//默认男
+
+    private var isWeightKg = false
+
+    private var weightChanged = false
+
+    private var isUpdatingWeightInput = false
+
+    private var isHeightCm = false
+
+    private var heightChanged = false
+
+    private var heightCm = 175.0
+
+    private var isUpdatingHeightInput = false
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {//使得点击输入框外，就失去焦点
+        if (ev.action == MotionEvent.ACTION_DOWN) {
+            val currentFocus = currentFocus
+            if (currentFocus is EditText) {
+                val location = IntArray(2)
+                currentFocus.getLocationOnScreen(location)
+                val left = location[0]
+                val top = location[1]
+                val right = left + currentFocus.width
+                val bottom = top + currentFocus.height
+                val x = ev.rawX
+                val y = ev.rawY
+                // 点击的位置不在当前 EditText 内
+                if (x < left || x > right || y < top || y > bottom) {
+                    currentFocus.clearFocus()
+                }
+            }
+        }
+
+        return super.dispatchTouchEvent(ev)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(
@@ -74,39 +120,160 @@ class InputActivity : AppCompatActivity() {
         setupAgePicker()
 
 
+        //体重相关
         //绑定点击事件
         binding.lb.setOnClickListener {
             binding.lb.alpha = 1f
             binding.kg.alpha = 0.3f
-            //weight换算并回显
+            // 本来就是 lb
+            if (!isWeightKg) {
+                return@setOnClickListener
+            }
+            isWeightKg = false
+
+            if (!weightChanged) {
+                setWeightText("140.00")
+            } else {
+                setWeightText(
+                    String.format("%.2f", kgToLb(weightKg))
+                )
+            }
         }
         binding.kg.setOnClickListener {
             binding.kg.alpha = 1f
             binding.lb.alpha = 0.3f
-            //weight换算并回显
+            // 本来就是 kg
+            if (isWeightKg) {
+                return@setOnClickListener
+            }
+            isWeightKg = true
+            if (!weightChanged) {
+                setWeightText("65.00")
+            } else {
+                setWeightText(
+                    String.format("%.2f", weightKg)
+                )
+            }
         }
-        binding.ftin.setOnClickListener {
-            binding.ftin.alpha = 1f
-            binding.cm.alpha = 0.3f
-            binding.heightFtInput.visibility= View.VISIBLE
-            binding.heightInInput.visibility= View.VISIBLE
-            binding.heightInput.visibility= View.GONE
-            //height换算并回显
+
+        binding.weightInput.doAfterTextChanged { text ->
+            if (isUpdatingWeightInput) {
+                return@doAfterTextChanged
+            }
+            val value =
+                text?.toString()?.toDoubleOrNull()
+                    ?: return@doAfterTextChanged
+            weightChanged = true
+            weightKg = if (isWeightKg) {
+                value
+            } else {
+                lbToKg(value)
+            }
         }
+
+        binding.weightInput.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                validateWeight()
+            }
+        }
+
+
+        //高度相关
         binding.cm.setOnClickListener {
             binding.cm.alpha = 1f
             binding.ftin.alpha = 0.3f
-            binding.heightFtInput.visibility= View.GONE
-            binding.heightInInput.visibility= View.GONE
-            binding.heightInput.visibility= View.VISIBLE
-            //height换算并回显
+            // 本来就是 CM，不需要任何操作
+            if (isHeightCm) {
+                return@setOnClickListener
+            }
+            isHeightCm = true
+            binding.heightFtInput.visibility = View.GONE
+            binding.heightInInput.visibility = View.GONE
+            binding.heightFtUnit.visibility = View.GONE
+            binding.heightInUnit.visibility = View.GONE
+            binding.heightInput.visibility = View.VISIBLE
+            if (!heightChanged) {
+                // 初始默认值
+                setHeightCmText("170.0")
+            } else {
+                // 使用后台保存的完整 cm
+                setHeightCmText(
+                    String.format(
+                        "%.1f",
+                        heightCm
+                    )
+                )
+            }
         }
+        binding.ftin.setOnClickListener {
+
+            binding.ftin.alpha = 1f
+            binding.cm.alpha = 0.3f
+            // 本来就是 FT/IN
+            if (!isHeightCm) {
+                return@setOnClickListener
+            }
+            isHeightCm = false
+            binding.heightFtInput.visibility = View.VISIBLE
+            binding.heightInInput.visibility = View.VISIBLE
+            binding.heightFtUnit.visibility = View.VISIBLE
+            binding.heightInUnit.visibility = View.VISIBLE
+            binding.heightInput.visibility = View.GONE
+            if (!heightChanged) {
+                // 初始默认值
+                setHeightFtInText(
+                    5,
+                    8
+                )
+            } else {
+                // 后台 cm → ft + in
+                val (feet, inches) =
+                    cmToFtIn(heightCm)
+                setHeightFtInText(
+                    feet,
+                    inches
+                )
+            }
+        }
+        binding.heightInput.doAfterTextChanged { text ->
+            if (isUpdatingHeightInput) {
+                return@doAfterTextChanged
+            }
+            val value =
+                text?.toString()?.toDoubleOrNull()
+                    ?: return@doAfterTextChanged
+            heightChanged = true
+            heightCm = value
+        }
+        binding.heightFtInput.doAfterTextChanged {
+
+            if (isUpdatingHeightInput) {
+                return@doAfterTextChanged
+            }
+
+            updateHeightFromFtIn()
+        }
+        binding.heightInInput.doAfterTextChanged {
+
+            if (isUpdatingHeightInput) {
+                return@doAfterTextChanged
+            }
+
+            updateHeightFromFtIn()
+        }
+
+        //ft-in单位设置
+
+
+
+        //性别
         binding.maleContainer.setOnClickListener {
             binding.maleContainer.alpha = 1f
             binding.femaleContainer.alpha = 0.3f
             binding.maleTick.visibility = View.VISIBLE
             binding.femaleTick.visibility = View.GONE
             //保存性别选择
+            isMale = true
         }
         binding.femaleContainer.setOnClickListener {
             binding.femaleContainer.alpha = 1f
@@ -114,6 +281,7 @@ class InputActivity : AppCompatActivity() {
             binding.femaleTick.visibility = View.VISIBLE
             binding.maleTick.visibility = View.GONE
             //保存性别选择
+            isMale = false
         }
         binding.date.text = "${months[currentMonth]} $currentDay,$currentYear"
         binding.date.setOnClickListener {
@@ -290,6 +458,236 @@ class InputActivity : AppCompatActivity() {
             in 12..17 -> "Afternoon"
             in 18..20 -> "Evening"
             else -> "Night"
+        }
+    }
+
+    private fun kgToLb(kg: Double): Double {
+        return kg / LB_TO_KG
+    }
+
+    private fun lbToKg(lb: Double): Double {
+        return lb * LB_TO_KG
+    }
+
+    private fun setWeightText(value: String) {
+
+        isUpdatingWeightInput = true
+
+        binding.weightInput.setText(value)
+        binding.weightInput.setSelection(value.length)
+
+        isUpdatingWeightInput = false
+    }
+
+    private fun ftInToCm(
+        feet: Int,
+        inches: Int
+    ): Double {
+
+        return feet * 30.48 +
+                inches * 2.54
+    }
+
+    private fun cmToFtIn(cm: Double): Pair<Int, Int> {
+
+        val totalInches =
+            cm / 2.54
+
+        val feet =
+            (totalInches / 12).toInt()
+
+        val inches =
+            (totalInches % 12).toInt()
+
+        return Pair(feet, inches)
+    }
+
+    private fun setHeightCmText(
+        value: String
+    ) {
+
+        isUpdatingHeightInput = true
+
+        binding.heightInput.setText(value)
+
+        binding.heightInput.setSelection(
+            value.length
+        )
+
+        isUpdatingHeightInput = false
+    }
+
+    private fun setHeightFtInText(
+        feet: Int,
+        inches: Int
+    ) {
+        isUpdatingHeightInput = true
+        binding.heightFtInput.setText(
+            feet.toString()
+        )
+        binding.heightInInput.setText(
+            inches.toString()
+        )
+        binding.heightFtInput.setSelection(
+            binding.heightFtInput.text.length
+        )
+        binding.heightInInput.setSelection(
+            binding.heightInInput.text.length
+        )
+        isUpdatingHeightInput = false
+    }
+
+    private fun updateHeightFromFtIn() {
+
+        val feet =
+            binding.heightFtInput.text
+                .toString()
+                .toIntOrNull()
+                ?: return
+
+        val inches =
+            binding.heightInInput.text
+                .toString()
+                .toIntOrNull()
+                ?: return
+
+        heightChanged = true
+
+        heightCm =
+            ftInToCm(
+                feet,
+                inches
+            )
+    }
+
+
+    private fun showInvalidWeightToast() {
+        val range = if (isWeightKg) {
+            "1-250 kg"
+        } else {
+            "2-551 lb"
+        }
+        Toast.makeText(
+            this,
+            "Please input a valid weight ($range) to calculate your BMI accurately.",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+    //校验体重
+    private fun validateWeight() {
+
+        val text = binding.weightInput.text.toString().trim()
+
+        // 空
+        if (text.isEmpty()) {
+
+            val defaultValue = if (isWeightKg) {
+                "65.00"
+            } else {
+                "140.00"
+            }
+
+            setWeightText(defaultValue)
+
+            // 同时更新后台 kg
+            weightKg = if (isWeightKg) {
+                65.0
+            } else {
+                lbToKg(140.0)
+            }
+
+            weightChanged = true
+
+            showInvalidWeightToast()
+
+            return
+        }
+
+        val value = text.toDoubleOrNull()
+
+        // 无法转换
+        if (value == null) {
+
+            val defaultValue = if (isWeightKg) {
+                "65.00"
+            } else {
+                "140.00"
+            }
+
+            setWeightText(defaultValue)
+
+            weightKg = if (isWeightKg) {
+                65.0
+            } else {
+                lbToKg(140.0)
+            }
+
+            weightChanged = true
+
+            showInvalidWeightToast()
+
+            return
+        }
+
+        val min = if (isWeightKg) {
+            1.0
+        } else {
+            2.0
+        }
+
+        val max = if (isWeightKg) {
+            250.0
+        } else {
+            551.0
+        }
+
+        // 小于下限
+        if (value < min) {
+
+            val correctedValue =
+                String.format("%.2f", min)
+
+            setWeightText(correctedValue)
+
+            updateWeightKg(min)
+
+            showInvalidWeightToast()
+
+            return
+        }
+
+        // 大于上限
+        if (value > max) {
+
+            val correctedValue =
+                String.format("%.2f", max)
+
+            setWeightText(correctedValue)
+
+            updateWeightKg(max)
+
+            showInvalidWeightToast()
+
+            return
+        }
+
+        // 合法值
+        val formattedValue =
+            String.format("%.2f", value)
+
+        setWeightText(formattedValue)
+
+        updateWeightKg(value)
+    }
+
+    private fun updateWeightKg(value: Double) {
+
+        weightChanged = true
+
+        weightKg = if (isWeightKg) {
+            value
+        } else {
+            lbToKg(value)
         }
     }
 

@@ -119,7 +119,7 @@
                 android:fontFamily="@font/montserrat_extrabold"
                 android:gravity="center"
                 android:letterSpacing="-0.01"
-                android:text="141.50"
+                android:text="140.00"
                 android:textColor="#000000"
                 android:textSize="30sp"
                 android:layout_marginStart="20dp"
@@ -127,7 +127,9 @@
                 app:layout_constraintEnd_toStartOf="@id/heightContainer"
                 app:layout_constraintHorizontal_weight="1"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/top" />
+                app:layout_constraintTop_toBottomOf="@id/top"
+                android:inputType="numberDecimal"
+                android:maxLength="6"/>
 
 
             <!-- ========================= -->
@@ -171,7 +173,7 @@
                     android:background="@drawable/rectangle4"
                     android:fontFamily="@font/montserrat_extrabold"
                     android:gravity="center"
-                    android:text="8''"
+                    android:text="8"
                     android:textColor="#000000"
                     android:textSize="30sp"
                     android:layout_marginStart="5.5dp"
@@ -180,6 +182,23 @@
                     app:layout_constraintStart_toEndOf="@id/heightFtInput"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent" />
+                <TextView
+                    android:id="@+id/heightInUnit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="68dp"
+                    android:gravity="center"
+                    android:text="&quot;"
+                    android:textColor="#000000"
+                    android:textSize="30sp"
+                    android:fontFamily="@font/montserrat_extrabold"
+                    android:includeFontPadding="false"
+                    android:translationX="22dp"
+                    android:clickable="false"
+                    android:focusable="false"
+                    app:layout_constraintStart_toStartOf="@id/heightInInput"
+                    app:layout_constraintEnd_toEndOf="@id/heightInInput"
+                    app:layout_constraintTop_toTopOf="@id/heightInInput"
+                    app:layout_constraintBottom_toBottomOf="@id/heightInInput" />
 
                 <EditText
                     android:id="@+id/heightFtInput"
@@ -188,7 +207,7 @@
                     android:background="@drawable/rectangle3"
                     android:fontFamily="@font/montserrat_extrabold"
                     android:gravity="center"
-                    android:text="5'"
+                    android:text="5"
                     android:textColor="#000000"
                     android:textSize="30sp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -196,6 +215,23 @@
                     app:layout_constraintHorizontal_weight="140"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/heightFtUnit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="68dp"
+                    android:gravity="center"
+                    android:text="'"
+                    android:textColor="#000000"
+                    android:textSize="30sp"
+                    android:fontFamily="@font/montserrat_extrabold"
+                    android:includeFontPadding="false"
+                    android:translationX="13dp"
+                    android:clickable="false"
+                    android:focusable="false"
+                    app:layout_constraintStart_toStartOf="@id/heightFtInput"
+                    app:layout_constraintEnd_toEndOf="@id/heightFtInput"
+                    app:layout_constraintTop_toTopOf="@id/heightFtInput"
+                    app:layout_constraintBottom_toBottomOf="@id/heightFtInput" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -540,7 +576,8 @@
         android:background="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="gone">
 
 
         <!-- Calculator -->
