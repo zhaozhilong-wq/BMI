@@ -1,16 +1,18 @@
 package com.example.bmi.ui.input
 
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bmi.R
 
-class DatePickerAdapter(
+class PickerAdapter(
     private var data: List<String>,
+    private val itemLayoutId: Int,
+    private val textViewId: Int,
     private val onItemClick: (Int) -> Unit
-) : RecyclerView.Adapter<DatePickerAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<PickerAdapter.ViewHolder>() {
 
     private var selectedPosition =
         RecyclerView.NO_POSITION
@@ -18,8 +20,7 @@ class DatePickerAdapter(
     class ViewHolder(view: View) :
         RecyclerView.ViewHolder(view) {
 
-        val tvDate: TextView =
-            view.findViewById(R.id.tvDate)
+        lateinit var textView: TextView
     }
 
     override fun onCreateViewHolder(
@@ -30,12 +31,17 @@ class DatePickerAdapter(
         val view =
             LayoutInflater.from(parent.context)
                 .inflate(
-                    R.layout.item_date_picker,
+                    itemLayoutId,
                     parent,
                     false
                 )
 
-        return ViewHolder(view)
+        val holder = ViewHolder(view)
+
+        holder.textView =
+            view.findViewById(textViewId)
+
+        return holder
     }
 
     override fun onBindViewHolder(
@@ -43,11 +49,10 @@ class DatePickerAdapter(
         position: Int
     ) {
 
-        holder.tvDate.text =
+        holder.textView.text =
             data[position]
 
-        // 唯一决定透明度的地方
-        holder.tvDate.alpha =
+        holder.textView.alpha =
             if (position == selectedPosition) {
                 1f
             } else {
@@ -55,7 +60,6 @@ class DatePickerAdapter(
             }
 
         holder.itemView.setOnClickListener {
-
             onItemClick(position)
         }
     }
@@ -79,9 +83,7 @@ class DatePickerAdapter(
         notifyDataSetChanged()
     }
 
-    fun updateData(
-        newData: List<String>
-    ) {
+    fun updateData(newData: List<String>) {
 
         data = newData
 

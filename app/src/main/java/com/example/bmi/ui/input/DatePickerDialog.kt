@@ -27,9 +27,9 @@ class DatePickerDialog(
     private val onDoneClick: (Int, Int, Int) -> Unit
 ) : Dialog(context, R.style.DatePickerDialogStyle) {
 
-    private lateinit var monthAdapter: DatePickerAdapter
-    private lateinit var dayAdapter: DatePickerAdapter
-    private lateinit var yearAdapter: DatePickerAdapter
+    private lateinit var monthAdapter: PickerAdapter
+    private lateinit var dayAdapter: PickerAdapter
+    private lateinit var yearAdapter: PickerAdapter
 
 
     private lateinit var binding: DialogDatePickerBinding
@@ -167,7 +167,7 @@ class DatePickerDialog(
         initialPosition: Int,
         space15dp: Int,
         onItemSelected: (Int) -> Unit
-    ): DatePickerAdapter {
+    ): PickerAdapter {
 
         val layoutManager = LinearLayoutManager(
             context,
@@ -177,9 +177,11 @@ class DatePickerDialog(
 
         recyclerView.layoutManager = layoutManager
 
-        lateinit var adapter: DatePickerAdapter
+        lateinit var adapter: PickerAdapter
 
-        adapter = DatePickerAdapter(data) { position ->
+        adapter = PickerAdapter(data,
+            itemLayoutId = R.layout.item_date_picker,
+            textViewId = R.id.tvDate) { position ->
 
             adapter.setSelectedPosition(position)
 

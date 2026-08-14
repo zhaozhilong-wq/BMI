@@ -43,6 +43,13 @@ class InputActivity : AppCompatActivity() {
         "Dec"
     )
 
+    val times = listOf(
+        "Morning",
+        "Afternoon",
+        "Evening",
+        "Night"
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(
@@ -66,8 +73,6 @@ class InputActivity : AppCompatActivity() {
 
         setupAgePicker()
 
-        //日期选择器
-        setupDatePicker()
 
         //绑定点击事件
         binding.lb.setOnClickListener {
@@ -119,6 +124,14 @@ class InputActivity : AppCompatActivity() {
                 }
 
             datePickerDialog.show()
+        }
+
+        binding.timeSlot.text = getCurrentTimeSlot()
+        binding.timeSlot.setOnClickListener {
+            val timeSlotDialog = TimePickerDialog(this) { timeSlot ->
+                binding.timeSlot.text = times[timeSlot]
+            }
+            timeSlotDialog.show()
         }
 
 
@@ -266,8 +279,18 @@ class InputActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupDatePicker() {
 
+    private fun getCurrentTimeSlot(): String {
+
+        val hour = Calendar.getInstance()
+            .get(Calendar.HOUR_OF_DAY)
+
+        return when (hour) {
+            in 5..11 -> "Morning"
+            in 12..17 -> "Afternoon"
+            in 18..20 -> "Evening"
+            else -> "Night"
+        }
     }
 
 
