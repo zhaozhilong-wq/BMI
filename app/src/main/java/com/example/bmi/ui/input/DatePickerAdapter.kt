@@ -7,13 +7,15 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bmi.R
 
-class AgePickerAdapter(
-    private val ages: List<Int>,
+class DatePickerAdapter(
+    private val data: List<String>,
     private val onItemClick: (Int) -> Unit
-) : RecyclerView.Adapter<AgePickerAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<DatePickerAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvAge: TextView = view.findViewById(R.id.tvNumber)
+
+        val tvDate: TextView =
+            view.findViewById(R.id.tvDate)
     }
 
     override fun onCreateViewHolder(
@@ -22,23 +24,11 @@ class AgePickerAdapter(
     ): ViewHolder {
 
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_picker_number, parent, false)
-
-        val itemWidth =
-            (55 * parent.resources.displayMetrics.density).toInt()
-
-        val params = RecyclerView.LayoutParams(
-            itemWidth,
-            RecyclerView.LayoutParams.MATCH_PARENT
-        )
-
-        val margin =
-            (9 * parent.resources.displayMetrics.density).toInt()
-
-        params.marginStart = margin
-        params.marginEnd = margin
-
-        view.layoutParams = params
+            .inflate(
+                R.layout.item_date_picker,
+                parent,
+                false
+            )
 
         return ViewHolder(view)
     }
@@ -47,16 +37,18 @@ class AgePickerAdapter(
         holder: ViewHolder,
         position: Int
     ) {
-        holder.tvAge.text = ages[position].toString()
+
+        holder.tvDate.text = data[position]
+
+        // 默认灰色
+        holder.tvDate.alpha = 0.3f
 
         holder.itemView.setOnClickListener {
             onItemClick(position)
         }
-
-        holder.tvAge.alpha = 0.3f
     }
 
     override fun getItemCount(): Int {
-        return ages.size
+        return data.size
     }
 }

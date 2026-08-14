@@ -3,9 +3,8 @@ package com.example.bmi.ui.input
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
-import kotlin.math.abs
 
-class OneItemSnapHelper : LinearSnapHelper() {
+class DatePickerSnapHelper : LinearSnapHelper() {
 
     override fun findTargetSnapPosition(
         layoutManager: RecyclerView.LayoutManager,
@@ -28,30 +27,20 @@ class OneItemSnapHelper : LinearSnapHelper() {
             return RecyclerView.NO_POSITION
         }
 
-        // 根据滑动速度决定一次跳几个
-        val moveCount = when {
-            abs(velocityX) > 5000 -> 30
-            abs(velocityX) > 3500 -> 12
-            abs(velocityX) > 2000 -> 6
-            abs(velocityX) > 1000 -> 3
-            else -> 1
-        }
-
-        val targetPosition = when {
-            velocityX > 0 -> {
-                currentPosition + moveCount
+        // 竖直 RecyclerView，所以看 velocityY
+        return when {
+            velocityY > 0 -> {
+                currentPosition + 1
             }
 
-            velocityX < 0 -> {
-                currentPosition - moveCount
+            velocityY < 0 -> {
+                currentPosition - 1
             }
 
             else -> {
                 currentPosition
             }
-        }
-
-        return targetPosition.coerceIn(
+        }.coerceIn(
             0,
             layoutManager.itemCount - 1
         )
