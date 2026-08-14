@@ -1,10 +1,92 @@
 package com.example.bmi.ui.input
 
+import android.view.View
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.example.bmi.R
 
 class DatePickerSnapHelper : LinearSnapHelper() {
+
+    private var recyclerView: RecyclerView? = null
+
+    override fun attachToRecyclerView(
+        recyclerView: RecyclerView?
+    ) {
+        super.attachToRecyclerView(recyclerView)
+        this.recyclerView = recyclerView
+    }
+
+    override fun findSnapView(
+        layoutManager: RecyclerView.LayoutManager
+    ): View? {
+
+        val rv =
+            recyclerView
+                ?: return null
+
+        val center =
+            rv.paddingTop +
+                    (
+                            rv.height -
+                                    rv.paddingTop -
+                                    rv.paddingBottom
+                            ) / 2
+
+        var closestView: View? = null
+        var closestDistance = Int.MAX_VALUE
+
+        for (i in 0 until layoutManager.childCount) {
+
+            val child =
+                layoutManager.getChildAt(i)
+                    ?: continue
+
+            val childCenter =
+                child.top + child.height / 2
+
+            val distance =
+                kotlin.math.abs(
+                    childCenter - center
+                )
+
+            if (distance < closestDistance) {
+
+                closestDistance = distance
+                closestView = child
+            }
+        }
+
+        return closestView
+    }
+
+    override fun calculateDistanceToFinalSnap(
+        layoutManager: RecyclerView.LayoutManager,
+        targetView: View
+    ): IntArray {
+
+        val rv =
+            recyclerView
+                ?: return IntArray(2)
+
+        val center =
+            rv.paddingTop +
+                    (
+                            rv.height -
+                                    rv.paddingTop -
+                                    rv.paddingBottom
+                            ) / 2
+
+        val targetCenter =
+            targetView.top +
+                    targetView.height / 2
+
+        return intArrayOf(
+            0,
+            targetCenter - center
+        )
+    }
 
     override fun findTargetSnapPosition(
         layoutManager: RecyclerView.LayoutManager,
@@ -12,7 +94,9 @@ class DatePickerSnapHelper : LinearSnapHelper() {
         velocityY: Int
     ): Int {
 
-        if (layoutManager !is LinearLayoutManager) {
+        if (
+            layoutManager !is LinearLayoutManager
+        ) {
             return RecyclerView.NO_POSITION
         }
 
@@ -21,52 +105,26 @@ class DatePickerSnapHelper : LinearSnapHelper() {
                 ?: return RecyclerView.NO_POSITION
 
         val currentPosition =
-            layoutManager.getPosition(currentView)
+            layoutManager.getPosition(
+                currentView
+            )
 
-        if (currentPosition == RecyclerView.NO_POSITION) {
-            return RecyclerView.NO_POSITION
+        if (velocityY == 0) {
+            return currentPosition
         }
 
-        // 竖直 RecyclerView，所以看 velocityY
-        return when {
-            velocityY > 0 -> {
-                currentPosition + 1
-            }
+        return if (velocityY > 0) {
 
-            velocityY < 0 -> {
-                currentPosition - 1
-            }
+            minOf(
+                currentPosition + 1,
+                layoutManager.itemCount - 1
+            )
 
-            else -> {
-                currentPosition
-            }
-        }.coerceIn(
-            0,
-            layoutManager.itemCount - 1
-        )
-    }
+        } else {
 
-    fun snapToCenter(recyclerView: RecyclerView) {
-
-        val layoutManager =
-            recyclerView.layoutManager
-                ?: return
-
-        val snapView =
-            findSnapView(layoutManager)
-                ?: return
-
-        val distances =
-            calculateDistanceToFinalSnap(
-                layoutManager,
-                snapView
-            ) ?: return
-
-        if (distances[0] != 0 || distances[1] != 0) {
-
-            recyclerView.smoothScrollBy(
-                distances[0],
-                distances[1]
+            maxOf(
+                currentPosition - 1,
+                0
             )
         }
     }

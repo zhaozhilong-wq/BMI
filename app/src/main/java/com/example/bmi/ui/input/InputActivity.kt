@@ -15,9 +15,33 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper
 import com.example.bmi.R
 import com.example.bmi.databinding.ActivityInputBinding
+import java.util.Calendar
 
 class InputActivity : AppCompatActivity() {
     private lateinit var binding: ActivityInputBinding
+
+    private val calendar = Calendar.getInstance()
+
+    private val currentYear = calendar.get(Calendar.YEAR)
+
+    private val currentMonth = calendar.get(Calendar.MONTH)
+
+    private val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
+
+    val months = listOf(
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "June",
+        "July",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,9 +110,13 @@ class InputActivity : AppCompatActivity() {
             binding.maleTick.visibility = View.GONE
             //保存性别选择
         }
+        binding.date.text = "${months[currentMonth]} $currentDay,$currentYear"
         binding.date.setOnClickListener {
             val datePickerDialog =
-                DatePickerDialog(this)
+                DatePickerDialog(this) { year, month, day ->
+                    binding.date.text = "${months[month]} $day,$year"
+                    //后续日期保存
+                }
 
             datePickerDialog.show()
         }

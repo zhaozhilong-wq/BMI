@@ -8,11 +8,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bmi.R
 
 class DatePickerAdapter(
-    private val data: List<String>,
+    private var data: List<String>,
     private val onItemClick: (Int) -> Unit
 ) : RecyclerView.Adapter<DatePickerAdapter.ViewHolder>() {
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    private var selectedPosition =
+        RecyclerView.NO_POSITION
+
+    class ViewHolder(view: View) :
+        RecyclerView.ViewHolder(view) {
 
         val tvDate: TextView =
             view.findViewById(R.id.tvDate)
@@ -23,12 +27,13 @@ class DatePickerAdapter(
         viewType: Int
     ): ViewHolder {
 
-        val view = LayoutInflater.from(parent.context)
-            .inflate(
-                R.layout.item_date_picker,
-                parent,
-                false
-            )
+        val view =
+            LayoutInflater.from(parent.context)
+                .inflate(
+                    R.layout.item_date_picker,
+                    parent,
+                    false
+                )
 
         return ViewHolder(view)
     }
@@ -38,17 +43,48 @@ class DatePickerAdapter(
         position: Int
     ) {
 
-        holder.tvDate.text = data[position]
+        holder.tvDate.text =
+            data[position]
 
-        // 默认灰色
-        holder.tvDate.alpha = 0.3f
+        // 唯一决定透明度的地方
+        holder.tvDate.alpha =
+            if (position == selectedPosition) {
+                1f
+            } else {
+                0.3f
+            }
 
         holder.itemView.setOnClickListener {
+
             onItemClick(position)
         }
     }
 
     override fun getItemCount(): Int {
         return data.size
+    }
+
+    fun setSelectedPosition(position: Int) {
+
+        if (position !in data.indices) {
+            return
+        }
+
+        if (selectedPosition == position) {
+            return
+        }
+
+        selectedPosition = position
+
+        notifyDataSetChanged()
+    }
+
+    fun updateData(
+        newData: List<String>
+    ) {
+
+        data = newData
+
+        notifyDataSetChanged()
     }
 }

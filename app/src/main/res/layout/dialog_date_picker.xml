@@ -23,7 +23,7 @@
         android:layout_marginTop="20dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="0dp"
+        android:layout_width="40dp"
         android:layout_height="225dp"
         android:id="@+id/month"
         app:layout_constraintTop_toTopOf="parent"
@@ -34,8 +34,28 @@
         app:layout_constraintHorizontal_weight="1"
         android:clipToPadding="false"/>
 
+    <View
+        android:id="@+id/monthTopLine"
+        android:layout_width="40dp"
+        android:layout_height="0.5dp"
+        android:background="#3659CF"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@id/month"
+        app:layout_constraintEnd_toEndOf="@id/month"
+        android:layout_marginTop="167.5dp" />
+
+    <View
+        android:id="@+id/monthBottomLine"
+        android:layout_width="40dp"
+        android:layout_height="0.5dp"
+        android:background="#3659CF"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@id/month"
+        app:layout_constraintEnd_toEndOf="@id/month"
+        android:layout_marginTop="198.5dp" />
+
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="0dp"
+        android:layout_width="40dp"
         android:layout_height="225dp"
         android:id="@+id/day"
         app:layout_constraintTop_toTopOf="parent"
@@ -46,8 +66,28 @@
         app:layout_constraintHorizontal_weight="1"
         android:clipToPadding="false"/>
 
+    <View
+        android:id="@+id/dayTopLine"
+        android:layout_width="40dp"
+        android:layout_height="0.5dp"
+        android:background="#3659CF"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@id/day"
+        app:layout_constraintEnd_toEndOf="@id/day"
+        android:layout_marginTop="167.5dp" />
+
+    <View
+        android:id="@+id/dayBottomLine"
+        android:layout_width="40dp"
+        android:layout_height="0.5dp"
+        android:background="#3659CF"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@id/day"
+        app:layout_constraintEnd_toEndOf="@id/day"
+        android:layout_marginTop="198.5dp" />
+
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="0dp"
+        android:layout_width="40dp"
         android:layout_height="225dp"
         android:id="@+id/year"
         app:layout_constraintTop_toTopOf="parent"
@@ -58,6 +98,26 @@
         android:layout_marginEnd="87.5dp"
         app:layout_constraintHorizontal_weight="1"
         android:clipToPadding="false"/>
+
+    <View
+        android:id="@+id/yearTopLine"
+        android:layout_width="40dp"
+        android:layout_height="0.5dp"
+        android:background="#3659CF"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@id/year"
+        app:layout_constraintEnd_toEndOf="@id/year"
+        android:layout_marginTop="167.5dp" />
+
+    <View
+        android:id="@+id/yearBottomLine"
+        android:layout_width="40dp"
+        android:layout_height="0.5dp"
+        android:background="#3659CF"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@id/year"
+        app:layout_constraintEnd_toEndOf="@id/year"
+        android:layout_marginTop="198.5dp" />
 
     
     <TextView
