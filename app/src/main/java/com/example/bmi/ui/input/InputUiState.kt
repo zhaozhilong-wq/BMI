@@ -1,7 +1,5 @@
 package com.example.bmi.ui.input
 
-import java.util.Calendar
-
 data class InputUiState(
     //体重
     val weightKg: Double = 140.0 * 0.45359237,
@@ -9,7 +7,7 @@ data class InputUiState(
     val weightText: String = "140.00",
     val weightChanged: Boolean = false,
     //身高
-    val heightCm: Double = 170.0,
+    val heightCm: Double = 170.18,
     val isHeightCm: Boolean = false,
     val heightCmText: String = "170.0",
     val heightFtText: String = "5",

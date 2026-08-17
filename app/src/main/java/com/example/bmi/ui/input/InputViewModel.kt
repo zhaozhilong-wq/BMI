@@ -3,6 +3,7 @@ package com.example.bmi.ui.input
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.bmi.data.entity.BmiRecord
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import com.example.bmi.data.repository.BmiRepository
@@ -332,10 +333,11 @@ class InputViewModel (
                 // CM -> FT/IN
                 _uiState.value = currentState.copy(
                     isHeightCm = false,
-                    heightCm = 170.0,
+                    heightCm = 170.18,
                     heightFtText = "5",
                     heightInText = "7"
                 )
+                Log.d("HEIGHT_TEST", "切换FTIN后 heightCm=${_uiState.value.heightCm}")
             }
 
             return
@@ -555,9 +557,9 @@ class InputViewModel (
             .get(Calendar.HOUR_OF_DAY)
 
         return when (hour) {
-            in 5..11 -> 0 // Morning
-            in 12..17 -> 1 // Afternoon
-            in 18..20 -> 2 // Evening
+            in 8..<12 -> 0 // Morning
+            in 12..<19 -> 1 // Afternoon
+            in 19..<23 -> 2 // Evening
             else -> 3 // Night
         }
     }
@@ -620,6 +622,60 @@ class InputViewModel (
             _toastEvent.emit(
                 "Please input a valid height ($range) to calculate your BMI accurately."
             )
+        }
+    }
+
+    private fun calculateBmi(
+        weightKg: Double,
+        heightCm: Double
+    ): Double {
+
+        val heightM = heightCm / 100.0
+
+        return weightKg / (heightM * heightM)
+    }
+
+    fun calculateAndSave() {
+        val state = _uiState.value
+        Log.d(
+            "HEIGHT_TEST",
+            "保存前 state.heightCm=${state.heightCm}"
+        )
+        val weightKg = state.weightKg
+        val heightCm = state.heightCm
+        val bmi = calculateBmi(
+            weightKg = weightKg,
+            heightCm = heightCm
+        )
+        val record = BmiRecord(
+            weightKg = weightKg,
+            heightCm = heightCm,
+            weightUnit = if (state.isWeightKg) {
+                "kg"
+            } else {
+                "lb"
+            },
+            heightUnit = if (state.isHeightCm) {
+                "cm"
+            } else {
+                "ft_in"
+            },
+            bmi = bmi,
+            age = state.age,
+            gender = if (state.isMale) {
+                "male"
+            } else {
+                "female"
+            },
+            isChild = state.age in 2..20,
+            year = state.year,
+            month = state.month,
+            day = state.day,
+            time = state.timeSlot
+        )
+
+        viewModelScope.launch {
+            repository.insert(record)
         }
     }
 

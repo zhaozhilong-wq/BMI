@@ -18,11 +18,16 @@ import androidx.core.view.doOnLayout
 import androidx.lifecycle.lifecycleScope
 import com.example.bmi.R
 import com.example.bmi.databinding.ActivitySplashBinding
+import com.example.bmi.ui.input.InputActivity
 import com.example.bmi.ui.main.MainActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SplashActivity : AppCompatActivity() {
+
+    private val viewModel: SplashViewModel by viewModel()
+
     private lateinit var binding: ActivitySplashBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -180,10 +185,16 @@ class SplashActivity : AppCompatActivity() {
                             // 2 秒动画结束后，再停留 1 秒
                             delay(1000L)
 
+                            val targetActivity = if (viewModel.isNewUser.value) {
+                                InputActivity::class.java
+                            } else {
+                                MainActivity::class.java
+                            }
+
                             startActivity(
                                 Intent(
                                     this@SplashActivity,
-                                    MainActivity::class.java
+                                    targetActivity
                                 )
                             )
 

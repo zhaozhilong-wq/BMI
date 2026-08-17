@@ -9,7 +9,7 @@ import com.example.bmi.data.entity.BmiRecord
 
 @Database(
     entities = [BmiRecord::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class BmiDatabase : RoomDatabase() {
@@ -25,7 +25,8 @@ abstract class BmiDatabase : RoomDatabase() {
                     context.applicationContext,
                     BmiDatabase::class.java,
                     "bmi_database"
-                ).build()
+                ).fallbackToDestructiveMigration(dropAllTables = true)
+                    .build()
                 INSTANCE = instance
                 instance
             }

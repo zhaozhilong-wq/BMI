@@ -209,6 +209,10 @@ class InputFragment : Fragment() {
             viewModel.selectGender(false)
         }
 
+        binding.calButton.setOnClickListener {
+            viewModel.calculateAndSave()
+        }
+
     }
 
     private fun updateWeightUi(uiState: InputUiState) {
