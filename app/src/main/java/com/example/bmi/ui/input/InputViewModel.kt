@@ -2,9 +2,13 @@ package com.example.bmi.ui.input
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import com.example.bmi.data.repository.BmiRepository
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import java.util.Calendar
 
 class InputViewModel (
@@ -20,6 +24,9 @@ class InputViewModel (
     ))
 
     val uiState = _uiState.asStateFlow()
+
+    private val _toastEvent = MutableSharedFlow<String>()
+    val toastEvent = _toastEvent.asSharedFlow()//用来监听事件
 
     fun onWeightChanged(text: String) {
 
@@ -140,10 +147,12 @@ class InputViewModel (
             return
         }
 
-        val text = _uiState.value.weightText
+        val currentState = _uiState.value
+        val text = currentState.weightText
 
         if (text.isEmpty()) {
             resetWeightToDefault()
+            showInvalidWeightToast()
             return
         }
 
@@ -151,18 +160,36 @@ class InputViewModel (
 
         if (value == null) {
             resetWeightToDefault()
+            showInvalidWeightToast()
             return
         }
 
+
         val validValue = validateWeight(value)
 
-        val weightKg = if (_uiState.value.isWeightKg) {
+        if (value != validValue) {
+            val weightKg = if (currentState.isWeightKg) {
+                validValue
+            } else {
+                lbToKg(validValue)
+            }
+            _uiState.value = currentState.copy(
+                weightKg = weightKg,
+                weightText = formatWeight(validValue),
+                weightChanged = true
+            )
+
+            showInvalidWeightToast()
+            return
+        }
+
+        val weightKg = if (currentState.isWeightKg) {
             validValue
         } else {
             lbToKg(validValue)
         }
 
-        _uiState.value = _uiState.value.copy(
+        _uiState.value = currentState.copy(
             weightKg = weightKg,
             weightText = formatWeight(validValue)
         )
@@ -222,6 +249,21 @@ class InputViewModel (
         _uiState.value = _uiState.value.copy(
             isMale = isMale
         )
+    }
+
+    private fun showInvalidWeightToast() {
+
+        val range = if (_uiState.value.isWeightKg) {
+            "1-250 kg"
+        } else {
+            "2-551 lb"
+        }
+
+        viewModelScope.launch {
+            _toastEvent.emit(
+                "Please input a valid weight ($range) to calculate your BMI accurately."
+            )
+        }
     }
 
 }
