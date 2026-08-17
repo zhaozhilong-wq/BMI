@@ -61,6 +61,9 @@ class InputFragment : Fragment() {
 
     private var isUpdatingWeightInput = false//区分用户修改和系统修改
 
+    private var isUpdatingHeightInput = false//区分用户修改和系统修改
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -101,50 +104,17 @@ class InputFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { uiState ->
-
-                    if (uiState.isWeightKg) {
-                        binding.kg.alpha = 1f
-                        binding.lb.alpha = 0.3f
-                    } else {
-                        binding.kg.alpha = 0.3f
-                        binding.lb.alpha = 1f
-                    }
-
-                    if (binding.weightInput.text.toString() != uiState.weightText) {
-                        isUpdatingWeightInput = true
-                        binding.weightInput.setText(uiState.weightText)
-                        binding.weightInput.setSelection(
-                            binding.weightInput.text.length
-                        )
-                        isUpdatingWeightInput = false
-                    }
-                    binding.date.text = "${months[uiState.month]} ${uiState.day},${uiState.year}"
-                    binding.timeSlot.text = times[uiState.timeSlot]
-                    if (uiState.isMale) {
-
-                        binding.maleContainer.alpha = 1f
-                        binding.femaleContainer.alpha = 0.3f
-
-                        binding.maleTick.visibility = View.VISIBLE
-                        binding.femaleTick.visibility = View.GONE
-
-                    } else {
-
-                        binding.maleContainer.alpha = 0.3f
-                        binding.femaleContainer.alpha = 1f
-
-                        binding.maleTick.visibility = View.GONE
-                        binding.femaleTick.visibility = View.VISIBLE
-                    }
+                    updateWeightUi(uiState)
+                    updateHeightUi(uiState)
+                    updateDateTimeUi(uiState)
+                    updateGenderUi(uiState)
                 }
             }
         }
         binding.weightInput.doAfterTextChanged { text ->
-
             if (isUpdatingWeightInput) {
                 return@doAfterTextChanged
             }
-
             viewModel.onWeightChanged(
                 text.toString()
             )
@@ -153,6 +123,46 @@ class InputFragment : Fragment() {
             Log.d("InputFragment", "weightInput focus = $hasFocus")
             viewModel.onWeightFocusChanged(hasFocus)
         }
+
+        binding.heightInput.doAfterTextChanged { text ->
+            if (isUpdatingHeightInput) {
+                return@doAfterTextChanged
+            }
+            viewModel.onHeightCmChanged(
+                text.toString()
+            )
+        }
+
+        binding.heightFtInput.doAfterTextChanged { text ->
+            if (isUpdatingHeightInput) {
+                return@doAfterTextChanged
+            }
+            viewModel.onHeightFtChanged(
+                text.toString()
+            )
+        }
+
+        binding.heightInInput.doAfterTextChanged { text ->
+            if (isUpdatingHeightInput) {
+                return@doAfterTextChanged
+            }
+            viewModel.onHeightInChanged(
+                text.toString()
+            )
+        }
+
+        binding.heightInput.setOnFocusChangeListener { _, hasFocus ->
+            viewModel.onHeightCmFocusChanged(hasFocus)
+        }
+
+        binding.heightFtInput.setOnFocusChangeListener { _, hasFocus ->
+            viewModel.onHeightFtFocusChanged(hasFocus)
+        }
+
+        binding.heightInInput.setOnFocusChangeListener { _, hasFocus ->
+            viewModel.onHeightInFocusChanged(hasFocus)
+        }
+
         binding.lb.setOnClickListener {
             viewModel.selectWeightUnit(false)
         }
@@ -160,6 +170,15 @@ class InputFragment : Fragment() {
         binding.kg.setOnClickListener {
             viewModel.selectWeightUnit(true)
         }
+
+        binding.cm.setOnClickListener {
+            viewModel.selectHeightUnit(true)
+        }
+
+        binding.ftin.setOnClickListener {
+            viewModel.selectHeightUnit(false)
+        }
+
 
         binding.date.setOnClickListener {
             val datePickerDialog =
@@ -190,15 +209,83 @@ class InputFragment : Fragment() {
             viewModel.selectGender(false)
         }
 
-
-
-
-
-
-
-
     }
 
+    private fun updateWeightUi(uiState: InputUiState) {
+        if (uiState.isWeightKg) {
+            binding.kg.alpha = 1f
+            binding.lb.alpha = 0.3f
+        } else {
+            binding.kg.alpha = 0.3f
+            binding.lb.alpha = 1f
+        }
+        if (binding.weightInput.text.toString() != uiState.weightText) {
+            isUpdatingWeightInput = true
+            binding.weightInput.setText(uiState.weightText)
+            binding.weightInput.setSelection(
+                binding.weightInput.text.length
+            )
+            isUpdatingWeightInput = false
+        }
+    }
+    private fun updateHeightUi(uiState: InputUiState) {
+        isUpdatingHeightInput = true
+        if (uiState.isHeightCm) {
+            binding.cm.alpha = 1f
+            binding.ftin.alpha = 0.3f
+            binding.heightInput.visibility = View.VISIBLE
+            binding.heightFtInput.visibility = View.GONE
+            binding.heightInInput.visibility = View.GONE
+            binding.heightFtUnit.visibility = View.GONE
+            binding.heightInUnit.visibility = View.GONE
+            if (binding.heightInput.text.toString() != uiState.heightCmText) {
+                binding.heightInput.setText(uiState.heightCmText)
+                binding.heightInput.setSelection(
+                    binding.heightInput.text.length
+                )
+            }
+        } else {
+            binding.cm.alpha = 0.3f
+            binding.ftin.alpha = 1f
+            binding.heightInput.visibility = View.GONE
+            binding.heightFtInput.visibility = View.VISIBLE
+            binding.heightInInput.visibility = View.VISIBLE
+            binding.heightFtUnit.visibility = View.VISIBLE
+            binding.heightInUnit.visibility = View.VISIBLE
+            if (binding.heightFtInput.text.toString() != uiState.heightFtText) {
+                binding.heightFtInput.setText(uiState.heightFtText)
+                binding.heightFtInput.setSelection(
+                    binding.heightFtInput.text.length
+                )
+            }
+            if (binding.heightInInput.text.toString() != uiState.heightInText) {
+                binding.heightInInput.setText(uiState.heightInText)
+                binding.heightInInput.setSelection(
+                    binding.heightInInput.text.length
+                )
+            }
+        }
+        isUpdatingHeightInput = false
+    }
+
+    private fun updateGenderUi(uiState: InputUiState) {
+        if (uiState.isMale) {
+            binding.maleContainer.alpha = 1f
+            binding.femaleContainer.alpha = 0.3f
+            binding.maleTick.visibility = View.VISIBLE
+            binding.femaleTick.visibility = View.GONE
+        } else {
+            binding.maleContainer.alpha = 0.3f
+            binding.femaleContainer.alpha = 1f
+            binding.maleTick.visibility = View.GONE
+            binding.femaleTick.visibility = View.VISIBLE
+        }
+    }
+
+    private fun updateDateTimeUi(uiState: InputUiState) {
+        binding.date.text = "${months[uiState.month]} ${uiState.day},${uiState.year}"
+        binding.timeSlot.text = times[uiState.timeSlot]
+    }
     fun updateSelectedItem(
         recyclerView: RecyclerView,
         layoutManager: LinearLayoutManager,

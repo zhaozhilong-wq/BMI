@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import java.util.Calendar
+import kotlin.math.roundToInt
 
 class InputViewModel (
     private val repository: BmiRepository
@@ -207,6 +208,347 @@ class InputViewModel (
         }
     }
 
+    //身高
+    fun onHeightCmChanged(text: String) {
+
+        if (text.isEmpty()) {
+            _uiState.value = _uiState.value.copy(
+                heightCmText = ""
+            )
+            return
+        }
+        val value = text.toDoubleOrNull() ?: return
+        _uiState.value = _uiState.value.copy(
+            heightCm = value,
+            heightCmText = text,
+            heightChanged = true
+        )
+        Log.d(
+            "InputViewModel",
+            "heightCm=$value"
+        )
+    }
+
+    fun onHeightFtChanged(text: String) {
+
+        if (text.isEmpty()) {
+
+            _uiState.value = _uiState.value.copy(
+                heightFtText = "",
+                heightChanged = true
+            )
+
+            return
+        }
+
+        val feet = text.toIntOrNull()
+            ?: return
+
+        val currentState = _uiState.value
+
+        val inches = currentState.heightInText
+            .toIntOrNull()
+
+        _uiState.value = currentState.copy(
+            heightFtText = text,
+            heightChanged = true
+        )
+
+        if (inches != null) {
+
+            val heightCm = ftInToCm(
+                feet,
+                inches
+            )
+
+            _uiState.value = _uiState.value.copy(
+                heightCm = heightCm
+            )
+        }
+    }
+
+    fun onHeightInChanged(text: String) {
+
+        if (text.isEmpty()) {
+
+            _uiState.value = _uiState.value.copy(
+                heightInText = "",
+                heightChanged = true
+            )
+
+            return
+        }
+
+        val inches = text.toIntOrNull()
+            ?: return
+
+        val currentState = _uiState.value
+
+        val feet = currentState.heightFtText
+            .toIntOrNull()
+
+        _uiState.value = currentState.copy(
+            heightInText = text,
+            heightChanged = true
+        )
+
+        if (feet != null) {
+
+            val heightCm = ftInToCm(
+                feet,
+                inches
+            )
+
+            _uiState.value = _uiState.value.copy(
+                heightCm = heightCm
+            )
+        }
+    }
+
+    fun selectHeightUnit(isCm: Boolean) {
+
+        val currentState = _uiState.value
+
+        if (currentState.isHeightCm == isCm) {
+            return
+        }
+
+        // =========================
+        // 用户从来没有编辑过
+        // =========================
+        if (!currentState.heightChanged) {
+
+            if (isCm) {
+
+                // FT/IN -> CM
+                _uiState.value = currentState.copy(
+                    isHeightCm = true,
+                    heightCm = 170.0,
+                    heightCmText = "170.0"
+                )
+
+            } else {
+
+                // CM -> FT/IN
+                _uiState.value = currentState.copy(
+                    isHeightCm = false,
+                    heightCm = 170.0,
+                    heightFtText = "5",
+                    heightInText = "7"
+                )
+            }
+
+            return
+        }
+
+        // =========================
+        // 用户已经编辑过
+        // =========================
+
+        if (isCm) {
+
+            // FT/IN -> CM
+            val heightCm = currentState.heightCm
+
+            _uiState.value = currentState.copy(
+                isHeightCm = true,
+                heightCmText = formatHeight(heightCm)
+            )
+
+        } else {
+
+            // CM -> FT/IN
+            val (feet, inches) =
+                cmToFtIn(currentState.heightCm)
+
+            _uiState.value = currentState.copy(
+                isHeightCm = false,
+                heightFtText = feet.toString(),
+                heightInText = inches.toString()
+            )
+        }
+    }
+    private fun formatHeight(value: Double): String {
+        return String.format("%.1f", value)
+    }
+
+
+    fun onHeightCmFocusChanged(hasFocus: Boolean) {
+        if (hasFocus) {
+            return
+        }
+        val currentState = _uiState.value
+        val text = currentState.heightCmText
+        if (text.isEmpty()) {
+            resetHeightToDefault()
+            showInvalidHeightToast()
+            return
+        }
+        val value = text.toDoubleOrNull()
+        if (value == null) {
+            resetHeightToDefault()
+            showInvalidHeightToast()
+            return
+        }
+        val validValue =
+            validateHeightCm(value)
+        if (value != validValue) {
+            _uiState.value =
+                currentState.copy(
+                    heightCm = validValue,
+                    heightCmText =
+                        formatHeight(validValue),
+                    heightChanged = true
+                )
+            showInvalidHeightToast()
+            return
+        }
+        _uiState.value =
+            currentState.copy(
+                heightCm = value,
+                heightCmText =
+                    formatHeight(value),
+                heightChanged = true
+            )
+    }
+
+    fun onHeightFtFocusChanged(hasFocus: Boolean) {
+
+        if (hasFocus) {
+            return
+        }
+
+        validateHeightFtIn()
+    }
+
+    fun onHeightInFocusChanged(hasFocus: Boolean) {
+
+        if (hasFocus) {
+            return
+        }
+
+        validateHeightFtIn()
+    }
+
+    private fun validateHeightFtIn() {
+
+        val currentState = _uiState.value
+
+        val feet = currentState.heightFtText
+            .toIntOrNull()
+
+        val inches = currentState.heightInText
+            .toIntOrNull()
+
+        // 任意一个为空 / 非数字
+        if (feet == null || inches == null) {
+
+            resetHeightToDefault()
+            showInvalidHeightToast()
+
+            return
+        }
+
+        val validFeet = feet.coerceIn(1, 8)
+        val validInches = inches.coerceIn(0, 11)
+
+        var heightCm = ftInToCm(
+            validFeet,
+            validInches
+        )
+
+        // 最终 CM 不能超过 250
+        if (heightCm > 250.0) {
+
+            heightCm = 250.0
+
+            val (newFeet, newInches) =
+                cmToFtIn(heightCm)
+
+            _uiState.value = currentState.copy(
+                heightFtText = newFeet.toString(),
+                heightInText = newInches.toString(),
+                heightCm = heightCm,
+                heightChanged = true
+            )
+
+            showInvalidHeightToast()
+
+            return
+        }
+
+        // FT 或 IN 超出范围
+        if (feet != validFeet || inches != validInches) {
+
+            _uiState.value = currentState.copy(
+                heightFtText = validFeet.toString(),
+                heightInText = validInches.toString(),
+                heightCm = heightCm,
+                heightChanged = true
+            )
+
+            showInvalidHeightToast()
+
+            return
+        }
+
+        // 合法
+        _uiState.value = currentState.copy(
+            heightFtText = validFeet.toString(),
+            heightInText = validInches.toString(),
+            heightCm = heightCm,
+            heightChanged = true
+        )
+    }
+
+
+    private fun resetHeightToDefault() {
+        val currentState = _uiState.value
+        if (currentState.isHeightCm) {
+            _uiState.value =
+                currentState.copy(
+                    heightCm = 170.0,
+                    heightCmText = "170.0"
+                )
+        } else {
+            _uiState.value =
+                currentState.copy(
+                    heightCm = 170.0,
+                    heightFtText = "5",
+                    heightInText = "7"
+                )
+        }
+    }
+
+    private fun validateHeightCm(
+        value: Double
+    ): Double {
+        return value.coerceIn(
+            1.0,
+            250.0
+        )
+    }
+
+
+    private fun ftInToCm(
+        feet: Int,
+        inches: Int
+    ): Double {
+
+        return feet * 30.48 +
+                inches * 2.54
+    }
+
+    private fun cmToFtIn(cm: Double): Pair<Int, Int> {
+
+        val totalInches = (cm / 2.54).roundToInt()
+
+        val feet = totalInches / 12
+        val inches = totalInches % 12
+
+        return Pair(feet, inches)
+    }
+
     private fun getCurrentTimeSlotIndex(): Int {
 
         val hour = Calendar.getInstance()
@@ -262,6 +604,21 @@ class InputViewModel (
         viewModelScope.launch {
             _toastEvent.emit(
                 "Please input a valid weight ($range) to calculate your BMI accurately."
+            )
+        }
+    }
+
+    private fun showInvalidHeightToast() {
+
+        val range = if (_uiState.value.isHeightCm) {
+            "1-250 cm"
+        } else {
+            "1-8 ft, 0-11 in"
+        }
+
+        viewModelScope.launch {
+            _toastEvent.emit(
+                "Please input a valid height ($range) to calculate your BMI accurately."
             )
         }
     }
