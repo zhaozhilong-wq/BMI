@@ -18,7 +18,6 @@ import androidx.core.view.doOnLayout
 import androidx.lifecycle.lifecycleScope
 import com.example.bmi.R
 import com.example.bmi.databinding.ActivitySplashBinding
-import com.example.bmi.ui.input.InputActivity
 import com.example.bmi.ui.main.MainActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -184,7 +183,7 @@ class SplashActivity : AppCompatActivity() {
                             startActivity(
                                 Intent(
                                     this@SplashActivity,
-                                    InputActivity::class.java
+                                    MainActivity::class.java
                                 )
                             )
 

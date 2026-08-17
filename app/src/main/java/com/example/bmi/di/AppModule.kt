@@ -2,6 +2,7 @@ package com.example.bmi.di
 
 import com.example.bmi.data.BmiDatabase
 import com.example.bmi.data.repository.BmiRepository
+import com.example.bmi.ui.input.InputViewModel
 import com.example.bmi.ui.main.MainViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
@@ -25,6 +26,11 @@ val appModule = module {
 
     viewModel {
         MainViewModel(
+            repository = get()
+        )
+    }
+    viewModel {
+        InputViewModel(
             repository = get()
         )
     }
