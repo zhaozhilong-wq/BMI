@@ -62,6 +62,14 @@ class ResultFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.bmiDialView.setConfig(adultMaleConfig)
+        binding.bmiHelp.setOnClickListener {
+            val dialog = BmiDialDialog(requireContext())
+            dialog.show()
+        }
+        binding.discord.setOnClickListener {
+            val dialog = ConfirmDialog(requireContext())
+            dialog.show()
+        }
     }
     override fun onDestroyView() {
         super.onDestroyView()

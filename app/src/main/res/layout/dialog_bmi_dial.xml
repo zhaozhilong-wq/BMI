@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="590dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/rectangle9"
+    android:id="@+id/bmiDialDialog">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="BMI for adults"
+        android:textSize="20sp"
+        android:letterSpacing="-0.01"
+        android:textColor="#000000"
+        android:fontFamily="@font/montserrat_extrabold"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/dialContainer"
+        android:layout_width="0dp"
+        android:layout_height="172dp"
+        android:layout_marginStart="10.5dp"
+        android:layout_marginTop="60.5dp"
+        android:layout_marginEnd="10.5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.example.bmi.ui.BmiDialView
+            android:id="@+id/bmiDialView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <include
+        android:id="@+id/bmiCategoryLayout"
+        layout="@layout/layout_bmi_categories"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialContainer"
+        android:layout_marginTop="25dp" />
+
+    <TextView
+        android:id="@+id/gotButton"
+        android:layout_width="0dp"
+        android:layout_height="55dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintTop_toBottomOf="@id/bmiCategoryLayout"
+        android:layout_marginTop="23dp"
+        android:text="GOT IT"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/rectangle12"
+        android:fontFamily="@font/montserrat_extrabold" />
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
