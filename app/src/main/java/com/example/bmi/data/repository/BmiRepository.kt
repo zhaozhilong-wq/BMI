@@ -10,6 +10,10 @@ class BmiRepository(
     fun getCount() =
         bmiRecordDao.getCount()
 
+    suspend fun hasRecords(): Boolean {
+        return bmiRecordDao.getCountOnce() > 0
+    }
+
     fun getAllRecords() =
         bmiRecordDao.getAllRecords()
 
@@ -19,11 +23,12 @@ class BmiRepository(
     suspend fun getById(id: Long) =
         bmiRecordDao.getById(id)
 
-    suspend fun insert(record: BmiRecord) {
-        bmiRecordDao.insert(record)
+    suspend fun insert(record: BmiRecord): Long {
+        return bmiRecordDao.insert(record)
     }
 
     suspend fun delete(record: BmiRecord) {
         bmiRecordDao.delete(record)
     }
+
 }

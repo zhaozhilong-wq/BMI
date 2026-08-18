@@ -7,6 +7,7 @@ import com.example.bmi.data.entity.BmiRecord
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import com.example.bmi.data.repository.BmiRepository
+import com.example.bmi.ui.result.ResultMode
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -635,7 +636,8 @@ class InputViewModel (
         return weightKg / (heightM * heightM)
     }
 
-    fun calculateAndSave() {
+    fun calculateAndSave(onResultReady: (mode: ResultMode,
+                                         recordId: Long) -> Unit) {
         val state = _uiState.value
         Log.d(
             "HEIGHT_TEST",
@@ -663,9 +665,9 @@ class InputViewModel (
             bmi = bmi,
             age = state.age,
             gender = if (state.isMale) {
-                "male"
+                "Male"
             } else {
-                "female"
+                "Female"
             },
             isChild = state.age in 2..20,
             year = state.year,
@@ -675,7 +677,17 @@ class InputViewModel (
         )
 
         viewModelScope.launch {
-            repository.insert(record)
+            // 先判断插入之前有没有历史记录
+            val isNewUser = !repository.hasRecords()
+            // 插入数据库
+            val recordId = repository.insert(record)
+
+            if (isNewUser) {
+                onResultReady(ResultMode.NEW_USER, recordId)
+            } else {
+                onResultReady(ResultMode.NORMAL, recordId)
+            }
+
         }
     }
 

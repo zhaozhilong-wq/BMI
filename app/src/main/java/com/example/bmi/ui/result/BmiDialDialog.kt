@@ -5,50 +5,94 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.WindowManager
+import androidx.activity.ComponentActivity
+import androidx.lifecycle.ViewModelProvider
 import com.example.bmi.R
+import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.databinding.DialogBmiDialBinding
 import com.example.bmi.ui.BmiDialConfig
 import com.example.bmi.ui.BmiSection
+import com.example.bmi.ui.result.category.BmiCategoryViewHelper
+import com.example.bmi.ui.result.category.femaleChildBmi
+import com.example.bmi.ui.result.category.maleChildBmi
+import com.example.bmi.ui.toDialConfig
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import kotlin.getValue
 
 class BmiDialDialog(
-    context: Context
+    context: Context,
+    private val record: BmiRecord
 ) : Dialog(context) {
 
     private var _binding: DialogBmiDialBinding? = null
     private val binding get() = _binding!!
 
-    private val adultMaleConfig = BmiDialConfig(
-        minBmi = 15.6f,
-        maxBmi = 40.3f,
-        sections = listOf(
-            BmiSection(15.6f, 16f, R.color.vsu),
-            BmiSection(16f, 17f, R.color.su),
-            BmiSection(17f, 18.5f, R.color.underweight),
-            BmiSection(18.5f, 25f, R.color.normal),
-            BmiSection(25f, 30f, R.color.overweight),
-            BmiSection(30f, 35f, R.color.obesity1),
-            BmiSection(35f, 40f, R.color.obesity2),
-            BmiSection(40f, 40.3f, R.color.obesity3)
-        ),
-        ticks = listOf(
-            16f,
-            17f,
-            18.5f,
-            25f,
-            30f,
-            35f,
-            40f
-        )
-    )
+    private val viewModel: ResultViewModel by lazy {
+        ViewModelProvider(
+            (context as ComponentActivity)
+        )[ResultViewModel::class.java]
+    }
+
+
+    private fun setupCategories() {
+        val container =
+            binding.bmiCategoryLayout.bmiCategoryContainer
+        if (record.isChild) {
+            val childThreshold = viewModel.getChildThreshold(record)
+            if (childThreshold == null) {
+                Log.e(
+                    "ResultFragment",
+                    "No BMI threshold found: gender=${record.gender}, age=${record.age}"
+                )
+                return
+            }
+            val items =
+                BmiCategoryViewHelper.createChildCategoryItems(
+                    childThreshold
+                )
+            val selectedCategory =
+                viewModel.getChildCategory(
+                    record.bmi.toFloat(),
+                    childThreshold
+                )
+
+            BmiCategoryViewHelper.setup(
+                container = container,
+                items = items,
+                selectedCategory = selectedCategory,
+                inflater = layoutInflater
+            )
+
+        } else {
+
+            val items =
+                BmiCategoryViewHelper.createAdultCategoryItems()
+
+            val selectedCategory =
+                viewModel.getAdultCategory(record.bmi.toFloat())
+
+            BmiCategoryViewHelper.setup(
+                container = container,
+                items = items,
+                selectedCategory = selectedCategory,
+                inflater = layoutInflater
+            )
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = DialogBmiDialBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.bmiDialView.setConfig(adultMaleConfig)
+        binding.bmiDialView.setConfig(
+            viewModel.getDialConfig(record)
+        )
+
+        setupCategories()
         binding.gotButton.setOnClickListener {
             dismiss()
         }
@@ -78,4 +122,5 @@ class BmiDialDialog(
     private fun dpToPx(dp: Int): Int {
         return (dp * context.resources.displayMetrics.density).toInt()
     }
+
 }

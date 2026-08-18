@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper
 import com.example.bmi.R
 import com.example.bmi.databinding.FragmentInputBinding
+import com.example.bmi.ui.result.ResultActivity
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
@@ -210,7 +211,11 @@ class InputFragment : Fragment() {
         }
 
         binding.calButton.setOnClickListener {
-            viewModel.calculateAndSave()
+            viewModel.calculateAndSave { mode, recordId ->
+                startActivity(
+                    ResultActivity.newIntent(requireContext(), mode, recordId)
+                )
+            }
         }
 
     }

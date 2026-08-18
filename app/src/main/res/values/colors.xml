@@ -11,4 +11,13 @@
     <color name="obesity1">#FD9845</color>
     <color name="obesity2">#F67D3C</color>
     <color name="obesity3">#F04E46</color>
+
+    <color name="vsu_cycle">#4343B8</color>
+    <color name="su_cycle">#1258E1</color>
+    <color name="underweight_cycle">#0099F2</color>
+    <color name="normal_cycle">#54A529</color>
+    <color name="overweight_cycle">#FECD2E</color>
+    <color name="obesity1_cycle">#FFA100</color>
+    <color name="obesity2_cycle">#FF7137</color>
+    <color name="obesity3_cycle">#D3333B</color>
 </resources>

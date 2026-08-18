@@ -8,10 +8,12 @@ import android.view.ViewGroup
 import com.example.bmi.databinding.DialogConfirmBinding
 
 class ConfirmDialog(
-    context: Context
+    context: Context,
+    private val onDeleteClick: () -> Unit
 ) : Dialog(context) {
 
     private lateinit var binding: DialogConfirmBinding
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +24,10 @@ class ConfirmDialog(
         setupDialog()
 
         binding.cancel.setOnClickListener {
+            dismiss()
+        }
+        binding.delete.setOnClickListener {
+            onDeleteClick()
             dismiss()
         }
     }
