@@ -7,7 +7,7 @@
     tools:context=".ui.result.ResultFragment">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="24dp"
+        android:layout_height="44dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -42,22 +42,42 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/dialContainer"
                 android:layout_width="0dp"
-                android:layout_height="158dp"
-                android:layout_margin="11dp"
+                android:layout_height="172dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="11dp"
+                android:layout_marginEnd="11dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
+                <com.example.bmi.ui.BmiDialView
+                    android:id="@+id/bmiDialView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
+            
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="168dp"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="103dp"
+                android:src="@drawable/result_pointer"/>
+
+            
 
             <TextView
                 android:id="@+id/title"
                 android:layout_width="0dp"
                 android:layout_height="22dp"
                 android:layout_marginStart="128dp"
-                android:layout_marginTop="35dp"
+                android:layout_marginTop="35.5dp"
                 android:layout_marginEnd="126dp"
                 android:fontFamily="@font/montserrat_extrabold"
                 android:gravity="center"
@@ -180,7 +200,7 @@
                     android:id="@+id/vsuRange"
                     android:layout_width="70dp"
                     android:layout_height="17dp"
-                    android:text="<16"
+                    android:text="&lt;16"
                     android:textColor="#000000"
                     android:textSize="14sp"
                     android:letterSpacing="-0.01"
@@ -573,7 +593,7 @@
                     android:id="@+id/oc3Range"
                     android:layout_width="70dp"
                     android:layout_height="17dp"
-                    android:text="≥ 40.0"
+                    android:text="≥40.0"
                     android:textColor="#000000"
                     android:textSize="14sp"
                     android:letterSpacing="-0.01"

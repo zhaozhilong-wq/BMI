@@ -3,4 +3,12 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="icon_gray">#999999</color>
+    <color name="vsu">#286DE6</color>
+    <color name="su">#349CEA</color>
+    <color name="underweight">#5BB1F5</color>
+    <color name="normal">#A8C526</color>
+    <color name="overweight">#FECD2E</color>
+    <color name="obesity1">#FD9845</color>
+    <color name="obesity2">#F67D3C</color>
+    <color name="obesity3">#F04E46</color>
 </resources>

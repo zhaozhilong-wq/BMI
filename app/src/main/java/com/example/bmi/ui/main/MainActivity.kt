@@ -14,6 +14,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.bmi.R
 import com.example.bmi.databinding.ActivityMainBinding
+import com.example.bmi.ui.BmiDialConfig
+import com.example.bmi.ui.BmiSection
 import kotlinx.coroutines.launch
 import com.example.bmi.ui.input.InputFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -24,6 +26,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private val viewModel : MainViewModel by viewModel()
+
+
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {//使得点击输入框外，就失去焦点
         if (ev.action == MotionEvent.ACTION_DOWN) {
@@ -82,6 +86,9 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }//底部导航栏监听，用户点击底部导航栏，viewPage2跳转到对应页面：更新页面
+
+
+
 
 
 

@@ -181,24 +181,24 @@ class SplashActivity : AppCompatActivity() {
                     override fun onAnimationEnd(animation: Animator) {
 
                         lifecycleScope.launch {
-
-                            // 2 秒动画结束后，再停留 1 秒
                             delay(1000L)
+                            viewModel.isNewUser.collect { isNewUser ->
 
-                            val targetActivity = if (viewModel.isNewUser.value) {
-                                InputActivity::class.java
-                            } else {
-                                MainActivity::class.java
-                            }
+                                val targetActivity = if (isNewUser) {
+                                    InputActivity::class.java
+                                } else {
+                                    MainActivity::class.java
+                                }
 
-                            startActivity(
-                                Intent(
-                                    this@SplashActivity,
-                                    targetActivity
+                                startActivity(
+                                    Intent(
+                                        this@SplashActivity,
+                                        targetActivity
+                                    )
                                 )
-                            )
 
-                            finish()
+                                finish()
+                            }
                         }
                     }
                 }
