@@ -194,7 +194,9 @@ class SplashActivity : AppCompatActivity() {
                                     Intent(
                                         this@SplashActivity,
                                         targetActivity
-                                    )
+                                    ).apply {
+                                        putExtra("open_page", 1)
+                                    }
                                 )
 
                                 finish()

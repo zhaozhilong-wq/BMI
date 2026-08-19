@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MotionEvent
+import android.view.View
 import android.widget.EditText
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
@@ -12,12 +13,14 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.viewpager2.widget.ViewPager2
 import com.example.bmi.R
 import com.example.bmi.databinding.ActivityMainBinding
 import com.example.bmi.ui.BmiDialConfig
 import com.example.bmi.ui.BmiSection
 import kotlinx.coroutines.launch
 import com.example.bmi.ui.input.InputFragment
+import com.example.bmi.ui.result.ResultFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 
@@ -47,6 +50,33 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        //结果页点击任意地方，返回输入页
+        if (
+            ev.action == MotionEvent.ACTION_UP &&
+            binding.viewPager.currentItem == 1
+        ) {
+            val recent = binding.root.findViewById<View>(R.id.recent)
+            if (recent != null) {
+                val location = IntArray(2)
+                recent.getLocationOnScreen(location)
+                val left = location[0]
+                val top = location[1]
+                val right = left + recent.width
+                val bottom = top + recent.height
+                val isInsideRecent =
+                    ev.rawX >= left &&
+                            ev.rawX <= right &&
+                            ev.rawY >= top &&
+                            ev.rawY <= bottom
+                if (!isInsideRecent) {
+                    goToInputPage()
+                }
+            } else {
+                // 找不到 Recent，就直接跳转
+                goToInputPage()
+            }
+        }
+
 
         return super.dispatchTouchEvent(ev)
     }
@@ -87,10 +117,42 @@ class MainActivity : AppCompatActivity() {
             true
         }//底部导航栏监听，用户点击底部导航栏，viewPage2跳转到对应页面：更新页面
 
+        //监听页面更新导航栏
+        viewPager2.registerOnPageChangeCallback(
+            object : ViewPager2.OnPageChangeCallback() {
+
+                override fun onPageSelected(position: Int) {
+                    when (position) {
+                        0 -> bottomNav.selectedItemId =
+                            R.id.navigation_calculator
+
+                        1 -> bottomNav.selectedItemId =
+                            R.id.navigation_bmi
+
+                        2 -> bottomNav.selectedItemId =
+                            R.id.navigation_statistics
+                    }
+                }
+            }
+        )
+
+
+        val openPage = intent.getIntExtra(
+            "open_page",
+            0
+        )
+
+        binding.viewPager.currentItem = openPage
+
 
 
 
 
 
     }
+
+    fun goToInputPage() {
+        binding.viewPager.currentItem = 0
+    }
+
 }

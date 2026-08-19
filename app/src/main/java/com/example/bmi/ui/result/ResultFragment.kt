@@ -8,6 +8,7 @@ import android.text.style.ForegroundColorSpan
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
@@ -113,6 +114,11 @@ class ResultFragment : Fragment() {
                 binding.bmiHelp.visibility = View.GONE
                 binding.recommendation.visibility = View.GONE
                 binding.saveButton.visibility = View.GONE
+                binding.discord.visibility = View.GONE
+                binding.BMI.visibility = View.VISIBLE
+                binding.time.visibility = View.VISIBLE
+                binding.recent.visibility = View.VISIBLE
+
             }
         }
 
@@ -226,6 +232,18 @@ class ResultFragment : Fragment() {
                 }
             }
         )
+
+        binding.saveButton.setOnClickListener {
+            startActivity(
+                Intent(
+                    requireContext(),
+                    MainActivity::class.java
+                ).apply {
+                    putExtra("open_page", 2)
+                }
+            )
+        }
+
     }
 
     override fun onDestroyView() {
@@ -347,8 +365,9 @@ class ResultFragment : Fragment() {
     ): Float {
 
         val ratio =
-            (bmi - config.minBmi) /
-                    (config.maxBmi - config.minBmi)
+            ((bmi - config.minBmi) /
+                    (config.maxBmi - config.minBmi))
+                .coerceIn(0f, 1f)
 
         return -71f + ratio * 180f
     }
@@ -416,5 +435,6 @@ class ResultFragment : Fragment() {
 
         binding.advice.text = spannable
     }
+
 
 }

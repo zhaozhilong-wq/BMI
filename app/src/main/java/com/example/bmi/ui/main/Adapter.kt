@@ -4,6 +4,7 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.bmi.ui.input.InputFragment
 import com.example.bmi.ui.result.ResultFragment
+import com.example.bmi.ui.statistics.StatisticsFragment
 
 class Adapter (activity: MainActivity): FragmentStateAdapter(activity)
 {
@@ -15,7 +16,7 @@ class Adapter (activity: MainActivity): FragmentStateAdapter(activity)
         return when(position){
             0-> InputFragment()
             1-> ResultFragment()
-            else-> InputFragment()
+            else-> StatisticsFragment()
         }
 
     }
