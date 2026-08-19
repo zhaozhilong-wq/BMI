@@ -25,6 +25,7 @@ import com.example.bmi.ui.BmiDialConfig
 import com.example.bmi.ui.BmiSection
 import com.example.bmi.ui.input.InputActivity
 import com.example.bmi.ui.main.MainActivity
+import com.example.bmi.ui.recent.RecentActivity
 import com.example.bmi.ui.result.category.BmiCategory
 import com.example.bmi.ui.result.category.BmiCategoryItem
 import com.example.bmi.ui.result.category.BmiCategoryViewHelper
@@ -55,6 +56,27 @@ class ResultFragment : Fragment() {
     private var recordId: Long = -1L
 
     private var currentRecord: BmiRecord? = null
+
+    private val months = listOf(
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "June",
+        "July",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
+    )
+    private val times = listOf(
+        "Morning",
+        "Afternoon",
+        "Evening",
+        "Night"
+    )
 
 
 
@@ -105,6 +127,23 @@ class ResultFragment : Fragment() {
             ResultMode.HISTORY -> {
                 Log.d("ResultFragment", "mode is HISTORY")
                 viewModel.loadRecord(recordId)
+                binding.bmiCategoryLayout.bmiCategoryContainer.visibility = View.GONE
+                binding.saveButton.visibility = View.GONE
+                binding.discord.visibility = View.GONE
+                binding.back.visibility = View.VISIBLE
+                binding.delete.visibility = View.VISIBLE
+                binding.lineText.visibility = View.VISIBLE
+
+
+                binding.back.setOnClickListener {
+                    requireActivity().finish()
+                }
+                binding.delete.setOnClickListener {
+                    showConfirmDialog()
+                }
+
+
+
             }
 
             ResultMode.LATEST -> {
@@ -119,6 +158,10 @@ class ResultFragment : Fragment() {
                 binding.time.visibility = View.VISIBLE
                 binding.recent.visibility = View.VISIBLE
 
+                binding.recent.setOnClickListener {
+                    startActivity(Intent(requireContext(), RecentActivity::class.java))
+                }
+
             }
         }
 
@@ -130,7 +173,7 @@ class ResultFragment : Fragment() {
                     if (record == null) {
                         return@collect
                     }
-                    binding.bmiResult.text = record.bmi.toString()
+                    binding.bmiResult.text = String.format("%.1f", record.bmi)
                     binding.bmiDialView.setConfig(
                         viewModel.getDialConfig(record)
                     )
@@ -187,6 +230,10 @@ class ResultFragment : Fragment() {
                         )
                     }
 
+                    if(binding.lineText.visibility == View.VISIBLE){
+                        binding.lineText.text = "${months[record.month]} ${record.day}，${record.year} ${times[record.time]}"
+                    }
+
                     setPersonInfo(record)
 
                     binding.BmiPointer.post {
@@ -228,7 +275,8 @@ class ResultFragment : Fragment() {
                         mode == ResultMode.NEW_USER
                     ) {
                         showConfirmDialog()
-                    }
+                    }else if (mode == ResultMode.HISTORY)
+                        requireActivity().finish()
                 }
             }
         )
@@ -261,7 +309,11 @@ class ResultFragment : Fragment() {
                             if (isNewUser) {
                                 InputActivity::class.java
                             } else {
-                                MainActivity::class.java
+                                if (mode != ResultMode.HISTORY) {
+                                    MainActivity::class.java
+                                } else {
+                                    RecentActivity::class.java
+                                }
                             }
                         startActivity(
                             Intent(

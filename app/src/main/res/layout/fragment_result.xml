@@ -12,6 +12,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:id="@+id/topRegion">
+        
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginBottom="17dp"
+            android:layout_marginTop="17dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="15dp"
+            android:src="@drawable/arrow_left"
+            android:visibility="gone"/>
         <TextView
             android:id="@+id/discord"
             android:layout_width="0dp"
@@ -72,6 +85,24 @@
             android:textSize="16sp"
             android:fontFamily="@font/montserrat_regular"
             android:textColor="#3659CF"
+            android:visibility="gone"/>
+        
+        <TextView
+            android:id="@+id/delete"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="17dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="17dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="15dp"
+            android:text="Delete"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:alpha="0.5"
+            android:fontFamily="@font/montserrat_regular"
+            android:letterSpacing="-0.01"
             android:visibility="gone"/>
 
 
@@ -242,76 +273,98 @@
                 android:id="@+id/recommendation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/advice"
                 android:layout_marginTop="30dp"
+                android:layout_marginBottom="32.5dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginBottom="32.5dp">
-                <View
-                    android:id="@+id/line1"
+                app:layout_constraintTop_toBottomOf="@id/advice"
+                app:layout_constraintVertical_bias="1.0"
+                tools:layout_editor_absoluteX="73dp">
+
+                <FrameLayout
+                    android:id="@+id/lineContainer"
                     android:layout_width="0dp"
-                    android:layout_height="0.5dp"
-                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_height="20dp"
                     android:layout_marginStart="22.5dp"
-                    app:layout_constraintEnd_toEndOf="parent"
                     android:layout_marginEnd="22.5dp"
-                    android:background="#000000"
-                    android:alpha="0.2"
-                    app:layout_constraintTop_toTopOf="parent"/>
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <View
+                        android:id="@+id/line1"
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:layout_gravity="center_vertical"
+                        android:alpha="0.2"
+                        android:background="#000000" />
+
+                    <TextView
+                        android:id="@+id/lineText"
+                        android:layout_width="153.5dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="#FFFFFF"
+                        android:gravity="center_horizontal"
+                        android:text="May 6, 2021 Morning"
+                        android:textColor="#80000000"
+                        android:textSize="12sp"
+                        android:letterSpacing="-0.01"
+                        android:fontFamily="@font/montserrat_extrabold"
+                        android:visibility="gone"/>
+
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/recommendTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="20dp"
-                    app:layout_constraintTop_toBottomOf="@id/line1"
-                    app:layout_constraintStart_toStartOf="parent"
-                    android:layout_marginTop="24.5dp"
                     android:layout_marginStart="20dp"
+                    android:layout_marginTop="24.5dp"
+                    android:fontFamily="@font/montserrat_extrabold"
+                    android:letterSpacing="-0.01"
                     android:text="Apps you might need"
                     android:textColor="#000000"
                     android:textSize="16sp"
-                    android:letterSpacing="-0.01"
-                    android:fontFamily="@font/montserrat_extrabold"/>
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/lineContainer" />
 
                 <include
                     android:id="@+id/recommend1"
                     layout="@layout/item_recommend"
                     android:layout_width="335dp"
                     android:layout_height="79dp"
-                    app:layout_constraintStart_toStartOf="parent"
                     android:layout_marginStart="20dp"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="14.5dp"
                     android:layout_marginEnd="20dp"
-                    app:layout_constraintTop_toBottomOf="@id/recommendTitle"
-                    android:layout_marginTop="14.5dp"/>
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/recommendTitle" />
 
                 <include
                     android:id="@+id/recommend2"
                     layout="@layout/item_recommend"
                     android:layout_width="335dp"
                     android:layout_height="79dp"
-                    app:layout_constraintStart_toStartOf="parent"
                     android:layout_marginStart="20dp"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="14.5dp"
                     android:layout_marginEnd="20dp"
-                    app:layout_constraintTop_toBottomOf="@id/recommend1"
-                    android:layout_marginTop="14.5dp"/>
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/recommend1" />
 
                 <include
                     android:id="@+id/recommend3"
                     layout="@layout/item_recommend"
                     android:layout_width="335dp"
                     android:layout_height="79dp"
-                    app:layout_constraintStart_toStartOf="parent"
                     android:layout_marginStart="20dp"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="14.5dp"
                     android:layout_marginEnd="20dp"
-                    app:layout_constraintTop_toBottomOf="@id/recommend2"
-                    android:layout_marginTop="14.5dp"/>
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/recommend2" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-            
-
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

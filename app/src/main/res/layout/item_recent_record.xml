@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/rectangle17">
+    <TextView
+        android:id="@+id/bmiValue"
+        android:layout_width="wrap_content"
+        android:layout_height="33dp"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="24dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="13.5dp"
+        android:text="24.7"
+        android:textSize="27sp"
+        android:textColor="#000000"
+        android:fontFamily="@font/montserrat_extrabold"
+        android:letterSpacing="-0.01"
+        android:gravity="center"/>
+    
+    <ImageView
+        android:id="@+id/typeCycle"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        app:layout_constraintStart_toStartOf="@id/bmiValue"
+        app:layout_constraintTop_toBottomOf="@id/bmiValue"
+        android:layout_marginTop="3dp"
+        android:src="@drawable/normal_cycle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="13dp"/>
+
+    <TextView
+        android:id="@+id/typeName"
+        android:layout_width="171.5dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/typeCycle"
+        android:layout_marginStart="5dp"
+        app:layout_constraintTop_toBottomOf="@id/bmiValue"
+        android:text="Normal"
+        android:textSize="16sp"
+        android:textColor="#000000"
+        android:fontFamily="@font/montserrat_regular"
+        android:letterSpacing="-0.01"
+        android:gravity="left"/>
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="41.5dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="21.5dp"
+        android:text="May 6, 2021\nMorning"
+        android:textSize="15sp"
+        android:textColor="#444444"
+        android:fontFamily="@font/montserrat_regular"
+        android:letterSpacing="-0.01"
+        android:gravity="right"/>
+    
+    <ImageView
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="15dp"
+        android:src="@drawable/chevron_right"/>
+
+    
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
