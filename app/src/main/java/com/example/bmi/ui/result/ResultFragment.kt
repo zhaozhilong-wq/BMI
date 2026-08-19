@@ -2,6 +2,9 @@ package com.example.bmi.ui.result
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -120,6 +124,7 @@ class ResultFragment : Fragment() {
                         viewModel.getDialConfig(record)
                     )
                     if (record.isChild) {
+
                         val childThreshold = viewModel.getChildThreshold(record)
                         if (childThreshold == null) {
                             Log.e(
@@ -135,18 +140,57 @@ class ResultFragment : Fragment() {
                         setupChildCategories(childThreshold,
                             selectedCategory = category)
                         binding.bmiStatus.text = category.displayName
+                        if (category.displayName == "Obese Class I"){
+                            val display = "Obese"
+                            binding.bmiStatus.text = display
+                        }
                         setStatusBackground(category.colorRes)
 
+                        val statusMessage =
+                            viewModel.getChildStatusMessage(
+                                record = record,
+                                threshold = childThreshold
+                            )
+
+                        setBmiAdviceText(
+                            text = statusMessage.text,
+                            weightRange = statusMessage.weightRange,
+                            differenceText = statusMessage.differenceText
+                        )
+
                     } else {
-                        binding.bmiDialView.setConfig(viewModel.adultConfig)
                         // 成年人显示分类
                         val category = viewModel.getAdultCategory(record.bmi.toFloat())
                         setupAdultCategories(category)
                         binding.bmiStatus.text = category.displayName
                         setStatusBackground(category.colorRes)
+                        val statusMessage =
+                            viewModel.getAdultStatusMessage(
+                                record = record
+                            )
+
+                        setBmiAdviceText(
+                            text = statusMessage.text,
+                            weightRange = statusMessage.weightRange,
+                            differenceText = statusMessage.differenceText
+                        )
                     }
 
                     setPersonInfo(record)
+
+                    binding.BmiPointer.post {
+
+                        binding.BmiPointer.pivotX =
+                            binding.BmiPointer.width / 2f
+
+                        binding.BmiPointer.pivotY =
+                            binding.BmiPointer.height.toFloat()
+
+                        binding.BmiPointer.rotation = bmiToPointerRotation(
+                            record.bmi.toFloat(),
+                            viewModel.getDialConfig(record)
+                        )
+                    }
 
                 }
             }
@@ -274,6 +318,82 @@ class ResultFragment : Fragment() {
                 binding.personInfo.text = "$lb lb | ${feet}ft ${inches}in | ${record.gender} | ${record.age} years old"
             }
         }
+    }
+
+    private fun bmiToPointerRotation(
+        bmi: Float,
+        config: BmiDialConfig
+    ): Float {
+
+        val ratio =
+            (bmi - config.minBmi) /
+                    (config.maxBmi - config.minBmi)
+
+        return -71f + ratio * 180f
+    }
+
+    private fun setBmiAdviceText(
+        text: String,
+        weightRange: String,
+        differenceText: String?
+    ) {
+
+        val spannable = SpannableString(text)
+
+        val boldTypeface = ResourcesCompat.getFont(
+            requireContext(),
+            R.font.montserrat_extrabold
+        ) ?: return
+
+        // 正常体重范围
+        val rangeStart = text.indexOf(weightRange)
+
+        if (rangeStart != -1) {
+
+            val rangeEnd =
+                rangeStart + weightRange.length
+
+            spannable.setSpan(
+                CustomTypefaceSpan(boldTypeface),
+                rangeStart,
+                rangeEnd,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        // 超重 / 体重不足的差值
+        if (differenceText != null) {
+
+            val differenceStart =
+                text.indexOf(differenceText)
+
+            if (differenceStart != -1) {
+
+                val differenceEnd =
+                    differenceStart + differenceText.length
+
+                spannable.setSpan(
+                    CustomTypefaceSpan(boldTypeface),
+                    differenceStart,
+                    differenceEnd,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                // 颜色
+                spannable.setSpan(
+                    ForegroundColorSpan(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.adviceWeight
+                        )
+                    ),
+                    differenceStart,
+                    differenceEnd,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+        }
+
+        binding.advice.text = spannable
     }
 
 }

@@ -53,8 +53,8 @@
 
                 <com.example.bmi.ui.BmiDialView
                     android:id="@+id/bmiDialView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -63,6 +63,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
             
             <ImageView
+                android:id="@+id/BmiPointer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
@@ -171,8 +172,9 @@
                 android:layout_marginTop="20dp" />
 
             <TextView
+                android:id="@+id/advice"
                 android:layout_width="0dp"
-                android:layout_height="85dp"
+                android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/bmiCategoryLayout"
                 android:layout_marginTop="25dp"
                 app:layout_constraintBottom_toBottomOf="parent"

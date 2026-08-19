@@ -13,7 +13,7 @@ import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
 
-class   BmiDialView @JvmOverloads constructor(
+class BmiDialView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : View(context, attrs) {
@@ -25,15 +25,15 @@ class   BmiDialView @JvmOverloads constructor(
 
     fun setConfig(config: BmiDialConfig) {
         this.config = config
-        invalidate()
+        invalidate()//如果view的内容改变，请重新调用ondraw
     }
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE
-        strokeWidth = 90f.dp
-        strokeCap = Paint.Cap.BUTT
+        style = Paint.Style.STROKE//只画线，不填充
+        strokeWidth = 90f.dp//线粗细
+        strokeCap = Paint.Cap.BUTT//线头形状
         color = Color.LTGRAY
-    }
+    }//画笔
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
         color = Color.BLACK
@@ -44,9 +44,9 @@ class   BmiDialView @JvmOverloads constructor(
             context,
             R.font.montserrat_extrabold
         )
-    }
+    }//画文字的画笔
 
-    override fun onDraw(canvas: Canvas) {
+    override fun onDraw(canvas: Canvas) {//canvas就是画布
         super.onDraw(canvas)
 
         val config = config ?: return
@@ -64,7 +64,7 @@ class   BmiDialView @JvmOverloads constructor(
             centerY - radius,
             centerX + radius,
             centerY + radius
-        )
+        )//构造一个包住这个圆的矩形
 
         for (section in config.sections) {
 
@@ -83,11 +83,11 @@ class   BmiDialView @JvmOverloads constructor(
             paint.color = context.getColor(section.color)
 
             canvas.drawArc(
-                rect,
-                startAngle,
-                sweepAngle,
-                false,
-                paint
+                rect,//圆所在矩形
+                startAngle,//从哪里开始
+                sweepAngle,//转多少度
+                false,//是否链接圆心
+                paint//用哪个画笔
             )
         }
         drawTicks(
@@ -96,7 +96,7 @@ class   BmiDialView @JvmOverloads constructor(
             centerX,
             centerY,
             radius
-        )
+        )//画数字
     }
 
     private fun bmiToAngle(
@@ -109,7 +109,7 @@ class   BmiDialView @JvmOverloads constructor(
                     (config.maxBmi - config.minBmi)
 
         return 180f + ratio * 180f
-    }
+    }//计算比例
     private fun drawTicks(
         canvas: Canvas,
         config: BmiDialConfig,
@@ -123,7 +123,7 @@ class   BmiDialView @JvmOverloads constructor(
                 bmi,
                 config
             )
-            val angleRadians = Math.toRadians(
+            val angleRadians = Math.toRadians(//角度转弧度
                 angleDegrees.toDouble()
             )
             val x = centerX +
@@ -131,7 +131,7 @@ class   BmiDialView @JvmOverloads constructor(
                     cos(angleRadians).toFloat()
             val y = centerY +
                     textRadius *
-                    sin(angleRadians).toFloat()
+                    sin(angleRadians).toFloat()//计算数字坐标
 
             val text = if (bmi % 1f == 0f) {
                 bmi.toInt().toString()
@@ -140,11 +140,11 @@ class   BmiDialView @JvmOverloads constructor(
             }
             val fontMetrics = textPaint.fontMetrics
             val baselineY =
-                -(fontMetrics.ascent + fontMetrics.descent) / 2f
+                -(fontMetrics.ascent + fontMetrics.descent) / 2f//让文字的中心落在坐标系原点
 
             canvas.save()
 
-            canvas.translate(x, y)
+            canvas.translate(x, y)//移动画布坐标系原点
 
             val rotation =
                 (angleDegrees - 270f)

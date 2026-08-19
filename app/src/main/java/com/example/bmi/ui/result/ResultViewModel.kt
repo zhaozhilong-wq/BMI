@@ -84,8 +84,7 @@ class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
 
         viewModelScope.launch {
             val record = repository.getById(recordId)
-            if (record != null)
-            {
+            if (record != null) {
                 repository.delete(record)
             }
         }
@@ -109,6 +108,7 @@ class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
                 BmiCategory.OBESE_CLASS_I
         }
     }
+
     fun getAdultCategory(
         bmi: Float,
     ): BmiCategory {
@@ -163,6 +163,7 @@ class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
 
         return threshold.toDialConfig()
     }
+
     fun getChildThreshold(record: BmiRecord): ChildBmiThreshold? {
 
         val table = if (record.gender == "male") {
@@ -175,4 +176,128 @@ class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
             it.age == record.age
         }
     }
+
+
+    fun getAdultStatusMessage(
+        record: BmiRecord
+    ): BmiStatusMessage {
+        val heightCm = record.heightCm.toFloat()
+
+        val heightM = heightCm / 100f
+        val heightSquared = heightM * heightM
+
+        val minHealthyWeight = 18.5f * heightSquared
+        val maxHealthyWeight = 25f * heightSquared
+
+        val weightRange =
+            "${String.format("%.1f", minHealthyWeight)}kg - " +
+                    "${String.format("%.1f", maxHealthyWeight)}kg"
+
+        val bmi = record.bmi.toFloat()
+
+        return when {
+
+            bmi < 18.5f -> {
+
+                val difference =
+                    minHealthyWeight - record.weightKg
+
+                BmiStatusMessage(
+                    text =
+                        "Normal Weight for your height (${heightCm.toInt()}cm):\n" +
+                                "$weightRange (-${String.format("%.1f", difference)}kg)",
+
+                    weightRange = weightRange,
+
+                    differenceText =
+                        "(-${String.format("%.1f", difference)}kg)"
+                )
+            }
+
+            bmi > 25f -> {
+
+                val difference =
+                    record.weightKg - maxHealthyWeight
+
+                BmiStatusMessage(
+                    text =
+                        "Normal Weight for your height (${heightCm.toInt()}cm):\n" +
+                                "$weightRange (+${String.format("%.1f", difference)}kg)",
+
+                    weightRange = weightRange,
+
+                    differenceText =
+                        "(+${String.format("%.1f", difference)}kg)"
+                )
+            }
+
+            else -> {
+
+                BmiStatusMessage(
+                    text ="\uD83D\uDE0E Congratulations! You’re in a great place now. Keep up your healthy habits to maintain your healthy weight.",
+
+                    weightRange = weightRange,
+
+                    differenceText = null
+                )
+            }
+        }
+    }
+
+    fun getChildStatusMessage(
+        record: BmiRecord,
+        threshold: ChildBmiThreshold
+    ): BmiStatusMessage {
+        val heightCm = record.heightCm.toFloat()
+        val heightM = heightCm / 100f
+        val heightSquared = heightM * heightM
+        // 儿童正常 BMI 对应的体重范围
+        val minHealthyWeight =
+            threshold.underweight * heightSquared
+        val maxHealthyWeight =
+            threshold.normal * heightSquared
+        val weightRange =
+            "${String.format("%.1f", minHealthyWeight)}kg - " + "${String.format("%.1f", maxHealthyWeight)}kg"
+
+        val bmi = record.bmi.toFloat()
+        return when {
+            bmi < threshold.underweight -> {
+                val difference =
+                    minHealthyWeight - record.weightKg
+                BmiStatusMessage(
+                    text =
+                        "Normal Weight for your height (${heightCm.toInt()}cm):\n" +
+                                "$weightRange (-${String.format("%.1f", difference)}kg)",
+                    weightRange = weightRange,
+                    differenceText =
+                        "(-${String.format("%.1f", difference)}kg)"
+                )
+            }
+            bmi > threshold.normal -> {
+                val difference =
+                    record.weightKg - maxHealthyWeight
+                BmiStatusMessage(
+                    text =
+                        "Normal Weight for your height (${heightCm.toInt()}cm):\n" +
+                                "$weightRange (+${String.format("%.1f", difference)}kg)",
+                    weightRange = weightRange,
+                    differenceText =
+                        "(+${String.format("%.1f", difference)}kg)"
+                )
+            }
+            else -> {
+                BmiStatusMessage(
+                    text ="\uD83D\uDC4D Thumbs Up! You’ve done a great job and now only need to keep your lifestyle healthy to stay in this range.",
+                    weightRange = weightRange,
+                    differenceText = null
+                )
+            }
+        }
+    }
 }
+
+data class BmiStatusMessage(
+    val text: String,
+    val weightRange: String,
+    val differenceText: String?
+)

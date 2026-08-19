@@ -96,6 +96,15 @@ class BmiDialDialog(
         binding.gotButton.setOnClickListener {
             dismiss()
         }
+        if (record.isChild) {
+            binding.title.text = "BMI for teenagers"
+            val gender = if (record.gender == "Male") "Boy" else "Girl"
+            binding.subTitle.text = "${record.age} years old ($gender)"
+            binding.subTitle.visibility = android.view.View.VISIBLE
+        }else{
+            binding.title.text = "BMI for adults"
+            binding.subTitle.visibility = android.view.View.GONE
+        }
     }
 
     override fun onStart() {
@@ -111,7 +120,7 @@ class BmiDialDialog(
             // Window 宽度占满屏幕
             setLayout(
                 WindowManager.LayoutParams.MATCH_PARENT,
-                dpToPx(590)
+                WindowManager.LayoutParams.WRAP_CONTENT
             )
             window?.setBackgroundDrawable(
                 ColorDrawable(Color.TRANSPARENT)
