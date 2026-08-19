@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="335dp"
+    android:layout_height="79dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/rectangle14">
+    
+    <ImageView
+        android:id="@+id/cover"
+        android:layout_width="49dp"
+        android:layout_height="49dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="16dp"
+        android:src="@drawable/recommend_cover"/>
+    
+    <TextView
+        android:id="@id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="17dp"
+        app:layout_constraintTop_toTopOf="@id/cover"
+        app:layout_constraintStart_toEndOf="@id/cover"
+        android:layout_marginStart="14dp"
+        android:text="Home Workout - No Equipments"
+        android:textColor="#000000"
+        android:textSize="14sp"
+        android:letterSpacing="-0.01"
+        android:fontFamily="@font/montserrat_regular"/>
+    
+    <TextView
+        android:id="@+id/subTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        android:layout_marginTop="2dp"
+        app:layout_constraintStart_toStartOf="@id/title"
+        android:text="Weight Loss, Lose Belly Fat"
+        android:textSize="12sp"
+        android:textColor="#000000"
+        android:alpha="0.8"
+        android:letterSpacing="-0.01"
+        android:fontFamily="@font/montserrat_regular"/>
+
+    <ImageView
+        android:id="@+id/star1"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        app:layout_constraintBottom_toBottomOf="@id/cover"
+        app:layout_constraintStart_toStartOf="@id/title"
+        android:src="@drawable/star"/>
+
+    <ImageView
+        android:id="@+id/star2"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        app:layout_constraintBottom_toBottomOf="@id/cover"
+        app:layout_constraintStart_toEndOf="@id/star1"
+        android:layout_marginStart="1dp"
+        android:src="@drawable/star"/>
+
+    <ImageView
+        android:id="@+id/star3"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        app:layout_constraintBottom_toBottomOf="@id/cover"
+        app:layout_constraintStart_toEndOf="@id/star2"
+        android:layout_marginStart="1dp"
+        android:src="@drawable/star"/>
+
+    <ImageView
+        android:id="@+id/star4"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        app:layout_constraintBottom_toBottomOf="@id/cover"
+        app:layout_constraintStart_toEndOf="@id/star3"
+        android:layout_marginStart="1dp"
+        android:src="@drawable/star"/>
+
+    <ImageView
+        android:id="@+id/star5"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        app:layout_constraintBottom_toBottomOf="@id/cover"
+        app:layout_constraintStart_toEndOf="@id/star4"
+        android:layout_marginStart="1dp"
+        android:src="@drawable/star"/>
+
+    <TextView
+        android:id="@+id/score"
+        android:layout_width="wrap_content"
+        android:layout_height="15dp"
+        app:layout_constraintBottom_toBottomOf="@id/cover"
+        app:layout_constraintStart_toEndOf="@id/star5"
+        android:layout_marginStart="5dp"
+        android:text="4.8"
+        android:textSize="12sp"
+        android:textColor="#000000"
+        android:alpha="0.8"
+        android:letterSpacing="-0.01"
+        android:fontFamily="@font/montserrat_regular"/>
+    
+    <TextView
+        android:layout_width="29.5dp"
+        android:layout_height="14.5dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="AD"
+        android:textSize="8sp"
+        android:textColor="#FFFFFF"
+        android:gravity="center"
+        android:background="@drawable/rectangle16"
+        android:alpha="0.3"/>
+
+    
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

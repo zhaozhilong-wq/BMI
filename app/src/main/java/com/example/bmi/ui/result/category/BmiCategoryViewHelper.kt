@@ -2,6 +2,7 @@ package com.example.bmi.ui.result.category
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import com.example.bmi.R
 import com.example.bmi.databinding.ItemBmiTypeBinding
 
@@ -137,6 +138,22 @@ object BmiCategoryViewHelper {
                     item.backgroundRes
                 )
                 itemBinding.typeCycle.setImageResource(R.drawable.cycle_selected)
+                itemBinding.typeText.setTextColor(
+                    itemBinding.typeText.context.getColor(
+                        R.color.white
+                    )
+                )
+                itemBinding.typeText.typeface =
+                    ResourcesCompat.getFont(itemBinding.typeText.context, R.font.montserrat_extrabold)
+                itemBinding.typeText.alpha = 1f
+                itemBinding.typeRange.setTextColor(
+                    itemBinding.typeRange.context.getColor(
+                        R.color.white
+                    )
+                )
+                itemBinding.typeRange.typeface =
+                    ResourcesCompat.getFont(itemBinding.typeRange.context, R.font.montserrat_extrabold)
+                itemBinding.typeRange.alpha = 1f
             }
 
             container.addView(itemBinding.root)

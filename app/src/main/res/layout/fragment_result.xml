@@ -38,7 +38,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/dialContainer"
@@ -177,8 +177,6 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/bmiCategoryLayout"
                 android:layout_marginTop="25dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginBottom="28dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginStart="30dp"
@@ -190,6 +188,82 @@
                 android:fontFamily="@font/montserrat_regular"
                 android:gravity="center"
                 android:background="@drawable/rectangle14"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/recommendation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/advice"
+                android:layout_marginTop="30dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginBottom="32.5dp">
+                <View
+                    android:id="@+id/line1"
+                    android:layout_width="0dp"
+                    android:layout_height="0.5dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginStart="22.5dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="22.5dp"
+                    android:background="#000000"
+                    android:alpha="0.2"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <TextView
+                    android:id="@+id/recommendTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    app:layout_constraintTop_toBottomOf="@id/line1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginTop="24.5dp"
+                    android:layout_marginStart="20dp"
+                    android:text="Apps you might need"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:letterSpacing="-0.01"
+                    android:fontFamily="@font/montserrat_extrabold"/>
+
+                <include
+                    android:id="@+id/recommend1"
+                    layout="@layout/item_recommend"
+                    android:layout_width="335dp"
+                    android:layout_height="79dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginStart="20dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintTop_toBottomOf="@id/recommendTitle"
+                    android:layout_marginTop="14.5dp"/>
+
+                <include
+                    android:id="@+id/recommend2"
+                    layout="@layout/item_recommend"
+                    android:layout_width="335dp"
+                    android:layout_height="79dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginStart="20dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintTop_toBottomOf="@id/recommend1"
+                    android:layout_marginTop="14.5dp"/>
+
+                <include
+                    android:id="@+id/recommend3"
+                    layout="@layout/item_recommend"
+                    android:layout_width="335dp"
+                    android:layout_height="79dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginStart="20dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintTop_toBottomOf="@id/recommend2"
+                    android:layout_marginTop="14.5dp"/>
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            
+
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

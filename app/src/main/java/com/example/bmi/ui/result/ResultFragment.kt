@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -96,6 +97,7 @@ class ResultFragment : Fragment() {
             ResultMode.NEW_USER -> {
                 Log.d("ResultFragment", "mode is NEW_USER")
                 binding.bmiHelp.visibility = View.GONE
+                binding.recommendation.visibility = View.GONE
                 viewModel.loadRecord(recordId)
             }
 
@@ -107,7 +109,10 @@ class ResultFragment : Fragment() {
             ResultMode.LATEST -> {
                 Log.d("ResultFragment", "mode is LATEST")
                 viewModel.getLatestRecord()
+                binding.advice.visibility = View.GONE
                 binding.bmiHelp.visibility = View.GONE
+                binding.recommendation.visibility = View.GONE
+                binding.saveButton.visibility = View.GONE
             }
         }
 
@@ -206,36 +211,52 @@ class ResultFragment : Fragment() {
             }
         }
         binding.discord.setOnClickListener {
-            val dialog = ConfirmDialog(requireContext()) {
-                viewModel.deleteRecord(recordId)
+            showConfirmDialog()
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
 
-                viewLifecycleOwner.lifecycleScope.launch {
-                    repeatOnLifecycle(Lifecycle.State.STARTED) {
-                        viewModel.isNewUser.collect { isNewUser ->
-                            val targetActivity = if (isNewUser) {
-                                InputActivity::class.java
-                            } else {
-                                MainActivity::class.java
-                            }
-                            startActivity(
-                                Intent(
-                                    requireContext(),
-                                    targetActivity
-                                )
-                            )
-                            requireActivity().finish()
-                        }
+                override fun handleOnBackPressed() {
+                    if (mode == ResultMode.NORMAL ||
+                        mode == ResultMode.NEW_USER
+                    ) {
+                        showConfirmDialog()
                     }
                 }
             }
-            dialog.show()
-
-        }
+        )
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun showConfirmDialog() {
+        val dialog = ConfirmDialog(requireContext()) {
+            viewModel.deleteRecord(recordId)
+            viewLifecycleOwner.lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.isNewUser.collect { isNewUser ->
+                        val targetActivity =
+                            if (isNewUser) {
+                                InputActivity::class.java
+                            } else {
+                                MainActivity::class.java
+                            }
+                        startActivity(
+                            Intent(
+                                requireContext(),
+                                targetActivity
+                            )
+                        )
+                        requireActivity().finish()
+                    }
+                }
+            }
+        }
+        dialog.show()
     }
 
     companion object {
