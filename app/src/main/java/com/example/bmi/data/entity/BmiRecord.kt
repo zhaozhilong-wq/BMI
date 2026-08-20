@@ -21,5 +21,8 @@ data class BmiRecord(
     val year: Int,
     val month: Int,
     val day: Int,
-    val time: Int
+    val time: Int,
+
+    // 真实创建时间
+    val createdAt: Long
 )

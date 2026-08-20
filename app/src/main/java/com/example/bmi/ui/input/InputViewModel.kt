@@ -673,7 +673,8 @@ class InputViewModel (
             year = state.year,
             month = state.month,
             day = state.day,
-            time = state.timeSlot
+            time = state.timeSlot,
+            createdAt = System.currentTimeMillis()
         )
 
         viewModelScope.launch {

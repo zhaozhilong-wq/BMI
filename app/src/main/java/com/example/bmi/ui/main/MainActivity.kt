@@ -1,13 +1,18 @@
 package com.example.bmi.ui.main
 
+import android.app.Activity
+import android.app.ComponentCaller
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MotionEvent
 import android.view.View
 import android.widget.EditText
+import android.widget.Toast
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -99,7 +104,7 @@ class MainActivity : AppCompatActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+            v.setPadding(systemBars.left, 0, systemBars.right, 0)
             insets
         }
         val viewPager2 = binding.viewPager
@@ -123,26 +128,18 @@ class MainActivity : AppCompatActivity() {
 
                 override fun onPageSelected(position: Int) {
                     when (position) {
-                        0 -> bottomNav.selectedItemId =
-                            R.id.navigation_calculator
+                        0 -> bottomNav.selectedItemId = R.id.navigation_calculator
 
-                        1 -> bottomNav.selectedItemId =
-                            R.id.navigation_bmi
+                        1 -> bottomNav.selectedItemId = R.id.navigation_bmi
 
-                        2 -> bottomNav.selectedItemId =
-                            R.id.navigation_statistics
+                        2 -> bottomNav.selectedItemId = R.id.navigation_statistics
                     }
                 }
             }
         )
 
 
-        val openPage = intent.getIntExtra(
-            "open_page",
-            0
-        )
-
-        binding.viewPager.currentItem = openPage
+        handleIntent(intent)
 
 
 
@@ -150,9 +147,41 @@ class MainActivity : AppCompatActivity() {
 
 
     }
+
+    override fun onNewIntent(
+        intent: Intent,
+        caller: ComponentCaller
+    ) {
+        super.onNewIntent(intent, caller)
+
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
+
 
     fun goToInputPage() {
         binding.viewPager.currentItem = 0
     }
+
+    private fun handleIntent(intent: Intent) {
+        val openPage = intent.getIntExtra(
+            "open_page",
+            0
+        )
+        binding.viewPager.currentItem = openPage
+        val showSavedToast = intent.getBooleanExtra(
+            "show_saved_toast",
+            false
+        )
+        if (showSavedToast) {
+            Toast.makeText(
+                this,
+                "Saved successfully",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
 
 }

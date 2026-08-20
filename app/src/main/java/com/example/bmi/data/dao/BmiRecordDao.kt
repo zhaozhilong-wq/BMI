@@ -19,12 +19,19 @@ interface BmiRecordDao {
     @Insert
     suspend fun insert(record: BmiRecord): Long
 
-    @Query("SELECT * FROM bmi_records ORDER BY year DESC, month DESC, day DESC, time DESC")
+    @Query("""
+    SELECT * FROM bmi_records
+    ORDER BY 
+        year DESC,
+        month DESC,
+        day DESC,
+        time DESC,
+        createdAt DESC""")
     fun getAllRecords(): Flow<List<BmiRecord>>
 
     @Query("""
         SELECT * FROM bmi_records
-        ORDER BY year DESC, month DESC, day DESC, time DESC
+        ORDER BY year DESC, month DESC, day DESC, time DESC,createdAt DESC
         LIMIT 1
     """)
     fun getLatestRecord(): Flow<BmiRecord?>

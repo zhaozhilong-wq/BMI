@@ -9,7 +9,7 @@ import com.example.bmi.data.entity.BmiRecord
 
 @Database(
     entities = [BmiRecord::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class BmiDatabase : RoomDatabase() {

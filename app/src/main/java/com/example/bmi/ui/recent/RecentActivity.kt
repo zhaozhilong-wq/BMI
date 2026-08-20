@@ -1,10 +1,13 @@
 package com.example.bmi.ui.recent
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -52,8 +55,12 @@ class RecentActivity : AppCompatActivity() {
             ItemSpaceDecoration(space)
         )
         adapter.setOnItemClick { record ->
-            startActivity(
-                ResultActivity.newIntent(this, ResultMode.HISTORY, record.id)
+            resultLauncher.launch(
+                ResultActivity.newIntent(
+                    this,
+                    ResultMode.HISTORY,
+                    record.id
+                )
             )
         }
         binding.recentRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -70,4 +77,27 @@ class RecentActivity : AppCompatActivity() {
         }
 
     }
+
+    private val resultLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+
+            if (result.resultCode == Activity.RESULT_OK) {
+
+                val deleteSuccess =
+                    result.data?.getBooleanExtra(
+                        "delete_success",
+                        false
+                    ) ?: false
+
+                if (deleteSuccess) {
+                    Toast.makeText(
+                        this,
+                        "Deleted successfully",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
 }

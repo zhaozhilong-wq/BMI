@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -79,14 +80,20 @@ class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
 
 
     fun deleteRecord(
-        recordId: Long
+        recordId: Long,
+        onDeleted: (Boolean) -> Unit
     ) {
-
         viewModelScope.launch {
+
             val record = repository.getById(recordId)
+
             if (record != null) {
                 repository.delete(record)
             }
+
+            val count = repository.getCount().first()
+
+            onDeleted(count == 0)
         }
     }
 

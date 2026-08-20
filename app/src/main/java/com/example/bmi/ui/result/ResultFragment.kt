@@ -38,6 +38,8 @@ import com.example.bmi.ui.toDialConfig
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import kotlin.math.roundToInt
+import android.animation.ValueAnimator
+import android.app.Activity
 
 
 /**
@@ -173,10 +175,9 @@ class ResultFragment : Fragment() {
                     if (record == null) {
                         return@collect
                     }
-                    binding.bmiResult.text = String.format("%.1f", record.bmi)
-                    binding.bmiDialView.setConfig(
-                        viewModel.getDialConfig(record)
-                    )
+
+                    val config = viewModel.getDialConfig(record)
+                    binding.bmiDialView.setConfig(config)
                     if (record.isChild) {
 
                         val childThreshold = viewModel.getChildThreshold(record)
@@ -237,17 +238,32 @@ class ResultFragment : Fragment() {
                     setPersonInfo(record)
 
                     binding.BmiPointer.post {
+                        val pivotX = 38.543f / 53f * binding.BmiPointer.width
+                        val pivotY = 77.617f / 92f * binding.BmiPointer.height
 
-                        binding.BmiPointer.pivotX =
-                            binding.BmiPointer.width / 2f
+                        binding.BmiPointer.pivotX = pivotX
+                        binding.BmiPointer.pivotY = pivotY
 
-                        binding.BmiPointer.pivotY =
-                            binding.BmiPointer.height.toFloat()
 
-                        binding.BmiPointer.rotation = bmiToPointerRotation(
-                            record.bmi.toFloat(),
-                            viewModel.getDialConfig(record)
-                        )
+                        if (mode == ResultMode.NORMAL ||
+                            mode == ResultMode.NEW_USER
+                        ) {
+                            showResultWithAnimation(
+                                record,
+                                config
+                            )
+                        } else {
+                            binding.bmiResult.text =
+                                String.format(
+                                    "%.1f",
+                                    record.bmi
+                                )
+                            binding.BmiPointer.rotation =
+                                bmiToPointerRotation(
+                                    record.bmi.toFloat(),
+                                    config
+                                )
+                        }
                     }
 
                 }
@@ -288,6 +304,8 @@ class ResultFragment : Fragment() {
                     MainActivity::class.java
                 ).apply {
                     putExtra("open_page", 2)
+                    putExtra("show_saved_toast", true)
+                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 }
             )
         }
@@ -301,31 +319,37 @@ class ResultFragment : Fragment() {
 
     private fun showConfirmDialog() {
         val dialog = ConfirmDialog(requireContext()) {
-            viewModel.deleteRecord(recordId)
-            viewLifecycleOwner.lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.isNewUser.collect { isNewUser ->
-                        val targetActivity =
-                            if (isNewUser) {
-                                InputActivity::class.java
-                            } else {
-                                if (mode != ResultMode.HISTORY) {
-                                    MainActivity::class.java
-                                } else {
-                                    RecentActivity::class.java
-                                }
-                            }
-                        startActivity(
-                            Intent(
-                                requireContext(),
-                                targetActivity
-                            )
-                        )
-                        requireActivity().finish()
-                    }
+            viewModel.deleteRecord(recordId) { isNewUser ->
+                if (isNewUser && mode==ResultMode.HISTORY) {
+                    // 已经没有任何记录了
+                    startActivity(
+                        Intent(
+                            requireContext(),
+                            InputActivity::class.java
+                        ).apply {
+
+                            putExtra("show_delete_toast", true)
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                                    Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        }
+                    )
+                    requireActivity().finish()
+                } else{
+                    // 历史结果页删除后还有记录
+                    // 不要重新打开 RecentActivity
+                    // 直接关闭当前 ResultActivity
+
+                    requireActivity().setResult(
+                        Activity.RESULT_OK,
+                        Intent().apply {
+                            putExtra("delete_success", true)
+                        }
+                    )
+                    requireActivity().finish()
                 }
             }
         }
+
         dialog.show()
     }
 
@@ -486,6 +510,51 @@ class ResultFragment : Fragment() {
         }
 
         binding.advice.text = spannable
+    }
+
+    private fun animateBmiValue(
+        targetBmi: Float
+    ) {
+        val animator = ValueAnimator.ofFloat(0f, targetBmi)
+
+        animator.duration = 800L
+
+        animator.addUpdateListener {
+            val value = it.animatedValue as Float
+
+            binding.bmiResult.text =
+                String.format("%.1f", value)
+        }
+
+        animator.start()
+    }//bmi数值动画
+
+    private fun animatePointer(
+        targetRotation: Float
+    ) {
+        binding.BmiPointer.rotation = -71f
+
+        binding.BmiPointer.animate()
+            .rotation(targetRotation)
+            .setDuration(1200L)
+            .start()
+    }//指针动画
+
+    private fun showResultWithAnimation(
+        record: BmiRecord,
+        config: BmiDialConfig
+    ) {
+        val bmi = record.bmi.toFloat()
+        // BMI 从 0 开始
+        binding.bmiResult.text = "0.0"
+        // 指针从最左边开始
+        binding.BmiPointer.rotation = -71f
+        // BMI 数字动画
+        animateBmiValue(bmi)
+        // 指针动画
+        val targetRotation =
+            bmiToPointerRotation(bmi, config)
+        animatePointer(targetRotation)
     }
 
 

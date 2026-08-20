@@ -1,5 +1,6 @@
 package com.example.bmi.ui.input
 
+import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -10,6 +11,9 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -87,6 +91,7 @@ class InputFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -212,8 +217,9 @@ class InputFragment : Fragment() {
 
         binding.calButton.setOnClickListener {
             viewModel.calculateAndSave { mode, recordId ->
-                startActivity(
+                resultLauncher.launch(
                     ResultActivity.newIntent(requireContext(), mode, recordId)
+
                 )
             }
         }
@@ -436,6 +442,29 @@ class InputFragment : Fragment() {
             )
         }
     }
+
+    private val resultLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+
+            if (result.resultCode == Activity.RESULT_OK) {
+
+                val deleteSuccess =
+                    result.data?.getBooleanExtra(
+                        "delete_success",
+                        false
+                    ) ?: false
+
+                if (deleteSuccess) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Deleted successfully",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
 
 
 

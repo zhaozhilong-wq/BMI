@@ -3,6 +3,7 @@ package com.example.bmi.ui.input
 import android.graphics.Color
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.widget.Toast
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -31,12 +32,25 @@ class InputActivity : AppCompatActivity(){
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom)
             insets
         }
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.fragment_container, InputFragment())
             commit()
+        }
+
+        val showDeleteToast = intent.getBooleanExtra(
+            "show_delete_toast",
+            false
+        )
+
+        if (showDeleteToast) {
+            Toast.makeText(
+                this,
+                "Deleted successfully",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
