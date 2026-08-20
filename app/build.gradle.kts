@@ -62,4 +62,5 @@ dependencies {
     implementation(libs.koin.android)
 
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }

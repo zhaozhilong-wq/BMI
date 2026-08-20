@@ -8,6 +8,7 @@ import com.example.bmi.ui.main.MainViewModel
 import com.example.bmi.ui.recent.RecentViewModel
 import com.example.bmi.ui.result.ResultViewModel
 import com.example.bmi.ui.splash.SplashViewModel
+import com.example.bmi.ui.statistics.StatisticsViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -58,6 +59,11 @@ val appModule = module {
     }
     viewModel {
         RecentViewModel(
+            repository = get()
+        )
+    }
+    viewModel {
+        StatisticsViewModel(
             repository = get()
         )
     }
