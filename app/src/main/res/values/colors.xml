@@ -22,4 +22,5 @@
     <color name="obesity3_cycle">#D3333B</color>
     <color name="adviceWeight">#D13B3B</color>
     <color name="MainBackground">#EAEAEE</color>
+    <color name="gridColor">#80EEEEEE</color>
 </resources>

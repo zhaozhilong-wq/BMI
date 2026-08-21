@@ -109,6 +109,7 @@ class MainActivity : AppCompatActivity() {
         }
         val viewPager2 = binding.viewPager
         val bottomNav = binding.bottomNav
+        viewPager2.isUserInputEnabled = false
 
 
         viewPager2.adapter = Adapter(this)

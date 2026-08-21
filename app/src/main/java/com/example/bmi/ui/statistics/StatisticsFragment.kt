@@ -1,29 +1,31 @@
 package com.example.bmi.ui.statistics
 
-import android.R.attr.description
-import android.R.attr.entries
-import android.R.attr.textColor
-import android.R.attr.textSize
-import android.R.attr.typeface
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.fragment.app.activityViewModels
+import androidx.core.view.doOnLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.bmi.R
 import com.example.bmi.databinding.FragmentStatisticsBinding
+import com.example.bmi.ui.main.MainActivity
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.listener.ChartTouchListener
+import com.github.mikephil.charting.listener.OnChartGestureListener
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.util.Calendar
@@ -42,6 +44,9 @@ class StatisticsFragment : Fragment() {
 
     private val viewModel: StatisticsViewModel by activityViewModel()
 
+    private val initialVisibleMinX = 52f
+    private val initialVisibleMaxX = 59f
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -57,12 +62,31 @@ class StatisticsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupChart(binding.BmiChart)
-        setupChart(binding.WeightChart)
+        binding.update1.setOnClickListener {
+            (requireActivity() as MainActivity).goToInputPage()
+        }
+        binding.update2.setOnClickListener {
+            (requireActivity() as MainActivity).goToInputPage()
+        }
+        setupChart(binding.BmiChart,binding.bmiTimeAxis)
+        setupChart(binding.WeightChart,binding.weightTimeAxis)
+        binding.bmiTimeAxis.setChart(binding.BmiChart)
+        binding.weightTimeAxis.setChart(binding.WeightChart)
+
+        binding.bmiTimeAxis.setVisibleRange(
+            initialVisibleMinX,
+            initialVisibleMaxX
+        )
+
+        binding.weightTimeAxis.setVisibleRange(
+            initialVisibleMinX,
+            initialVisibleMaxX
+        )
+
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.dailyBmi.collect { points ->
-                    updateChart(binding.BmiChart, points, "BMI")
+                    updateChart(binding.BmiChart, points, "BMI", binding.bmiTimeAxis)
                 }
             }
         }
@@ -70,21 +94,23 @@ class StatisticsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.dailyWeight.collect { points ->
-                    updateChart(binding.WeightChart, points, "Weight")
+                    updateChart(binding.WeightChart, points, "Weight", binding.weightTimeAxis)
+                }
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.timeMarkers.collect { markers ->
+                    binding.bmiTimeAxis.setMarkers(markers)
+                    binding.weightTimeAxis.setMarkers(markers)
                 }
             }
         }
     }
 
-    private fun setupChart(chart: LineChart) {
+    private fun setupChart(chart: LineChart,timeAxis: TimeAxisView) {
 
         chart.apply {
-            setExtraOffsets(
-                20f,
-                15f,
-                20f,
-                20f
-            )
 
             description.isEnabled = false
 
@@ -94,18 +120,108 @@ class StatisticsFragment : Fragment() {
             isDragEnabled = true
             setScaleEnabled(false)
 
+            setExtraOffsets(
+                10f,
+                30f,
+                27.5f,
+                20f
+            )
+
         }
+        chart.setOnChartGestureListener(
+            object : OnChartGestureListener {
+
+                override fun onChartTranslate(
+                    me: MotionEvent?,
+                    dX: Float,
+                    dY: Float
+                ) {
+                    val minX = chart.lowestVisibleX
+                    val maxX = chart.highestVisibleX
+                    Log.d(
+                        "ChartGesture",
+                        "TRANSLATE: dX=$dX dY=$dY " +
+                                "visibleX=${chart.lowestVisibleX} ~ ${chart.highestVisibleX}"
+                    )
+                    timeAxis.setVisibleRange(
+                        minX,
+                        maxX
+                    )
+                }
+
+                override fun onChartGestureStart(
+                    me: MotionEvent?,
+                    lastPerformedGesture: ChartTouchListener.ChartGesture?
+                ) {
+                }
+
+                override fun onChartGestureEnd(
+                    me: MotionEvent?,
+                    lastPerformedGesture: ChartTouchListener.ChartGesture?
+                ) {
+                }
+
+                override fun onChartLongPressed(
+                    me: MotionEvent?
+                ) {
+                }
+
+                override fun onChartDoubleTapped(
+                    me: MotionEvent?
+                ) {
+                }
+
+                override fun onChartSingleTapped(
+                    me: MotionEvent?
+                ) {
+                }
+
+                override fun onChartFling(
+                    me1: MotionEvent?,
+                    me2: MotionEvent?,
+                    velocityX: Float,
+                    velocityY: Float
+                ) {
+                }
+
+                override fun onChartScale(
+                    me: MotionEvent?,
+                    scaleX: Float,
+                    scaleY: Float
+                ) {
+                }
+            }
+        )
     }
 
 
     private fun updateChart(
         chart: LineChart,
         points: List<ChartPoint>,
-        label: String
+        label: String,
+        timeAxis: TimeAxisView
     ) {
+        Log.d(
+            "ChartDebug",
+            "========== updateChart START: $label =========="
+        )
+
+        Log.d(
+            "ChartDebug",
+            "points.size = ${points.size}"
+        )
+
+        Log.d(
+            "ChartDebug",
+            "points = ${
+                points.joinToString {
+                    "(index=${it.index}, value=${it.value})"
+                }
+            }"
+        )
 
         if (points.isEmpty()) {
-                binding.BmiChart.clear()
+                chart.clear()
             return
         }
 
@@ -114,14 +230,28 @@ class StatisticsFragment : Fragment() {
 
         val entries = points
             .filter {
-                it.date in 0L..58L
+                it.index in 0L..58L
             }
             .map {
                 Entry(
-                    it.date.toFloat(),
+                    it.index.toFloat(),
                     it.value
                 )
             }
+
+        Log.d(
+            "ChartDebug",
+            "$label entries.size = ${entries.size}"
+        )
+
+        Log.d(
+            "ChartDebug",
+            "$label entries = ${
+                entries.joinToString {
+                    "(x=${it.x}, y=${it.y})"
+                }
+            }"
+        )
 
         val dataSet = LineDataSet(
             entries,
@@ -153,6 +283,18 @@ class StatisticsFragment : Fragment() {
             setDrawHighlightIndicators(false)
             //平滑曲线
             mode = LineDataSet.Mode.HORIZONTAL_BEZIER
+
+            // 开启下面区域填充
+            setDrawFilled(true)
+
+            // 渐变
+            fillDrawable = GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                intArrayOf(
+                    Color.argb(100, 255, 255, 255),
+                    Color.argb(0, 255, 255, 255)
+                )
+            )
         }
 
 
@@ -160,6 +302,11 @@ class StatisticsFragment : Fragment() {
             setAutoScaleMinMaxEnabled(false)
 
             data = LineData(dataSet)
+
+            Log.d(
+                "ChartDebug",
+                "$label DATA_SET_DONE"
+            )
 
             // =========================
             // X轴
@@ -179,6 +326,11 @@ class StatisticsFragment : Fragment() {
 
                 // 允许网格线
                 setDrawGridLines(true)
+                gridColor = ContextCompat.getColor(
+                    context,
+                    R.color.gridColor
+                )
+                gridLineWidth = 0.5f
                 setDrawAxisLine(false)
 
                 textSize = 12f
@@ -206,6 +358,14 @@ class StatisticsFragment : Fragment() {
                 // 整个时间范围
                 axisMinimum = 0f
                 axisMaximum = 59f
+                Log.d(
+                    "ChartDebug",
+                    "$label AXIS_SET: xAxis=${
+                        xAxis.axisMinimum
+                    } ~ ${
+                        xAxis.axisMaximum
+                    }"
+                )
 
                 yOffset = 8f
             }
@@ -262,30 +422,38 @@ class StatisticsFragment : Fragment() {
 
                 setDrawAxisLine(false)
             }
+            notifyDataSetChanged()
+            chart.doOnLayout {
 
-            // =========================
-            // 图表边距
-            // =========================
+                chart.setVisibleXRange(
+                    7f,
+                    7f
+                )
 
-            setExtraOffsets(
-                10f,
-                30f,
-                27.5f,
-                20f
-            )
+                chart.moveViewToX(
+                    55.5f
+                )
+
+                chart.post {
+                    val minX = chart.lowestVisibleX
+                    val maxX = chart.highestVisibleX
+                    Log.d(
+                        "ChartDebug",
+                        "$label FINAL = $minX ~ $maxX"
+                    )
+                    // 如果 Chart 已经正确移动，就同步 Chart 的真实范围
+                    timeAxis.setVisibleRange(
+                        minX,
+                        maxX
+                    )
+
+                    chart.invalidate()
+                }
+            }
 
 
-            setVisibleXRange(
-                7f,
-                7f
-            )
-
-            moveViewToX(
-                52f
-            )
-
-            invalidate()
         }
+
     }
 
     private fun dateIndexToDay(value: Float): String {

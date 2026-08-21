@@ -147,29 +147,54 @@
         app:layout_constraintTop_toBottomOf="@id/top"
         android:layout_marginTop="350.5dp"/>
 
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/BmiChart"
+    <FrameLayout
         android:layout_width="0dp"
-        android:layout_height="243dp"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/BmiTitle"
         android:layout_marginTop="10dp"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
-        android:background="@drawable/mask1"/>
+        android:id="@+id/BmiChartContainer">
 
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/WeightChart"
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/BmiChart"
+            android:layout_width="match_parent"
+            android:layout_height="243dp"
+            android:background="@drawable/mask1"/>
+
+        <com.example.bmi.ui.statistics.TimeAxisView
+            android:id="@+id/bmiTimeAxis"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_gravity="top" />
+    </FrameLayout>
+
+    <FrameLayout
         android:layout_width="0dp"
-        android:layout_height="243dp"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/WeightTitle"
         android:layout_marginTop="10dp"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
-        android:background="@drawable/mask2"/>
+        android:id="@+id/WeightChartContainer">
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/WeightChart"
+            android:layout_width="match_parent"
+            android:layout_height="243dp"
+            android:background="@drawable/mask2"/>
+
+        <com.example.bmi.ui.statistics.TimeAxisView
+            android:id="@+id/weightTimeAxis"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_gravity="top" />
+    </FrameLayout>
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
