@@ -38,8 +38,8 @@ class TimeAxisView @JvmOverloads constructor(
     private var chart: LineChart? = null
 
     // 当前 TimeAxis 真正应该显示的 X 范围
-    private var visibleMinX = 52f
-    private var visibleMaxX = 59f
+    private var visibleMinX = 0f
+    private var visibleMaxX = 7f
 
     fun setChart(chart: LineChart) {
         this.chart = chart
@@ -73,17 +73,9 @@ class TimeAxisView @JvmOverloads constructor(
 
             val index = marker.index.toFloat()
 
-            // =========================
-            // 1. 先判断 index 是否在当前显示范围
-            // =========================
-
             if (index < visibleMinX || index > visibleMaxX) {
                 return@forEach
             }
-
-            // =========================
-            // 2. 转成 Chart 上的像素位置
-            // =========================
 
             val point = chart.getPixelForValues(
                 index,
@@ -92,10 +84,6 @@ class TimeAxisView @JvmOverloads constructor(
             )
 
             val x = point.x
-
-            // =========================
-            // 3. 最后再判断是否真的在 View 内
-            // =========================
 
             if (x < 0f || x > width) {
                 return@forEach

@@ -47,6 +47,21 @@ class StatisticsFragment : Fragment() {
     private val initialVisibleMinX = 52f
     private val initialVisibleMaxX = 59f
 
+    private var dailyBmiPoints =
+        emptyList<ChartPoint>()
+
+    private var dailyWeightPoints =
+        emptyList<ChartPoint>()
+
+    private var weeklyBmiPoints =
+        emptyList<ChartPoint>()
+
+    private var weeklyWeightPoints =
+        emptyList<ChartPoint>()
+
+    private var currentInterval =
+        ChartInterval.DAY
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -68,6 +83,30 @@ class StatisticsFragment : Fragment() {
         binding.update2.setOnClickListener {
             (requireActivity() as MainActivity).goToInputPage()
         }
+        binding.day.setOnClickListener {
+            binding.day.alpha = 1f
+            binding.week.alpha = 0.3f
+            binding.month.alpha = 0.3f
+            currentInterval = ChartInterval.DAY
+            updateCurrentCharts()
+            viewModel.setInterval(ChartInterval.DAY)
+        }
+        binding.week.setOnClickListener {
+            binding.week.alpha = 1f
+            binding.day.alpha = 0.3f
+            binding.month.alpha = 0.3f
+            currentInterval = ChartInterval.WEEK
+            updateCurrentCharts()
+            viewModel.setInterval(ChartInterval.WEEK)
+        }
+        binding.month.setOnClickListener {
+            binding.month.alpha = 1f
+            binding.day.alpha = 0.3f
+            binding.week.alpha = 0.3f
+            currentInterval = ChartInterval.MONTH
+            updateCurrentCharts()
+            viewModel.setInterval(ChartInterval.MONTH)
+        }
         setupChart(binding.BmiChart,binding.bmiTimeAxis)
         setupChart(binding.WeightChart,binding.weightTimeAxis)
         binding.bmiTimeAxis.setChart(binding.BmiChart)
@@ -86,7 +125,10 @@ class StatisticsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.dailyBmi.collect { points ->
-                    updateChart(binding.BmiChart, points, "BMI", binding.bmiTimeAxis)
+                    dailyBmiPoints = points
+                    if (currentInterval == ChartInterval.DAY) {
+                        updateCurrentCharts()
+                    }
                 }
             }
         }
@@ -94,7 +136,30 @@ class StatisticsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.dailyWeight.collect { points ->
-                    updateChart(binding.WeightChart, points, "Weight", binding.weightTimeAxis)
+                    dailyWeightPoints = points
+                    if (currentInterval == ChartInterval.DAY) {
+                        updateCurrentCharts()
+                    }
+                }
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.weeklyBmi.collect { points ->
+                    weeklyBmiPoints = points
+                    if (currentInterval == ChartInterval.WEEK) {
+                        updateCurrentCharts()
+                    }
+                }
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.weeklyWeight.collect { points ->
+                    weeklyWeightPoints = points
+                    if (currentInterval == ChartInterval.WEEK) {
+                        updateCurrentCharts()
+                    }
                 }
             }
         }
@@ -109,13 +174,9 @@ class StatisticsFragment : Fragment() {
     }
 
     private fun setupChart(chart: LineChart,timeAxis: TimeAxisView) {
-
         chart.apply {
-
             description.isEnabled = false
-
             legend.isEnabled = false
-
             setTouchEnabled(true)
             isDragEnabled = true
             setScaleEnabled(false)
@@ -126,11 +187,65 @@ class StatisticsFragment : Fragment() {
                 27.5f,
                 20f
             )
-
+            xAxis.apply {
+                position = XAxis.XAxisPosition.BOTTOM
+                // 最多显示8个标签
+                setAvoidFirstLastClipping(false)
+                // 允许网格线
+                setDrawGridLines(true)
+                gridColor = ContextCompat.getColor(
+                    context,
+                    R.color.gridColor
+                )
+                gridLineWidth = 0.5f
+                setDrawAxisLine(false)
+                textSize = 12f
+                typeface = ResourcesCompat.getFont(
+                    context,
+                    R.font.montserrat_extrabold
+                )
+                textColor = ContextCompat.getColor(
+                    context,
+                    R.color.white
+                )
+            }
+            axisLeft.apply {
+                setDrawGridLines(false)
+                setDrawAxisLine(false)
+                setDrawLabels(true)
+                textSize = 12f
+                typeface = ResourcesCompat.getFont(
+                    context,
+                    R.font.montserrat_extrabold
+                )
+                textColor = ContextCompat.getColor(
+                    context,
+                    R.color.white
+                )
+                valueFormatter = object : ValueFormatter() {
+                    override fun getFormattedValue(
+                        value: Float
+                    ): String {
+                        return String.format(
+                            Locale.US,
+                            "%.1f",
+                            value
+                        )
+                    }
+                }
+                // 5等分
+                setLabelCount(6, true)
+                xOffset = 10f
+            }
+            // 右侧Y轴
+            axisRight.apply {
+                setDrawLabels(false)
+                setDrawGridLines(false)
+                setDrawAxisLine(false)
+            }
         }
         chart.setOnChartGestureListener(
             object : OnChartGestureListener {
-
                 override fun onChartTranslate(
                     me: MotionEvent?,
                     dX: Float,
@@ -138,44 +253,33 @@ class StatisticsFragment : Fragment() {
                 ) {
                     val minX = chart.lowestVisibleX
                     val maxX = chart.highestVisibleX
-                    Log.d(
-                        "ChartGesture",
-                        "TRANSLATE: dX=$dX dY=$dY " +
-                                "visibleX=${chart.lowestVisibleX} ~ ${chart.highestVisibleX}"
-                    )
                     timeAxis.setVisibleRange(
                         minX,
                         maxX
                     )
                 }
-
                 override fun onChartGestureStart(
                     me: MotionEvent?,
                     lastPerformedGesture: ChartTouchListener.ChartGesture?
                 ) {
                 }
-
                 override fun onChartGestureEnd(
                     me: MotionEvent?,
                     lastPerformedGesture: ChartTouchListener.ChartGesture?
                 ) {
                 }
-
                 override fun onChartLongPressed(
                     me: MotionEvent?
                 ) {
                 }
-
                 override fun onChartDoubleTapped(
                     me: MotionEvent?
                 ) {
                 }
-
                 override fun onChartSingleTapped(
                     me: MotionEvent?
                 ) {
                 }
-
                 override fun onChartFling(
                     me1: MotionEvent?,
                     me2: MotionEvent?,
@@ -183,7 +287,6 @@ class StatisticsFragment : Fragment() {
                     velocityY: Float
                 ) {
                 }
-
                 override fun onChartScale(
                     me: MotionEvent?,
                     scaleX: Float,
@@ -194,40 +297,53 @@ class StatisticsFragment : Fragment() {
         )
     }
 
+    private fun updateCurrentCharts() {
+        when (currentInterval) {
+            ChartInterval.DAY -> {
+                updateDailyChart(
+                    binding.BmiChart,
+                    dailyBmiPoints,
+                    "BMI",
+                    binding.bmiTimeAxis
+                )
+                updateDailyChart(
+                    binding.WeightChart,
+                    dailyWeightPoints,
+                    "Weight",
+                    binding.weightTimeAxis
+                )
+            }
+            ChartInterval.WEEK -> {
+                updateWeeklyChart(
+                    binding.BmiChart,
+                    weeklyBmiPoints,
+                    "BMI",
+                    binding.bmiTimeAxis
+                )
+                updateWeeklyChart(
+                    binding.WeightChart,
+                    weeklyWeightPoints,
+                    "Weight",
+                    binding.weightTimeAxis
+                )
+            }
+            ChartInterval.MONTH -> {
+                // 后面做
+            }
+        }
+    }
 
-    private fun updateChart(
+
+    private fun updateDailyChart(
         chart: LineChart,
         points: List<ChartPoint>,
         label: String,
-        timeAxis: TimeAxisView
+        timeAxis: TimeAxisView,
     ) {
-        Log.d(
-            "ChartDebug",
-            "========== updateChart START: $label =========="
-        )
-
-        Log.d(
-            "ChartDebug",
-            "points.size = ${points.size}"
-        )
-
-        Log.d(
-            "ChartDebug",
-            "points = ${
-                points.joinToString {
-                    "(index=${it.index}, value=${it.value})"
-                }
-            }"
-        )
-
         if (points.isEmpty()) {
                 chart.clear()
             return
         }
-
-        val context = requireContext()
-
-
         val entries = points
             .filter {
                 it.index in 0L..58L
@@ -238,191 +354,115 @@ class StatisticsFragment : Fragment() {
                     it.value
                 )
             }
-
-        Log.d(
-            "ChartDebug",
-            "$label entries.size = ${entries.size}"
-        )
-
-        Log.d(
-            "ChartDebug",
-            "$label entries = ${
-                entries.joinToString {
-                    "(x=${it.x}, y=${it.y})"
-                }
-            }"
-        )
-
-        val dataSet = LineDataSet(
-            entries,
-            label
-        ).apply {
-
-            setDrawValues(false)
-
-            setDrawCircles(true)
-
-            setDrawCircleHole(false)
-
-            circleRadius = 5f
-
-            lineWidth = 2f
-
-            color = ContextCompat.getColor(
-                context,
-                R.color.white
-            )
-
-            setCircleColor(
-                ContextCompat.getColor(
-                    context,
-                    R.color.white
-                )
-            )
-
-            setDrawHighlightIndicators(false)
-            //平滑曲线
-            mode = LineDataSet.Mode.HORIZONTAL_BEZIER
-
-            // 开启下面区域填充
-            setDrawFilled(true)
-
-            // 渐变
-            fillDrawable = GradientDrawable(
-                GradientDrawable.Orientation.TOP_BOTTOM,
-                intArrayOf(
-                    Color.argb(100, 255, 255, 255),
-                    Color.argb(0, 255, 255, 255)
-                )
-            )
-        }
-
+        val dataSet = createLineDataSet(entries, label)
 
         chart.apply {
             setAutoScaleMinMaxEnabled(false)
-
             data = LineData(dataSet)
-
-            Log.d(
-                "ChartDebug",
-                "$label DATA_SET_DONE"
-            )
-
-            // =========================
             // X轴
-            // =========================
-
             xAxis.apply {
-
-                position = XAxis.XAxisPosition.BOTTOM
-
                 // 每一天一个单位
                 granularity = 1f
                 isGranularityEnabled = true
-
-                // 最多显示8个标签
-                setLabelCount(8, false)
-                setAvoidFirstLastClipping(false)
-
-                // 允许网格线
-                setDrawGridLines(true)
-                gridColor = ContextCompat.getColor(
-                    context,
-                    R.color.gridColor
-                )
-                gridLineWidth = 0.5f
-                setDrawAxisLine(false)
-
-                textSize = 12f
-
-                typeface = ResourcesCompat.getFont(
-                    context,
-                    R.font.montserrat_extrabold
-                )
-
-                textColor = ContextCompat.getColor(
-                    context,
-                    R.color.white
-                )
-
                 valueFormatter = object : ValueFormatter() {
-
                     override fun getFormattedValue(
                         value: Float
                     ): String {
-
                         return dateIndexToDay(value)
                     }
                 }
-
                 // 整个时间范围
                 axisMinimum = 0f
                 axisMaximum = 59f
-                Log.d(
-                    "ChartDebug",
-                    "$label AXIS_SET: xAxis=${
-                        xAxis.axisMinimum
-                    } ~ ${
-                        xAxis.axisMaximum
-                    }"
+                yOffset = 8f
+            }
+            // Y轴
+            notifyDataSetChanged()
+            chart.doOnLayout {
+                chart.setVisibleXRange(
+                    7f,
+                    7f
                 )
+                chart.moveViewToX(
+                    55.5f
+                )
+                chart.post {
+                    val minX = chart.lowestVisibleX
+                    val maxX = chart.highestVisibleX
+                    // 如果 Chart 已经正确移动，就同步 Chart 的真实范围
+                    timeAxis.setVisibleRange(
+                        minX,
+                        maxX
+                    )
+                    chart.invalidate()
+                }
+            }
+        }
+    }
+
+    private fun updateWeeklyChart(
+        chart: LineChart,
+        points: List<ChartPoint>,
+        label: String,
+        timeAxis: TimeAxisView
+    ) {
+        if (points.isEmpty()) {
+            chart.clear()
+            timeAxis.invalidate()
+            return
+        }
+
+        val entries = points.map {
+            Entry(
+                it.index.toFloat() /7f,
+                it.value
+            )
+        }
+
+        val dataSet = createLineDataSet(
+            entries,
+            label
+        )
+
+        chart.apply {
+
+            setAutoScaleMinMaxEnabled(false)
+            data = LineData(dataSet)
+            xAxis.apply {
+                // 一个 X = 一周
+                granularity = 1f
+                isGranularityEnabled = true
+                setLabelCount(
+                    8,
+                    false
+                )
+                valueFormatter =
+                    object : ValueFormatter() {
+
+                        override fun getFormattedValue(
+                            value: Float
+                        ): String {
+
+                            return weekIndexToDay(
+                                value
+                            )
+                        }
+                    }
+
+                // 一年前的周日 -> 今年最后一个周日
+                axisMinimum = 0f
+                axisMaximum =
+                    viewModel.getTotalWeekCount().toFloat()+ 1f
 
                 yOffset = 8f
             }
 
-            // =========================
-            // Y轴
-            // =========================
-
-            axisLeft.apply {
-
-                setDrawGridLines(false)
-
-                setDrawAxisLine(false)
-
-                setDrawLabels(true)
-
-                textSize = 12f
-
-                typeface = ResourcesCompat.getFont(
-                    context,
-                    R.font.montserrat_extrabold
-                )
-
-                textColor = ContextCompat.getColor(
-                    context,
-                    R.color.white
-                )
-
-                valueFormatter = object : ValueFormatter() {
-                    override fun getFormattedValue(
-                        value: Float
-                    ): String {
-
-                        return String.format(
-                            Locale.US,
-                            "%.1f",
-                            value
-                        )
-                    }
-                }
-
-                // 5等分
-                setLabelCount(6, true)
-
-                xOffset = 10f
-            }
-
-            // 右侧Y轴
-            axisRight.apply {
-
-                setDrawLabels(false)
-
-                setDrawGridLines(false)
-
-                setDrawAxisLine(false)
-            }
             notifyDataSetChanged()
+
+            // =========================
+            // 默认显示最后一周附近
+            // =========================
+
             chart.doOnLayout {
 
                 chart.setVisibleXRange(
@@ -431,17 +471,17 @@ class StatisticsFragment : Fragment() {
                 )
 
                 chart.moveViewToX(
-                    55.5f
+                    chart.xAxis.axisMaximum
                 )
 
                 chart.post {
-                    val minX = chart.lowestVisibleX
-                    val maxX = chart.highestVisibleX
-                    Log.d(
-                        "ChartDebug",
-                        "$label FINAL = $minX ~ $maxX"
-                    )
-                    // 如果 Chart 已经正确移动，就同步 Chart 的真实范围
+
+                    val minX =
+                        chart.lowestVisibleX
+
+                    val maxX =
+                        chart.highestVisibleX
+
                     timeAxis.setVisibleRange(
                         minX,
                         maxX
@@ -450,16 +490,11 @@ class StatisticsFragment : Fragment() {
                     chart.invalidate()
                 }
             }
-
-
         }
-
     }
 
     private fun dateIndexToDay(value: Float): String {
-
         val today = Calendar.getInstance()
-
         val startDate = Calendar.getInstance().apply {
             timeInMillis = today.timeInMillis
             add(Calendar.DAY_OF_YEAR, -58)
@@ -468,13 +503,69 @@ class StatisticsFragment : Fragment() {
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }
-
         startDate.add(
             Calendar.DAY_OF_YEAR,
             value.toInt()
         )
-
         return startDate.get(Calendar.DAY_OF_MONTH).toString()
+    }
+
+    private fun weekIndexToDay(
+        value: Float
+    ): String {
+
+        val startSunday = viewModel.getStartSunday()
+
+        val calendar =
+            startSunday.clone() as Calendar
+
+        calendar.add(
+            Calendar.DAY_OF_YEAR,
+            value.toInt() * 7
+        )
+
+        return calendar.get(
+            Calendar.DAY_OF_MONTH
+        ).toString()
+    }
+
+
+
+    private fun createLineDataSet(
+        entries: List<Entry>,
+        label: String
+    ): LineDataSet {
+        val context = requireContext()
+        return LineDataSet(
+            entries,
+            label
+        ).apply {
+            setDrawValues(false)
+            setDrawCircles(true)
+            setDrawCircleHole(false)
+            circleRadius = 5f
+            lineWidth = 2f
+            color = ContextCompat.getColor(
+                context,
+                R.color.white
+            )
+            setCircleColor(
+                ContextCompat.getColor(
+                    context,
+                    R.color.white
+                )
+            )
+            setDrawHighlightIndicators(false)
+            mode = LineDataSet.Mode.HORIZONTAL_BEZIER
+            setDrawFilled(true)
+            fillDrawable = GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                intArrayOf(
+                    Color.argb(100, 255, 255, 255),
+                    Color.argb(0, 255, 255, 255)
+                )
+            )
+        }
     }
 
 
