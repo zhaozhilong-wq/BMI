@@ -1,8 +1,11 @@
 package com.example.bmi.ui.statistics
 
 import android.util.Log
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.bmi.R
 import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.data.repository.BmiRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -742,6 +745,31 @@ class StatisticsViewModel( private val repository: BmiRepository
         }
 
         return markers
+    }
+
+    fun getBmiColor(bmi: Float): Int {
+        return when {
+            bmi < 16.0f -> R.color.vsu_cycle
+
+            bmi < 17.0f ->
+                R.color.su_cycle
+
+            bmi < 18.5f -> R.color.underweight_cycle
+
+            bmi < 25.0f -> R.color.normal_cycle
+
+            bmi < 30.0f ->
+                R.color.overweight_cycle
+
+            bmi < 35.0f ->
+                R.color.obesity1_cycle
+
+            bmi < 40.0f ->
+                R.color.obesity2_cycle
+
+            else ->
+                R.color.obesity3_cycle
+        }
     }
 
 }

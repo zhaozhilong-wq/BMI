@@ -169,6 +169,13 @@
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:layout_gravity="top" />
+
+        <com.example.bmi.ui.statistics.ChartSelectionView
+            android:id="@+id/bmiSelectionView"
+            android:layout_width="match_parent"
+            android:layout_height="243dp"
+            android:clickable="false"
+            android:focusable="false"/>
     </FrameLayout>
 
     <FrameLayout
@@ -193,6 +200,12 @@
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:layout_gravity="top" />
+        <com.example.bmi.ui.statistics.ChartSelectionView
+            android:id="@+id/weightSelectionView"
+            android:layout_width="match_parent"
+            android:layout_height="243dp"
+            android:clickable="false"
+            android:focusable="false" />
     </FrameLayout>
 
 

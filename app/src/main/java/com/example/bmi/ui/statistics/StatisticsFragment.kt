@@ -24,8 +24,10 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.ChartTouchListener
 import com.github.mikephil.charting.listener.OnChartGestureListener
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.util.Calendar
@@ -68,6 +70,8 @@ class StatisticsFragment : Fragment() {
     private var currentInterval =
         ChartInterval.DAY
 
+    private var isUpdatingCharts = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -96,6 +100,11 @@ class StatisticsFragment : Fragment() {
             currentInterval = ChartInterval.DAY
             updateCurrentCharts()
             viewModel.setInterval(ChartInterval.DAY)
+
+            binding.BmiChart.highlightValue(null)
+            binding.WeightChart.highlightValue(null)
+            binding.bmiSelectionView.clearSelectedPoint()
+            binding.weightSelectionView.clearSelectedPoint()
         }
         binding.week.setOnClickListener {
             binding.week.alpha = 1f
@@ -104,6 +113,10 @@ class StatisticsFragment : Fragment() {
             currentInterval = ChartInterval.WEEK
             updateCurrentCharts()
             viewModel.setInterval(ChartInterval.WEEK)
+            binding.BmiChart.highlightValue(null)
+            binding.WeightChart.highlightValue(null)
+            binding.bmiSelectionView.clearSelectedPoint()
+            binding.weightSelectionView.clearSelectedPoint()
         }
         binding.month.setOnClickListener {
             binding.month.alpha = 1f
@@ -112,9 +125,20 @@ class StatisticsFragment : Fragment() {
             currentInterval = ChartInterval.MONTH
             updateCurrentCharts()
             viewModel.setInterval(ChartInterval.MONTH)
+            binding.BmiChart.highlightValue(null)
+            binding.WeightChart.highlightValue(null)
+            binding.bmiSelectionView.clearSelectedPoint()
+            binding.weightSelectionView.clearSelectedPoint()
         }
         setupChart(binding.BmiChart,binding.bmiTimeAxis)
         setupChart(binding.WeightChart,binding.weightTimeAxis)
+        binding.bmiSelectionView.setChart(
+            binding.BmiChart
+        )
+
+        binding.weightSelectionView.setChart(
+            binding.WeightChart
+        )
         binding.bmiTimeAxis.setChart(binding.BmiChart)
         binding.weightTimeAxis.setChart(binding.WeightChart)
 
@@ -197,6 +221,8 @@ class StatisticsFragment : Fragment() {
                 }
             }
         }
+
+
     }
 
     private fun setupChart(chart: LineChart,timeAxis: TimeAxisView) {
@@ -204,13 +230,71 @@ class StatisticsFragment : Fragment() {
             description.isEnabled = false
             legend.isEnabled = false
             setTouchEnabled(true)
+            setClipValuesToContent(false)
+            marker =
+                if (chart.id == R.id.WeightChart) {
+                    BmiMarkerView(
+                        requireContext(),
+                        " kg"
+                    )
+                } else {
+                    BmiMarkerView(
+                        requireContext(),
+                        ""
+                    )
+                }
+            chart.setOnChartValueSelectedListener(
+                object : OnChartValueSelectedListener {
+
+                    override fun onValueSelected(
+                        e: Entry?,
+                        h: Highlight?
+                    ) {
+                        e ?: return
+                        val selectionView =
+                            when (chart.id) {
+
+                                R.id.BmiChart ->
+                                    binding.bmiSelectionView
+
+                                R.id.WeightChart ->
+                                    binding.weightSelectionView
+
+                                else ->
+                                    return
+                            }
+                        val color = if (chart.id == R.id.BmiChart) {
+                            ContextCompat.getColor(
+                                requireContext(),
+                                viewModel.getBmiColor(e.y)
+                            )
+                        } else {
+                            Color.WHITE
+                        }
+                        selectionView.setSelectedPoint(
+                            e.x,
+                            e.y,
+                            color
+                        )
+                    }
+                    override fun onNothingSelected() {
+
+                        binding.bmiSelectionView
+                            .clearSelectedPoint()
+
+                        binding.weightSelectionView
+                            .clearSelectedPoint()
+                    }
+                }
+            )
+
             isDragEnabled = true
             setScaleEnabled(false)
 
             setExtraOffsets(
-                10f,
+                15f,
                 30f,
-                27.5f,
+                21f,
                 20f
             )
             xAxis.apply {
@@ -234,6 +318,8 @@ class StatisticsFragment : Fragment() {
                     context,
                     R.color.white
                 )
+
+                yOffset = 12f
             }
             axisLeft.apply {
                 setDrawGridLines(false)
@@ -277,6 +363,19 @@ class StatisticsFragment : Fragment() {
                     dX: Float,
                     dY: Float
                 ) {
+                    // 滑动时取消选中
+                    chart.highlightValues(null)
+                    when (chart.id) {
+                        R.id.BmiChart -> {
+                            binding.bmiSelectionView.clearSelectedPoint()
+                        }
+
+                        R.id.WeightChart -> {
+                            binding.weightSelectionView.clearSelectedPoint()
+                        }
+                    }
+
+
                     val minX = chart.lowestVisibleX
                     val maxX = chart.highestVisibleX
 
@@ -344,6 +443,11 @@ class StatisticsFragment : Fragment() {
     }
 
     private fun updateCurrentCharts() {
+        if (isUpdatingCharts) {
+            return
+        }
+        isUpdatingCharts = true
+
         when (currentInterval) {
             ChartInterval.DAY -> {
                 updateDailyChart(
@@ -389,6 +493,7 @@ class StatisticsFragment : Fragment() {
                 )
             }
         }
+        isUpdatingCharts = false
     }
 
 
@@ -432,14 +537,13 @@ class StatisticsFragment : Fragment() {
                 // 整个时间范围
                 axisMinimum = 0f
                 axisMaximum = 59f
-                yOffset = 8f
             }
-            // Y轴
             notifyDataSetChanged()
-            chart.doOnLayout {
+            chart.post {
+
                 chart.setVisibleXRange(
                     7f,
-                    7f
+                    7.6f
                 )
                 chart.moveViewToX(
                     55.5f
@@ -452,6 +556,20 @@ class StatisticsFragment : Fragment() {
                         minX,
                         maxX
                     )
+                    // 最新一个数据点
+                    val latestEntry =
+                        entries.maxByOrNull {
+                            it.x
+                        }
+
+                    latestEntry?.let {
+
+                        chart.highlightValue(
+                            it.x,
+                            0,
+                            true
+                        )
+                    }
                     chart.invalidate()
                 }
             }
@@ -512,7 +630,6 @@ class StatisticsFragment : Fragment() {
                 axisMaximum =
                     viewModel.getTotalWeekCount().toFloat()+ 1f
 
-                yOffset = 8f
             }
 
             notifyDataSetChanged()
@@ -521,11 +638,11 @@ class StatisticsFragment : Fragment() {
             // 默认显示最后一周附近
             // =========================
 
-            chart.doOnLayout {
+            chart.post {
 
                 chart.setVisibleXRange(
                     7f,
-                    7f
+                    7.6f
                 )
 
                 chart.moveViewToX(
@@ -544,6 +661,20 @@ class StatisticsFragment : Fragment() {
                         minX,
                         maxX
                     )
+                    // 最新一个数据点
+                    val latestEntry =
+                        entries.maxByOrNull {
+                            it.x
+                        }
+
+                    latestEntry?.let {
+
+                        chart.highlightValue(
+                            it.x,
+                            0,
+                            true
+                        )
+                    }
 
                     chart.invalidate()
                 }
@@ -601,7 +732,7 @@ class StatisticsFragment : Fragment() {
             setDrawValues(false)
             setDrawCircles(true)
             setDrawCircleHole(false)
-            circleRadius = 5f
+            circleRadius = 3f
             lineWidth = 2f
             color = ContextCompat.getColor(
                 context,
@@ -686,18 +817,15 @@ class StatisticsFragment : Fragment() {
                 // 当前月份 + 下一个月
                 axisMaximum =
                     getTotalMonthCount().toFloat()
-
-                yOffset = 8f
             }
 
             notifyDataSetChanged()
 
-            chart.doOnLayout {
+            chart.post {
 
-                // 一次显示 7 个月
                 chart.setVisibleXRange(
                     7f,
-                    7f
+                    7.6f
                 )
 
                 // 默认显示最后一个月附近
@@ -717,6 +845,20 @@ class StatisticsFragment : Fragment() {
                         minX,
                         maxX
                     )
+                    // 最新一个数据点
+                    val latestEntry =
+                        entries.maxByOrNull {
+                            it.x
+                        }
+
+                    latestEntry?.let {
+
+                        chart.highlightValue(
+                            it.x,
+                            0,
+                            true
+                        )
+                    }
 
                     chart.invalidate()
                 }
@@ -801,6 +943,7 @@ class StatisticsFragment : Fragment() {
 
         return count - 1
     }
+
 
 
 }
