@@ -58,6 +58,14 @@ class TimeAxisView @JvmOverloads constructor(
         minX: Float,
         maxX: Float
     ) {
+
+        // 防止边界附近非常小的浮动导致不断重绘
+        if (
+            kotlin.math.abs(visibleMinX - minX) < 0.01f &&
+            kotlin.math.abs(visibleMaxX - maxX) < 0.01f
+        ) {
+            return
+        }
         visibleMinX = minX
         visibleMaxX = maxX
 

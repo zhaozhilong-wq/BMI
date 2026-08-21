@@ -59,6 +59,12 @@ class StatisticsFragment : Fragment() {
     private var weeklyWeightPoints =
         emptyList<ChartPoint>()
 
+    private var monthlyBmiPoints =
+        emptyList<ChartPoint>()
+
+    private var monthlyWeightPoints =
+        emptyList<ChartPoint>()
+
     private var currentInterval =
         ChartInterval.DAY
 
@@ -165,6 +171,26 @@ class StatisticsFragment : Fragment() {
         }
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.monthlyBmi.collect { points ->
+                    monthlyBmiPoints = points
+                    if (currentInterval == ChartInterval.MONTH) {
+                        updateCurrentCharts()
+                    }
+                }
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.monthlyWeight.collect { points ->
+                    monthlyWeightPoints = points
+                    if (currentInterval == ChartInterval.MONTH) {
+                        updateCurrentCharts()
+                    }
+                }
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.timeMarkers.collect { markers ->
                     binding.bmiTimeAxis.setMarkers(markers)
                     binding.weightTimeAxis.setMarkers(markers)
@@ -253,6 +279,26 @@ class StatisticsFragment : Fragment() {
                 ) {
                     val minX = chart.lowestVisibleX
                     val maxX = chart.highestVisibleX
+
+                    val axisMin = chart.xAxis.axisMinimum
+                    val axisMax = chart.xAxis.axisMaximum
+
+                    // 已经到左边界，并且还在继续往左拖
+                    if (
+                        minX <= axisMin &&
+                        dX > 0f
+                    ) {
+                        return
+                    }
+
+                    // 已经到右边界，并且还在继续往右拖
+                    if (
+                        maxX >= axisMax &&
+                        dX < 0f
+                    ) {
+                        return
+                    }
+
                     timeAxis.setVisibleRange(
                         minX,
                         maxX
@@ -328,7 +374,19 @@ class StatisticsFragment : Fragment() {
                 )
             }
             ChartInterval.MONTH -> {
-                // 后面做
+                updateMonthlyChart(
+                    binding.BmiChart,
+                    monthlyBmiPoints,
+                    "BMI",
+                    binding.bmiTimeAxis
+                )
+
+                updateMonthlyChart(
+                    binding.WeightChart,
+                    monthlyWeightPoints,
+                    "Weight",
+                    binding.weightTimeAxis
+                )
             }
         }
     }
@@ -566,6 +624,182 @@ class StatisticsFragment : Fragment() {
                 )
             )
         }
+    }
+
+    private fun updateMonthlyChart(
+        chart: LineChart,
+        points: List<ChartPoint>,
+        label: String,
+        timeAxis: TimeAxisView
+    ) {
+        if (points.isEmpty()) {
+            chart.clear()
+            timeAxis.invalidate()
+            return
+        }
+
+        val entries = points.map {
+            Entry(
+                it.index.toFloat(),
+                it.value
+            )
+        }
+
+        val dataSet = createLineDataSet(
+            entries,
+            label
+        )
+
+        chart.apply {
+
+            setAutoScaleMinMaxEnabled(false)
+
+            data = LineData(dataSet)
+
+            xAxis.apply {
+
+                // 一个 X = 一个月
+                granularity = 1f
+                isGranularityEnabled = true
+
+                setLabelCount(
+                    8,
+                    false
+                )
+
+                valueFormatter =
+                    object : ValueFormatter() {
+
+                        override fun getFormattedValue(
+                            value: Float
+                        ): String {
+
+                            return monthIndexToText(
+                                value
+                            )
+                        }
+                    }
+
+                // 2021年10月
+                axisMinimum = 0f
+
+                // 当前月份 + 下一个月
+                axisMaximum =
+                    getTotalMonthCount().toFloat()
+
+                yOffset = 8f
+            }
+
+            notifyDataSetChanged()
+
+            chart.doOnLayout {
+
+                // 一次显示 7 个月
+                chart.setVisibleXRange(
+                    7f,
+                    7f
+                )
+
+                // 默认显示最后一个月附近
+                chart.moveViewToX(
+                    chart.xAxis.axisMaximum
+                )
+
+                chart.post {
+
+                    val minX =
+                        chart.lowestVisibleX
+
+                    val maxX =
+                        chart.highestVisibleX
+
+                    timeAxis.setVisibleRange(
+                        minX,
+                        maxX
+                    )
+
+                    chart.invalidate()
+                }
+            }
+        }
+    }
+
+    private fun monthIndexToText(
+        value: Float
+    ): String {
+
+        val calendar = Calendar.getInstance().apply {
+
+            set(
+                2021,
+                Calendar.OCTOBER,
+                1,
+                0,
+                0,
+                0
+            )
+
+            set(Calendar.MILLISECOND, 0)
+
+            add(
+                Calendar.MONTH,
+                value.toInt()
+            )
+        }
+
+        return (
+                calendar.get(Calendar.MONTH) + 1
+                ).toString()
+    }
+
+    private fun getTotalMonthCount(): Int {
+
+        val startCalendar =
+            Calendar.getInstance().apply {
+
+                set(
+                    2021,
+                    Calendar.OCTOBER,
+                    1,
+                    0,
+                    0,
+                    0
+                )
+
+                set(Calendar.MILLISECOND, 0)
+            }
+
+        val today =
+            Calendar.getInstance()
+
+        val endCalendar =
+            today.clone() as Calendar
+
+        endCalendar.set(
+            Calendar.DAY_OF_MONTH,
+            1
+        )
+
+        endCalendar.add(
+            Calendar.MONTH,
+            1
+        )
+
+        var count = 0
+
+        while (
+            startCalendar.before(endCalendar)
+        ) {
+
+            count++
+
+            startCalendar.add(
+                Calendar.MONTH,
+                1
+            )
+        }
+
+        return count - 1
     }
 
 

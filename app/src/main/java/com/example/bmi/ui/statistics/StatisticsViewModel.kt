@@ -37,21 +37,27 @@ class StatisticsViewModel( private val repository: BmiRepository
     val weeklyWeight =
         _weeklyWeight.asStateFlow()
 
+    private val _monthlyBmi =
+        MutableStateFlow<List<ChartPoint>>(emptyList())
+
+    val monthlyBmi =
+        _monthlyBmi.asStateFlow()
+
+    private val _monthlyWeight =
+        MutableStateFlow<List<ChartPoint>>(emptyList())
+
+    val monthlyWeight =
+        _monthlyWeight.asStateFlow()
+
     private val _timeMarkers =
         MutableStateFlow<List<TimeMarker>>(emptyList())
 
     val timeMarkers =
         _timeMarkers.asStateFlow()
 
-    private val _currentInterval =
-        MutableStateFlow(ChartInterval.DAY)
-
-    val currentInterval =
-        _currentInterval.asStateFlow()
 
     fun setInterval(interval: ChartInterval) {
 
-        _currentInterval.value = interval
         _timeMarkers.value =
             buildTimeMarkers(interval)
     }
@@ -74,6 +80,16 @@ class StatisticsViewModel( private val repository: BmiRepository
 
                 _weeklyWeight.value =
                     buildWeeklyData(records) {
+                        it.weightKg.toFloat()
+                    }
+
+                _monthlyBmi.value =
+                    buildMonthlyData(records) {
+                        it.bmi.toFloat()
+                    }
+
+                _monthlyWeight.value =
+                    buildMonthlyData(records) {
                         it.weightKg.toFloat()
                     }
 
@@ -169,7 +185,7 @@ class StatisticsViewModel( private val repository: BmiRepository
                 buildWeekTimeMarkers()
 
             ChartInterval.MONTH ->
-                emptyList()
+                buildMonthTimeMarkers()
         }
     }
 
@@ -527,6 +543,205 @@ class StatisticsViewModel( private val repository: BmiRepository
                         ) /
                         (7L * 24L * 60L * 60L * 1000L)
                 ).toInt()
+    }
+
+    private fun buildMonthlyData(
+        records: List<BmiRecord>,
+        valueSelector: (BmiRecord) -> Float
+    ): List<ChartPoint> {
+
+        val startCalendar = Calendar.getInstance().apply {
+            set(
+                2021,
+                Calendar.OCTOBER,
+                1,
+                0,
+                0,
+                0
+            )
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        val today = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        // 当前月份的下一个月
+        val endCalendar =
+            today.clone() as Calendar
+
+        endCalendar.set(
+            Calendar.DAY_OF_MONTH,
+            1
+        )
+
+        endCalendar.add(
+            Calendar.MONTH,
+            1
+        )
+
+        // 先得到每天最新的一条
+        val dailyLatest = records
+            .groupBy {
+                Triple(
+                    it.year,
+                    it.month,
+                    it.day
+                )
+            }
+            .mapNotNull { (_, dayRecords) ->
+                dayRecords.maxByOrNull {
+                    it.createdAt
+                }
+            }
+
+        val result = mutableListOf<ChartPoint>()
+
+        val monthCalendar =
+            startCalendar.clone() as Calendar
+
+        var monthIndex = 0L
+
+        while (monthCalendar.before(endCalendar)) {
+
+            val year =
+                monthCalendar.get(Calendar.YEAR)
+
+            val month =
+                monthCalendar.get(Calendar.MONTH)
+
+            val monthRecords =
+                dailyLatest.filter { record ->
+
+                    record.year == year &&
+                            record.month == month
+                }
+
+            if (monthRecords.isNotEmpty()) {
+
+                val average =
+                    monthRecords
+                        .map {
+                            valueSelector(it)
+                        }
+                        .average()
+                        .toFloat()
+
+                result.add(
+                    ChartPoint(
+                        index = monthIndex,
+                        value = average,
+                        recordId =
+                            monthRecords
+                                .maxByOrNull {
+                                    it.createdAt
+                                }!!
+                                .id
+                    )
+                )
+            }
+
+            monthCalendar.add(
+                Calendar.MONTH,
+                1
+            )
+
+            monthIndex++
+        }
+
+        return result
+    }
+
+    private fun buildMonthTimeMarkers(): List<TimeMarker> {
+
+        val startCalendar =
+            Calendar.getInstance().apply {
+
+                set(
+                    2021,
+                    Calendar.OCTOBER,
+                    1,
+                    0,
+                    0,
+                    0
+                )
+
+                set(Calendar.MILLISECOND, 0)
+            }
+
+        val today =
+            Calendar.getInstance().apply {
+
+                set(
+                    Calendar.HOUR_OF_DAY,
+                    0
+                )
+                set(
+                    Calendar.MINUTE,
+                    0
+                )
+                set(
+                    Calendar.SECOND,
+                    0
+                )
+                set(
+                    Calendar.MILLISECOND,
+                    0
+                )
+            }
+
+        // 当前月份的下一个月
+        val endCalendar =
+            today.clone() as Calendar
+
+        endCalendar.set(
+            Calendar.DAY_OF_MONTH,
+            1
+        )
+
+        endCalendar.add(
+            Calendar.MONTH,
+            1
+        )
+
+        val markers =
+            mutableListOf<TimeMarker>()
+
+        val calendar =
+            startCalendar.clone() as Calendar
+
+        var index = 0L
+
+        while (!calendar.after(endCalendar)) {
+
+            // 只有每年的 1 月显示年份
+            if (
+                calendar.get(Calendar.MONTH) ==
+                Calendar.JANUARY
+            ) {
+
+                markers.add(
+                    TimeMarker(
+                        index = index,
+                        text = calendar
+                            .get(Calendar.YEAR)
+                            .toString()
+                    )
+                )
+            }
+
+            calendar.add(
+                Calendar.MONTH,
+                1
+            )
+
+            index++
+        }
+
+        return markers
     }
 
 }
