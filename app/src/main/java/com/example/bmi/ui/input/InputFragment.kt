@@ -47,11 +47,11 @@ class InputFragment : Fragment() {
         "Nov",
         "Dec"
     )
-    val times = listOf(
-        "Morning",
-        "Afternoon",
-        "Evening",
-        "Night"
+    private val times = listOf(
+        R.string.morning,
+        R.string.afternoon,
+        R.string.evening,
+        R.string.night
     )
     private val ages = (2..99).toList()
 
@@ -302,7 +302,7 @@ class InputFragment : Fragment() {
 
     private fun updateDateTimeUi(uiState: InputUiState) {
         binding.date.text = "${months[uiState.month]} ${uiState.day},${uiState.year}"
-        binding.timeSlot.text = times[uiState.timeSlot]
+        binding.timeSlot.text = getString(times[uiState.timeSlot])
     }
     fun updateSelectedItem(
         recyclerView: RecyclerView,

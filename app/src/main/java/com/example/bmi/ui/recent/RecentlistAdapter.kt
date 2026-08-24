@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.bmi.R
 import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.databinding.ItemRecentRecordBinding
 import com.example.bmi.ui.result.category.BmiCategory
@@ -27,6 +28,14 @@ class RecentlistAdapter : ListAdapter<BmiRecord,RecentlistAdapter.RecentViewHold
         fun bind(record: BmiRecord,
                  onItemClick: (BmiRecord) -> Unit)
         {
+            val context = binding.root.context
+
+            val times = listOf(
+                context.getString(R.string.morning),
+                context.getString(R.string.afternoon),
+                context.getString(R.string.evening),
+                context.getString(R.string.night)
+            )
 
             // BMI
             binding.bmiValue.text =
@@ -34,7 +43,7 @@ class RecentlistAdapter : ListAdapter<BmiRecord,RecentlistAdapter.RecentViewHold
             // 获取分类
             val category = getCategory(record)
             // 分类名称
-            binding.typeName.text = category.displayName
+            binding.typeName.text = context.getString(category.displayName)
 
             // 分类图标
             binding.typeCycle.setImageResource(
@@ -64,12 +73,6 @@ class RecentlistAdapter : ListAdapter<BmiRecord,RecentlistAdapter.RecentViewHold
             "Oct",
             "Nov",
             "Dec"
-        )
-        private val times = listOf(
-            "Morning",
-            "Afternoon",
-            "Evening",
-            "Night"
         )
         fun getCategory(record: BmiRecord) : BmiCategory
         {

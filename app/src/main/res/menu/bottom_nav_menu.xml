@@ -4,16 +4,16 @@
     <item
         android:id="@+id/navigation_calculator"
         android:icon="@drawable/calculator"
-        android:title="Calculator" />
+        android:title="@string/calculator" />
 
     <item
         android:id="@+id/navigation_bmi"
         android:icon="@drawable/bmi"
-        android:title="BMI" />
+        android:title="@string/bmi" />
 
     <item
         android:id="@+id/navigation_statistics"
         android:icon="@drawable/statistics"
-        android:title="Statistics" />
+        android:title="@string/statistics" />
 
 </menu>

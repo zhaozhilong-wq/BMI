@@ -68,10 +68,10 @@ class ResultFragment : Fragment() {
         "Dec"
     )
     private val times = listOf(
-        "Morning",
-        "Afternoon",
-        "Evening",
-        "Night"
+        R.string.morning,
+        R.string.afternoon,
+        R.string.evening,
+        R.string.night
     )
 
 
@@ -188,10 +188,9 @@ class ResultFragment : Fragment() {
                         )
                         setupChildCategories(childThreshold,
                             selectedCategory = category)
-                        binding.bmiStatus.text = category.displayName
-                        if (category.displayName == "Obese Class I"){
-                            val display = "Obese"
-                            binding.bmiStatus.text = display
+                        binding.bmiStatus.text = getString(category.displayName)
+                        if (category.displayName == R.string.bmi_obese_class_i){
+                            binding.bmiStatus.text = "Obese"
                         }
                         setStatusBackground(category.colorRes)
 
@@ -211,7 +210,7 @@ class ResultFragment : Fragment() {
                         // 成年人显示分类
                         val category = viewModel.getAdultCategory(record.bmi.toFloat())
                         setupAdultCategories(category)
-                        binding.bmiStatus.text = category.displayName
+                        binding.bmiStatus.text = getString(category.displayName)
                         setStatusBackground(category.colorRes)
                         val statusMessage =
                             viewModel.getAdultStatusMessage(
@@ -226,7 +225,9 @@ class ResultFragment : Fragment() {
                     }
 
                     if(binding.lineText.visibility == View.VISIBLE){
-                        binding.lineText.text = "${months[record.month]} ${record.day}，${record.year} ${times[record.time]}"
+                        binding.lineText.text =
+                            "${months[record.month]} ${record.day}, ${record.year} " +
+                                    binding.root.context.getString(times[record.time])
                     }
 
                     setPersonInfo(record)
@@ -409,24 +410,43 @@ class ResultFragment : Fragment() {
     }
 
     private fun setPersonInfo(record: BmiRecord) {
+
         val totalInches = (record.heightCm / 2.54).roundToInt()
         val feet = totalInches / 12
         val inches = totalInches % 12
-        val lb = String.format("%.2f", record.weightKg / 0.45359237)
-        if(record.weightUnit == "kg"){
-            if (record.heightUnit == "cm"){
-                binding.personInfo.text = "${record.weightKg} kg | ${record.heightCm} cm | ${record.gender} | ${record.age} years old"
-            }else{
-                binding.personInfo.text = "${record.weightKg} kg | ${feet}ft ${inches}in | ${record.gender} | ${record.age} years old"
-            }
 
-        }else{
-            if(record.heightUnit == "cm"){
-                binding.personInfo.text = "$lb lb | ${record.heightCm} cm | ${record.gender} | ${record.age} years old"
-            }else{
-                binding.personInfo.text = "$lb lb | ${feet}ft ${inches}in | ${record.gender} | ${record.age} years old"
-            }
+        val weight: String
+        val height: String
+
+        // 体重
+        if (record.weightUnit == "kg") {
+            weight = String.format("%.2f kg", record.weightKg)
+        } else {
+            val lb = record.weightKg / 0.45359237
+            weight = String.format("%.2f lb", lb)
         }
+
+        // 身高
+        height = if (record.heightUnit == "cm") {
+            getString(
+                R.string.bmi_height_cm_format,
+                String.format("%.1f", record.heightCm)
+            )
+        } else {
+            getString(
+                R.string.bmi_height_ft_in_format,
+                feet,
+                inches
+            )
+        }
+
+        binding.personInfo.text = getString(
+            R.string.bmi_input_data,
+            weight,
+            height,
+            record.gender,
+            record.age
+        )
     }
 
     private fun bmiToPointerRotation(

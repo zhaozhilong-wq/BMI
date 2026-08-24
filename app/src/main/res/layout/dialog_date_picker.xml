@@ -15,7 +15,7 @@
         android:letterSpacing="-0.01"
         android:textColor="#000000"
         android:gravity="center"
-        android:text="DATE"
+        android:text="@string/date"
         android:fontFamily="@font/montserrat_extrabold"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="20dp"
@@ -134,7 +134,7 @@
         android:letterSpacing="-0.01"
         android:textColor="#000000"
         android:gravity="center"
-        android:text="CANCEL"
+        android:text="@string/cancel"
         android:fontFamily="@font/montserrat_extrabold"/>
 
     <TextView
@@ -152,7 +152,7 @@
         android:letterSpacing="-0.01"
         android:textColor="#FFFFFF"
         android:gravity="center"
-        android:text="DONE"
+        android:text="@string/done"
         android:fontFamily="@font/montserrat_extrabold"/>
     
 

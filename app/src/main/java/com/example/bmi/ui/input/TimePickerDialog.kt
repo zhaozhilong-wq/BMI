@@ -25,10 +25,10 @@ class TimePickerDialog(
     private lateinit var timeAdapter: PickerAdapter
 
     private val times = listOf(
-        "Morning",
-        "Afternoon",
-        "Evening",
-        "Night"
+        context.getString(R.string.morning),
+        context.getString(R.string.afternoon),
+        context.getString(R.string.evening),
+        context.getString(R.string.night)
     )
 
     private var selectedTime = 0

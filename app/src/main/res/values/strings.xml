@@ -1,8 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">BMI</string>
-    <string name="calculator">
-Calculator
-</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+	<string name="bmi">BMI</string>
+	<string name="action_cancel">Cancel</string>
+	<string name="action_ok">OK</string>
+	<string name="age">Age</string>
+	<string name="bmi_adult_tip">BMI for adults</string>
+	<string name="app_name">BMI Calculator</string>
+	<string name="bmi_overweight">Overweight</string>
+	<string name="bmi_range_obese_class1">Obese Class I</string>
+	<string name="bmi_range_obese_class2">Obese Class II</string>
+	<string name="bmi_range_obese_class3">Obese Class III</string>
+	<string name="bmi_severely_underweight">Severely underweight</string>
+	<string name="bmi_teenager_tip">BMI for teenagers</string>
+	<string name="bmi_tip_description">Your BMI is %s</string>
+	<string name="bmi_underweight">Underweight</string>
+	<string name="bmi_very_severely_underweight">Very severely underweight</string>
+	<string name="calculate">calculate</string>
+	<string name="cancel">Cancel</string>
+
+	<string name="delete_conf">Delete confirm</string>
+	<string name="are_you_sur">Are you sure you want to delete this record?</string>
+
+
+	<string name="cm">cm</string>
+	<string name="unit_cm" translatable="false">cm</string>
+	<string name="unit_ft" translatable="false">ft</string>
+	<string name="unit_ft_in" translatable="false">ft·in</string>
+	<string name="unit_in" translatable="false">in</string>
+	<string name="unit_kg" translatable="false">kg</string>
+	<string name="unit_lb" translatable="false">lb</string>
+	<string name="facebook" translatable="false">Facebook</string>
+	<string name="google" translatable="false">Google</string>
+	<string name="iap_debug" translatable="false">iapDebug</string>
+	<string name="ad_config_debug" translatable="false">是否显示去Ad入口</string>
+	<string name="googlefit_config_debug" translatable="false">是否显示GoogleFit入口</string>
+	<string name="bmi_result_suggest_middle" translatable="false">%s - %s</string>
+	<string name="bmi_result_suggest_end" translatable="false">(%s)</string>
+	<string name="connect_with_google_fit">Connect with Google Fit</string>
+	<!-- continue_with无用	-->
+	<string name="continue_with">Continue with</string>
+	<string name="date">Date</string>
+	<string name="day">Day</string>
+	<string name="delete">Delete</string>
+	<string name="delete_history_record_content">Are you sure you want to delete this record?</string>
+	<string name="delete_successfully">Deleted successfully.</string>
+	<string name="discard">Discard</string>
+	<string name="drive_syncing_data">Synchronizing data</string>
+	<string name="feedback">Feedback</string>
+	<string name="feedback_mail_text">System info</string>
+	<string name="feedback_or_suggestion">Feedback or suggestion</string>
+	<string name="female">Female</string>
+	<string name="gender_boy">Boy</string>
+	<string name="gender_girl">Girl</string>
+	<string name="got_it">GOT IT</string>
+	<string name="habit_toast_network_error">Something wrong with your network. Please check your network environment</string>
+	<string name="height">Height</string>
+	<string name="history">History</string>
+	<string name="input_valid_height_toast">Please input a valid height (%s) to calculate your BMI accurately</string>
+	<string name="input_valid_weight_toast">Please input a valid weight (%s) to calculate your BMI accurately</string>
+	<string name="language_title">Language</string>
+	<string name="last_sync">Last sync: %s</string>
+	<string name="login_out_sure">Are you sure you want to log out?</string>
+	<string name="log_out">Log out</string>
+	<string name="log_in">Log in</string>
+	<string name="log_weight_time">Time</string>
+	<string name="male">Male</string>
+	<string name="mine">Me</string>
+	<string name="month">Month</string>
+	<string name="normal_leg">Normal</string>
+	<string name="purchase_error_tip">Purchase failed, please try again later</string>
+	<string name="rate_us">Rate us</string>
+	<string name="recent">Recent</string>
+	<string name="recommend_apps_from_us">Recommended apps from us</string>
+	<string name="remove_ad">Remove ads</string>
+	<string name="save">Save</string><!-- 从pc拿的 -->
+	<string name="save_successfully">Saved successfully</string>
+	<string name="send">Send</string>
+	<string name="set_backup">Backup &#38; Restore</string>
+	<!--share_with_friend无用-->
+	<string name="share_with_friend">Share with friends</string>
+	<string name="sign_in_tips">Sign in and synchronize your data</string>
+	<string name="statistics">Statistics</string>
+	<string name="sync_data_success">Welcome! Your data will be safely stored in your account.</string>
+	<string name="sync_failed">Sync failed</string>
+	<string name="sync_success_toast">Sync successful</string>
+	<string name="td_feedback_email_title">%s Feedback</string>
+	<string name="tiktok_delete_confirm">Delete confirm</string>
+	<string name="toast_feedback_text">Thanks for your feedback! %s We\'ll do our best to bring a better user experience.</string>
+	<string name="update">Update</string>
+	<string name="week">Week</string>
+	<string name="weight">Weight</string>
+	<string name="yesterday">Yesterday</string>
+
+	<string name="bmi_teenager_info_tip">%s years old (%s)</string>
+	<string name="bmi_input_data">%1$s | %2$s | %3$s | %4$s years old</string>
+	<string name="bmi_height_ft_in_format">%1$sft %2$sin</string>
+	<string name="bmi_height_cm_format">%1$s cm</string>
+	<string name="bmi_weight_lose_format"> (-%1$.1f %2$s)</string>
+	<string name="bmi_weight_gain_format"> (+%1$.1f %2$s)</string>
+	<string name="bmi_range_format">%1$.1f %2$s - %3$.1f %4$s</string>
+
+
+
+	<!-- 涉及到的这部分文案只有英文才会用到 -->
+	<string name="bmi_range_very_severely_underweight_description" translatable="false">We wish you to show some love to yourself! You need to add healthy fats, go nutrient-dense and seek medical advice to gain weight.</string>
+	<string name="bmi_range_severely_underweight_description" translatable="false">It\'s time to take care of yourself and get rid of the risk of poor immune function and osteoporosis. Treat yourself to a balanced meal and a variety of nutrients.</string>
+	<string name="bmi_range_underweight_adult_description" translatable="false">It seems that your body needs more fuel. Unless you\'re naturally very slim, you may need to consider ways of gaining weight as your weight may pose certain health risks.</string>
+	<string name="bmi_range_underweight_child_description" translatable="false">Don\'t be picky eating anymore, your body needs more energy to grow. Try to snack on healthy and high energy foods to put on weight.</string>
+	<string name="bmi_range_overweight_adult_description" translatable="false">Don\'t wait any longer! It\'s time to take action to reach your weight target. You are carrying excess fat and should balance your diet and physical activity to achieve a healthy weight.</string>
+	<string name="bmi_range_overweight_child_description" translatable="false">Time to get moving and say no to junk food! Your extra weight increases the chance of developing health problems. A small amount of weight loss can make a difference.</string>
+	<string name="bmi_range_obeseClassI_adult_description" translatable="false">Uh-oh! Your current weight is more than the ideal range and you have an increased risk of developing various health problems. It\'s time to embrace healthy eating and increase your activity level.</string>
+	<string name="bmi_range_obeseClassI_child_description" translatable="false">Feeling hard to keep up with friends? It\'s time to repair your body by staying active and eating healthily! Seek advice from your parents and health professionals to get support.</string>
+	<string name="bmi_range_obeseClassII_description" translatable="false">Time to change! You are at high risk of obesity-related diseases. You should increase physical activity and reduce calorie intake slowly but surely. It is also vital to have a health screening.</string>
+	<string name="bmi_range_obeseClassIII_description" translatable="false">We are worried about you! Your weight is a serious and imminent threat to your health. Go for health advice and a weight loss plan scientifically. </string>
+
+
+	<string name="afternoon">Afternoon</string>
+	<string name="evening">Evening</string>
+	<!--	这个要改-->
+	<string name="morning">Morning</string>
+	<string name="night">Night</string><!-- 从sleep sounds拿的，用于BMI的时间段，简体和繁体是根据BMI需要的意思修改的 -->
+	<string name="phone_memery_low_1">Only %1$sM of space left. Please delete some files to make sure there is at least %2$sM.</string>
+	<string name="today">Today</string>
+	<string name="calculator">Calculator</string>
+	<string name="CALCULATE">CALCULATE</string>
+	<string name="loading">Loading…</string>
+	<string name="log_out_google_account">Logged out of Google account and disconnected from Google Fit.</string>
+	<string name="privacy_policy">Privacy Policy</string>
+	<string name="sync_failed_try_again">Sync failed. Please check your network and try again later.</string><!-- 根据后台文字整理 -->
+	<string name="select_right_date_toast">Please select a date that is earlier than today</string>
+	<string name="bmi_result_suggest_start">Normal weight for your height (%1$s):\n</string>
+	<string name="bmi_range_normal_adult_description">👍 Congratulations! You\'re in a great place now. Keep up your healthy habits to maintain your healthy weight.</string>
+	<string name="habit_morning">Morning</string>
+
+	<string name="app_recommend_30_day">30 Day Fitness Challenge - Workout at Home</string>
+	<string name="app_recommend_step_tracker">Step Tracker - Pedometer Free &amp; Calorie Tracker</string>
+	<string name="app_recommend_blood_pressure_monitor">Blood Pressure Monitor - Blood Pressure App</string>
+	<string name="app_recommend_fasting">Fasting App - Fasting Tracker &amp; Intermittent Fast</string>
+	<string name="app_recommend_fasting_en" translatable="false">Fasting App - Fasting Tracker &amp; Intermittent Fast</string>
+	<string name="app_recommend_home">Home Workout - No Equipment</string>
+	<string name="app_recommend_lose_weight">Lose Weight at Home - Home Workout in 30 Days</string>
+	<string name="app_recommend_men">Lose Weight App for Men - Weight Loss in 30 Days</string>
+	<string name="app_recommend_six_pack">Six Pack in 30 Days - Abs Workout</string>
+	<string name="app_recommend_walking">Walking App - Walking for Weight Loss</string>
+	<string name="app_recommend_women">Lose Weight App for Women - Workout at Home</string>
+	<string name="bmi_range_normal_child_description">👍 Thumbs Up! You\'ve done a great job and now only need to maintain your healthy lifestyle to stay in this range.</string>
+	<string name="data_sync_adjust_toast">Due to Google\'s request, we now need to adjust our data sync function, which will be temporarily unavailable during this period.\n\nThe function will be back soon. We\'d greatly appreciate your patience.</string><!-- 多语言是google的 -->
+	<string name="sorry_for_inconvenience">Sorry for the inconvenience</string><!-- 根据thx_feedback_tip整理 -->
+	<string name="done">Done</string>
+	<string name="purchase_failed_tip">Purchase failed! Your current version of Google Play Store is too old.</string><!--根据purchase_error_tip和step2_update_google_play整理-->
+	<string name="remove_ad_failed">Purchase failed, try again?</string>
+	<string name="toast_network_error">Something went wrong. %s Please check your network or try again later.</string>
+
+	<string name="default_weight_hint" translatable="false">0.0</string>
+	<string name="default_height_cm_hint" translatable="false">0</string>
+	<string name="default_height_ft_hint" translatable="false">0\'</string>
+	<string name="default_height_in_hint" translatable="false">0\'\'</string>
+	<string name="default_date_hint" translatable="false">July 30, 2021</string>
+	<string name="bmi_normal">Normal</string>
+	<string name="bmi_obese_class_i">Obese Class I</string>
+	<string name="bmi_obese_class_ii">Obese Class II</string>
+	<string name="bmi_obese_class_iii">Obese Class III</string>
+	<string name="logged_in_successfully">Logged in successfully</string>
+	<string name="logged_out_successfully">Logged out successfully</string>
+	<string name="kg">kg</string>
+	<string name="mmm_dd_yyyy">MMM dd, yyyy</string>
+	<string name="english">English</string>
+	<string name="portugu_s">Português</string>
+	<string name="languaes_ru">Русский</string>
+	<string name="languaes_de">Deutsch</string>
+	<string name="languaes_tw">繁體中文</string>
+	<string name="languaes_cn">简体中文</string>
+	<string name="languaes_fr">Français</string>
+	<string name="languaes_es">Español</string>
+	<string name="languaes_it">Italiano</string>
+	<string name="languaes_ko">한국어</string>
+	<string name="_1f">%.1f</string>
+	<string name="_1f_1f">%.1f- %.1f</string>
+	<string name="home_workout_no_equipments">Home Workout - No Equipments</string>
+	<string name="weight_loss_lose_belly_fat">Weight Loss, Lose Belly Fat</string>
+	<string name="homeworkout_homeworkouts_noequipment">homeworkout.homeworkouts.noequipment</string>
+    <string name="bmi_input_draft">bmi_input_draft</string>
 </resources>

@@ -10,6 +10,7 @@ import android.view.Gravity
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.ViewModelProvider
+import com.example.bmi.R
 import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.databinding.DialogBmiDialBinding
 import com.example.bmi.ui.result.category.BmiCategoryViewHelper
@@ -92,7 +93,11 @@ class BmiDialDialog(
         if (record.isChild) {
             binding.title.text = "BMI for teenagers"
             val gender = if (record.gender == "Male") "Boy" else "Girl"
-            binding.subTitle.text = "${record.age} years old ($gender)"
+            binding.subTitle.text = context.getString(
+                R.string.bmi_teenager_info_tip,
+                record.age,
+                gender
+            )
             binding.subTitle.visibility = android.view.View.VISIBLE
         }else{
             binding.title.text = "BMI for adults"

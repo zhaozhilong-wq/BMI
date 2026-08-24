@@ -30,7 +30,7 @@
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="14dp"
             android:layout_marginStart="10dp"
-            android:text="Recent"
+            android:text="@string/recent"
             android:textSize="20sp"
             android:textColor="#000000"
             android:letterSpacing="-0.01"
