@@ -1,19 +1,16 @@
 package com.example.bmi.ui.input
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -24,6 +21,7 @@ import androidx.recyclerview.widget.SnapHelper
 import com.example.bmi.R
 import com.example.bmi.databinding.FragmentInputBinding
 import com.example.bmi.ui.result.ResultActivity
+import com.example.bmi.ui.setting.SettingActivity
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
@@ -222,6 +220,11 @@ class InputFragment : Fragment() {
 
                 )
             }
+        }
+
+        binding.user.setOnClickListener {
+            val intent = Intent(requireContext(), SettingActivity::class.java)
+            startActivity(intent)
         }
 
     }

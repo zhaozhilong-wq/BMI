@@ -8,7 +8,6 @@ import android.text.style.ForegroundColorSpan
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
@@ -22,19 +21,14 @@ import com.example.bmi.R
 import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.databinding.FragmentResultBinding
 import com.example.bmi.ui.BmiDialConfig
-import com.example.bmi.ui.BmiSection
 import com.example.bmi.ui.input.InputActivity
 import com.example.bmi.ui.main.MainActivity
 import com.example.bmi.ui.recent.RecentActivity
 import com.example.bmi.ui.result.category.BmiCategory
-import com.example.bmi.ui.result.category.BmiCategoryItem
 import com.example.bmi.ui.result.category.BmiCategoryViewHelper
 import com.example.bmi.ui.result.category.BmiCategoryViewHelper.createAdultCategoryItems
 import com.example.bmi.ui.result.category.BmiCategoryViewHelper.createChildCategoryItems
 import com.example.bmi.ui.result.category.ChildBmiThreshold
-import com.example.bmi.ui.result.category.femaleChildBmi
-import com.example.bmi.ui.result.category.maleChildBmi
-import com.example.bmi.ui.toDialConfig
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import kotlin.math.roundToInt
@@ -418,7 +412,7 @@ class ResultFragment : Fragment() {
         val totalInches = (record.heightCm / 2.54).roundToInt()
         val feet = totalInches / 12
         val inches = totalInches % 12
-        val lb = record.weightKg / 0.45359237
+        val lb = String.format("%.2f", record.weightKg / 0.45359237)
         if(record.weightUnit == "kg"){
             if (record.heightUnit == "cm"){
                 binding.personInfo.text = "${record.weightKg} kg | ${record.heightCm} cm | ${record.gender} | ${record.age} years old"
@@ -445,7 +439,7 @@ class ResultFragment : Fragment() {
                     (config.maxBmi - config.minBmi))
                 .coerceIn(0f, 1f)
 
-        return -71f + ratio * 180f
+        return -68.6f + ratio * 180f
     }
 
     private fun setBmiAdviceText(

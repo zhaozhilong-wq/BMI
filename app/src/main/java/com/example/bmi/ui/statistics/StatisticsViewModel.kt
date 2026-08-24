@@ -1,8 +1,5 @@
 package com.example.bmi.ui.statistics
 
-import android.util.Log
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bmi.R
@@ -112,12 +109,12 @@ class StatisticsViewModel( private val repository: BmiRepository
                     it.month,
                     it.day
                 )
-            }
-            .map { (_, dayRecords) ->
+            }//按照日期分组
+            .map { (_, dayRecords) ->//每一项是日期和该日期下所有记录，_表示Triple(2026, 8, 20)
                 val latest =
                     dayRecords.maxBy {
                         it.createdAt
-                    }
+                    }//找当天最新的
                 ChartPoint(
                     index = dateToIndex(
                         latest.year,
@@ -129,7 +126,7 @@ class StatisticsViewModel( private val repository: BmiRepository
                 )
             }
             .sortedBy {
-                it.index
+                it.index//排序
             }
     }
 

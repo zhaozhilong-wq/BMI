@@ -23,4 +23,7 @@
     <color name="adviceWeight">#D13B3B</color>
     <color name="MainBackground">#EAEAEE</color>
     <color name="gridColor">#80EEEEEE</color>
+    <color name="rail_un_checked">#DDDDDD</color>
+    <color name="rail_checked">#354AD8</color>
+
 </resources>

@@ -3,9 +3,7 @@ package com.example.bmi.ui.result
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.nfc.cardemulation.CardEmulation.EXTRA_CATEGORY
 import android.os.Bundle
-import android.provider.ContactsContract.QuickContact.EXTRA_MODE
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity

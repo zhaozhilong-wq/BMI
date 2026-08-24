@@ -1,7 +1,6 @@
 package com.example.bmi.ui.recent
 
 import android.app.Activity
-import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.Toast
@@ -15,7 +14,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bmi.R
-import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.databinding.ActivityRecentBinding
 import com.example.bmi.ui.result.ResultActivity
 import com.example.bmi.ui.result.ResultMode

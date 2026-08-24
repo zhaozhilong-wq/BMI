@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:background="#EAEAEE">
+    
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/userImg"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="15dp"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="19dp"
+            android:src="@drawable/img_user"
+            app:shapeAppearanceOverlay="@style/CircleImageView"
+            />
+        
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            app:layout_constraintStart_toEndOf="@id/userImg"
+            app:layout_constraintTop_toTopOf="@id/userImg"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="15dp"
+            android:text="Cassie"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:fontFamily="@font/montserrat_extrabold"/>
+        
+        <TextView
+            android:id="@+id/email"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            app:layout_constraintStart_toStartOf="@id/name"
+            app:layout_constraintTop_toBottomOf="@id/name"
+            android:layout_marginTop="4dp"
+            android:text="cassiexiao@gmail.com"
+            android:textSize="16sp"
+            android:textColor="#888888"/>
+        
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            app:layout_constraintStart_toEndOf="@id/name"
+            android:layout_marginStart="5dp"
+            app:layout_constraintTop_toTopOf="@id/name"
+            android:src="@drawable/google"/>
+        
+        <ImageView
+            android:id="@+id/close"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/x"/>
+        
+        <TextView
+            android:id="@+id/login"
+            android:layout_width="0dp"
+            android:layout_height="55dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/email"
+            android:layout_marginTop="37dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/rectangle20"
+            android:text="Login"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:fontFamily="@font/montserrat_extrabold" />
+    
+        <TextView
+            android:id="@+id/logout"
+            android:layout_width="0dp"
+            android:layout_height="55dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/email"
+            android:layout_marginTop="37dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/rectangle20"
+            android:textColor="#F4333C"
+            android:text="Log out"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:fontFamily="@font/montserrat_extrabold"
+            android:visibility="gone"/>
+    
+        <TextView
+            android:id="@+id/cancel"
+            android:layout_width="0dp"
+            android:layout_height="55dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/email"
+            android:layout_marginTop="107dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:textColor="#000000"
+            android:background="@drawable/rectangle20"
+            android:text="Cancel"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:fontFamily="@font/montserrat_extrabold"/>
+    
+    
+    
+    
+    
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

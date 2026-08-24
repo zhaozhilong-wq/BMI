@@ -10,7 +10,6 @@ import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import com.example.bmi.R
 import kotlin.math.cos
-import kotlin.math.min
 import kotlin.math.sin
 
 class BmiDialView @JvmOverloads constructor(

@@ -10,16 +10,9 @@ import android.view.Gravity
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.ViewModelProvider
-import com.example.bmi.R
 import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.databinding.DialogBmiDialBinding
-import com.example.bmi.ui.BmiDialConfig
-import com.example.bmi.ui.BmiSection
 import com.example.bmi.ui.result.category.BmiCategoryViewHelper
-import com.example.bmi.ui.result.category.femaleChildBmi
-import com.example.bmi.ui.result.category.maleChildBmi
-import com.example.bmi.ui.toDialConfig
-import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import kotlin.getValue
 
 class BmiDialDialog(
@@ -126,10 +119,6 @@ class BmiDialDialog(
                 ColorDrawable(Color.TRANSPARENT)
             )
         }
-    }
-
-    private fun dpToPx(dp: Int): Int {
-        return (dp * context.resources.displayMetrics.density).toInt()
     }
 
 }

@@ -7,6 +7,7 @@ import com.example.bmi.ui.input.InputViewModel
 import com.example.bmi.ui.main.MainViewModel
 import com.example.bmi.ui.recent.RecentViewModel
 import com.example.bmi.ui.result.ResultViewModel
+import com.example.bmi.ui.setting.SettingViewModel
 import com.example.bmi.ui.splash.SplashViewModel
 import com.example.bmi.ui.statistics.StatisticsViewModel
 import org.koin.android.ext.koin.androidContext
@@ -64,6 +65,12 @@ val appModule = module {
     }
     viewModel {
         StatisticsViewModel(
+            repository = get()
+        )
+    }
+
+    viewModel {
+        SettingViewModel(
             repository = get()
         )
     }

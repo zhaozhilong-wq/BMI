@@ -1,11 +1,9 @@
 package com.example.bmi.ui.input
 
 import android.view.View
-import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bmi.R
 
 class DatePickerSnapHelper : LinearSnapHelper() {
 
