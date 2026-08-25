@@ -101,7 +101,6 @@
 	<string name="bmi_range_format">%1$.1f %2$s - %3$.1f %4$s</string>
 
 
-
 	<!-- 涉及到的这部分文案只有英文才会用到 -->
 	<string name="bmi_range_very_severely_underweight_description" translatable="false">We wish you to show some love to yourself! You need to add healthy fats, go nutrient-dense and seek medical advice to gain weight.</string>
 	<string name="bmi_range_severely_underweight_description" translatable="false">It\'s time to take care of yourself and get rid of the risk of poor immune function and osteoporosis. Treat yourself to a balanced meal and a variety of nutrients.</string>

@@ -1,5 +1,6 @@
 package com.example.bmi.ui.setting
 
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
@@ -108,6 +109,10 @@ class SettingActivity : AppCompatActivity() {
         }
         binding.synButton.setOnClickListener {
 
+        }
+        binding.language.setOnClickListener {
+            intent = Intent(this, LauSettingActivity::class.java)
+            startActivity(intent)
         }
 
 

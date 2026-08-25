@@ -129,7 +129,7 @@ object BmiCategoryViewHelper {
                 false
             )
 
-            itemBinding.typeText.text = item.name
+            itemBinding.typeText.text = inflater.context.getString(item.category.displayName)
             itemBinding.typeRange.text = item.range
             itemBinding.typeCycle.setImageResource(item.cycleRes)
 
