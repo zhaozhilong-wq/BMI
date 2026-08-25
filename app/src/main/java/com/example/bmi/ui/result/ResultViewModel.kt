@@ -7,11 +7,9 @@ import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.data.repository.BmiRepository
 import com.example.bmi.ui.BmiDialConfig
 import com.example.bmi.ui.BmiSection
-import com.example.bmi.ui.result.category.BmiCategory
-import com.example.bmi.ui.result.category.ChildBmiThreshold
-import com.example.bmi.ui.result.category.femaleChildBmi
-import com.example.bmi.ui.result.category.maleChildBmi
+import com.example.bmi.ui.result.category.BmiClassifier
 import com.example.bmi.ui.toDialConfig
+import com.example.bmi.ui.result.category.ChildBmiThreshold
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -97,54 +95,7 @@ class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
         }
     }
 
-    fun getChildCategory(
-        bmi: Float,
-        threshold: ChildBmiThreshold
-    ): BmiCategory {
-        return when {
-            bmi < threshold.underweight ->
-                BmiCategory.UNDERWEIGHT
 
-            bmi < threshold.normal ->
-                BmiCategory.NORMAL
-
-            bmi < threshold.overweight ->
-                BmiCategory.OVERWEIGHT
-
-            else ->
-                BmiCategory.OBESE_CLASS_I
-        }
-    }
-
-    fun getAdultCategory(
-        bmi: Float,
-    ): BmiCategory {
-        return when {
-            bmi < 16f ->
-                BmiCategory.VSU
-
-            bmi < 17f ->
-                BmiCategory.SU
-
-            bmi < 18.5f ->
-                BmiCategory.UNDERWEIGHT
-
-            bmi < 25f ->
-                BmiCategory.NORMAL
-
-            bmi < 30f ->
-                BmiCategory.OVERWEIGHT
-
-            bmi < 35f ->
-                BmiCategory.OBESE_CLASS_I
-
-            bmi < 40f ->
-                BmiCategory.OBESE_CLASS_II
-
-            else ->
-                BmiCategory.OBESE_CLASS_III
-        }
-    }
 
     fun getDialConfig(record: BmiRecord): BmiDialConfig {
 
@@ -152,36 +103,10 @@ class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
             return adultConfig
         }
 
-        val table = if (record.gender == "male") {
-            maleChildBmi
-        } else {
-            femaleChildBmi
-        }
-
-        val threshold = table.firstOrNull {
-            it.age == record.age
-        }
-
-        if (threshold == null) {
-            throw IllegalArgumentException(
-                "No BMI threshold found: gender=${record.gender}, age=${record.age}"
-            )
-        }
+        val threshold =
+            BmiClassifier.getChildThreshold(record)
 
         return threshold.toDialConfig()
-    }
-
-    fun getChildThreshold(record: BmiRecord): ChildBmiThreshold? {
-
-        val table = if (record.gender == "male") {
-            maleChildBmi
-        } else {
-            femaleChildBmi
-        }
-
-        return table.firstOrNull {
-            it.age == record.age
-        }
     }
 
 

@@ -34,6 +34,7 @@ import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import kotlin.math.roundToInt
 import android.animation.ValueAnimator
 import android.app.Activity
+import com.example.bmi.ui.result.category.BmiClassifier
 
 
 /**
@@ -174,7 +175,7 @@ class ResultFragment : Fragment() {
                     binding.bmiDialView.setConfig(config)
                     if (record.isChild) {
 
-                        val childThreshold = viewModel.getChildThreshold(record)
+                        val childThreshold = BmiClassifier.getChildThreshold(record)
                         if (childThreshold == null) {
                             Log.e(
                                 "ResultFragment",
@@ -182,10 +183,7 @@ class ResultFragment : Fragment() {
                             )
                             return@collect
                         }
-                        val category = viewModel.getChildCategory(
-                            bmi = record.bmi.toFloat(),
-                            threshold = childThreshold
-                        )
+                        val category = BmiClassifier.classify(record)
                         setupChildCategories(childThreshold,
                             selectedCategory = category)
                         binding.bmiStatus.text = getString(category.displayName)
@@ -208,7 +206,7 @@ class ResultFragment : Fragment() {
 
                     } else {
                         // 成年人显示分类
-                        val category = viewModel.getAdultCategory(record.bmi.toFloat())
+                        val category = BmiClassifier.classify(record)
                         setupAdultCategories(category)
                         binding.bmiStatus.text = getString(category.displayName)
                         setStatusBackground(category.colorRes)

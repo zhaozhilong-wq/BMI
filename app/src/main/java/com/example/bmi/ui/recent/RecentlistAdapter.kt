@@ -9,9 +9,7 @@ import com.example.bmi.R
 import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.databinding.ItemRecentRecordBinding
 import com.example.bmi.ui.result.category.BmiCategory
-import com.example.bmi.ui.result.category.ChildBmiThreshold
-import com.example.bmi.ui.result.category.femaleChildBmi
-import com.example.bmi.ui.result.category.maleChildBmi
+import com.example.bmi.ui.result.category.BmiClassifier
 
 class RecentlistAdapter : ListAdapter<BmiRecord,RecentlistAdapter.RecentViewHolder>(DIFF_CALLBACK) {
 
@@ -25,9 +23,10 @@ class RecentlistAdapter : ListAdapter<BmiRecord,RecentlistAdapter.RecentViewHold
         val binding: ItemRecentRecordBinding
     ) : RecyclerView.ViewHolder(binding.root)
     {
-        fun bind(record: BmiRecord,
-                 onItemClick: (BmiRecord) -> Unit)
-        {
+        fun bind(
+            record: BmiRecord,
+            onItemClick: (BmiRecord) -> Unit
+        ) {
             val context = binding.root.context
 
             val times = listOf(
@@ -40,10 +39,14 @@ class RecentlistAdapter : ListAdapter<BmiRecord,RecentlistAdapter.RecentViewHold
             // BMI
             binding.bmiValue.text =
                 String.format("%.1f", record.bmi)
+
             // 获取分类
-            val category = getCategory(record)
+            val category =
+                BmiClassifier.classify(record)
+
             // 分类名称
-            binding.typeName.text = context.getString(category.displayName)
+            binding.typeName.text =
+                context.getString(category.displayName)
 
             // 分类图标
             binding.typeCycle.setImageResource(
@@ -74,78 +77,7 @@ class RecentlistAdapter : ListAdapter<BmiRecord,RecentlistAdapter.RecentViewHold
             "Nov",
             "Dec"
         )
-        fun getCategory(record: BmiRecord) : BmiCategory
-        {
-            if (record.isChild){
-                val threshold = getChildThreshold(record)
-                return getChildCategory(record.bmi.toFloat(), threshold!!)
-            }else
-            {
-                return getAdultCategory(record.bmi.toFloat())
-            }
-        }
 
-        fun getChildCategory(
-            bmi: Float,
-            threshold: ChildBmiThreshold
-        ): BmiCategory {
-            return when {
-                bmi < threshold.underweight ->
-                    BmiCategory.UNDERWEIGHT
-
-                bmi < threshold.normal ->
-                    BmiCategory.NORMAL
-
-                bmi < threshold.overweight ->
-                    BmiCategory.OVERWEIGHT
-
-                else ->
-                    BmiCategory.OBESE_CLASS_I
-            }
-        }
-
-        fun getAdultCategory(
-            bmi: Float,
-        ): BmiCategory {
-            return when {
-                bmi < 16f ->
-                    BmiCategory.VSU
-
-                bmi < 17f ->
-                    BmiCategory.SU
-
-                bmi < 18.5f ->
-                    BmiCategory.UNDERWEIGHT
-
-                bmi < 25f ->
-                    BmiCategory.NORMAL
-
-                bmi < 30f ->
-                    BmiCategory.OVERWEIGHT
-
-                bmi < 35f ->
-                    BmiCategory.OBESE_CLASS_I
-
-                bmi < 40f ->
-                    BmiCategory.OBESE_CLASS_II
-
-                else ->
-                    BmiCategory.OBESE_CLASS_III
-            }
-        }
-
-        fun getChildThreshold(record: BmiRecord): ChildBmiThreshold? {
-
-            val table = if (record.gender == "male") {
-                maleChildBmi
-            } else {
-                femaleChildBmi
-            }
-
-            return table.firstOrNull {
-                it.age == record.age
-            }
-        }
     }
 
     override fun onCreateViewHolder(

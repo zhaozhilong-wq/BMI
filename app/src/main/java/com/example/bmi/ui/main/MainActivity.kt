@@ -178,10 +178,12 @@ class MainActivity : AppCompatActivity() {
         if (showSavedToast) {
             Toast.makeText(
                 this,
-                "Saved successfully",
+                getString(R.string.save_successfully),
                 Toast.LENGTH_SHORT
             ).show()
         }
+        intent.removeExtra("show_saved_toast")
+        intent.removeExtra("open_page")
     }
 
 

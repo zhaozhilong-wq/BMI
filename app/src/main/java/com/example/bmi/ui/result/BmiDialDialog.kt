@@ -14,6 +14,7 @@ import com.example.bmi.R
 import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.databinding.DialogBmiDialBinding
 import com.example.bmi.ui.result.category.BmiCategoryViewHelper
+import com.example.bmi.ui.result.category.BmiClassifier
 import kotlin.getValue
 
 class BmiDialDialog(
@@ -35,7 +36,7 @@ class BmiDialDialog(
         val container =
             binding.bmiCategoryLayout.bmiCategoryContainer
         if (record.isChild) {
-            val childThreshold = viewModel.getChildThreshold(record)
+            val childThreshold = BmiClassifier.getChildThreshold(record)
             if (childThreshold == null) {
                 Log.e(
                     "ResultFragment",
@@ -48,10 +49,7 @@ class BmiDialDialog(
                     childThreshold
                 )
             val selectedCategory =
-                viewModel.getChildCategory(
-                    record.bmi.toFloat(),
-                    childThreshold
-                )
+                BmiClassifier.classify(record)
 
             BmiCategoryViewHelper.setup(
                 container = container,
@@ -66,7 +64,7 @@ class BmiDialDialog(
                 BmiCategoryViewHelper.createAdultCategoryItems()
 
             val selectedCategory =
-                viewModel.getAdultCategory(record.bmi.toFloat())
+                BmiClassifier.classify(record)
 
             BmiCategoryViewHelper.setup(
                 container = container,
@@ -95,7 +93,7 @@ class BmiDialDialog(
             val gender = if (record.gender == "Male") "Boy" else "Girl"
             binding.subTitle.text = context.getString(
                 R.string.bmi_teenager_info_tip,
-                record.age,
+                record.age.toString(),
                 gender
             )
             binding.subTitle.visibility = android.view.View.VISIBLE

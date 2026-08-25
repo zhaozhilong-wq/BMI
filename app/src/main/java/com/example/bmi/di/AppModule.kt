@@ -25,10 +25,6 @@ val appModule = module {
     }
 
     single {
-        BmiDatabase.getDatabase(androidContext())
-    }
-
-    single {
         get<BmiDatabase>().bmiRecordDao()
     }
 

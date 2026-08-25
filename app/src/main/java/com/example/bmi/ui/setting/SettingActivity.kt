@@ -146,7 +146,7 @@ class SettingActivity : AppCompatActivity() {
                 if (saveSuccess) {
                     Toast.makeText(
                         this,
-                        getString(R.string.toast_feedback_text),
+                        getString(R.string.save_successfully),
                         Toast.LENGTH_SHORT
                     ).show()
                 }

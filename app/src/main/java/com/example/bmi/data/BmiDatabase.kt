@@ -15,21 +15,4 @@ import com.example.bmi.data.entity.BmiRecord
 abstract class BmiDatabase : RoomDatabase() {
 
     abstract fun bmiRecordDao(): BmiRecordDao
-
-    companion object {
-        @Volatile
-        private var INSTANCE: BmiDatabase? = null
-        fun getDatabase(context: Context): BmiDatabase {
-            return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    BmiDatabase::class.java,
-                    "bmi_database"
-                ).fallbackToDestructiveMigration(dropAllTables = true)
-                    .build()
-                INSTANCE = instance
-                instance
-            }
-        }
-    }
 }
