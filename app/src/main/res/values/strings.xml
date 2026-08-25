@@ -128,7 +128,7 @@
 	<string name="privacy_policy">Privacy Policy</string>
 	<string name="sync_failed_try_again">Sync failed. Please check your network and try again later.</string><!-- 根据后台文字整理 -->
 	<string name="select_right_date_toast">Please select a date that is earlier than today</string>
-	<string name="bmi_result_suggest_start">Normal weight for your height (%1$s):\n</string>
+	<string name="bmi_result_suggest_start">Normal weight for your height (%s):\n</string>
 	<string name="bmi_range_normal_adult_description">👍 Congratulations! You\'re in a great place now. Keep up your healthy habits to maintain your healthy weight.</string>
 	<string name="habit_morning">Morning</string>
 

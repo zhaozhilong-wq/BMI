@@ -34,7 +34,8 @@ import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import kotlin.math.roundToInt
 import android.animation.ValueAnimator
 import android.app.Activity
-import com.example.bmi.ui.result.category.BmiClassifier
+import com.example.bmi.ui.result.category.BmiStatus
+import com.example.bmi.ui.result.category.BmiStatusResult
 
 
 /**
@@ -175,7 +176,7 @@ class ResultFragment : Fragment() {
                     binding.bmiDialView.setConfig(config)
                     if (record.isChild) {
 
-                        val childThreshold = BmiClassifier.getChildThreshold(record)
+                        val childThreshold = viewModel.getChildThreshold(record)
                         if (childThreshold == null) {
                             Log.e(
                                 "ResultFragment",
@@ -183,7 +184,7 @@ class ResultFragment : Fragment() {
                             )
                             return@collect
                         }
-                        val category = BmiClassifier.classify(record)
+                        val category = viewModel.getCategory(record)
                         setupChildCategories(childThreshold,
                             selectedCategory = category)
                         binding.bmiStatus.text = getString(category.displayName)
@@ -192,33 +193,60 @@ class ResultFragment : Fragment() {
                         }
                         setStatusBackground(category.colorRes)
 
-                        val statusMessage =
-                            viewModel.getChildStatusMessage(
-                                record = record,
-                                threshold = childThreshold
-                            )
+                        val statusResult = viewModel.getStatus(record)
+
+                        val weightRange =
+                            getWeightRangeText(statusResult)
+
+                        val differenceText =
+                            getDifferenceText(statusResult)
+
+                        val text = when (statusResult.status) {
+                            BmiStatus.UNDERWEIGHT,
+                            BmiStatus.OVERWEIGHT -> {
+                                "Normal Weight for your height (${record.heightCm.toInt()}cm):\n" +
+                                        "$weightRange $differenceText"
+                            }
+
+                            BmiStatus.NORMAL -> {
+                                "\uD83D\uDC4D Thumbs Up! You’ve done a great job and now only need to keep your lifestyle healthy to stay in this range."
+                            }
+                        }
 
                         setBmiAdviceText(
-                            text = statusMessage.text,
-                            weightRange = statusMessage.weightRange,
-                            differenceText = statusMessage.differenceText
+                            text = text,
+                            weightRange = weightRange,
+                            differenceText = differenceText
                         )
 
                     } else {
                         // 成年人显示分类
-                        val category = BmiClassifier.classify(record)
+                        val category = viewModel.getCategory(record)
                         setupAdultCategories(category)
                         binding.bmiStatus.text = getString(category.displayName)
                         setStatusBackground(category.colorRes)
-                        val statusMessage =
-                            viewModel.getAdultStatusMessage(
-                                record = record
-                            )
+                        val statusResult = viewModel.getStatus(record)
+                        val weightRange =
+                            getWeightRangeText(statusResult)
+
+                        val differenceText =
+                            getDifferenceText(statusResult)
+                        val text = when (statusResult.status) {
+                            BmiStatus.UNDERWEIGHT,
+                            BmiStatus.OVERWEIGHT -> {
+                                "Normal Weight for your height (${record.heightCm.toInt()}cm):\n" +
+                                        "$weightRange $differenceText"
+                            }
+                            BmiStatus.NORMAL -> {
+                                "😎 Congratulations! You’re in a great place now. " +
+                                        "Keep up your healthy habits to maintain your healthy weight."
+                            }
+                        }
 
                         setBmiAdviceText(
-                            text = statusMessage.text,
-                            weightRange = statusMessage.weightRange,
-                            differenceText = statusMessage.differenceText
+                            text = text,
+                            weightRange = weightRange,
+                            differenceText = differenceText
                         )
                     }
 
@@ -588,6 +616,34 @@ class ResultFragment : Fragment() {
         val targetRotation =
             bmiToPointerRotation(bmi, config)
         animatePointer(targetRotation)
+    }
+
+    private fun getWeightRangeText(
+        statusResult: BmiStatusResult
+    ): String {
+        return "${String.format("%.1f", statusResult.minHealthyWeight)}kg - " +
+                "${String.format("%.1f", statusResult.maxHealthyWeight)}kg"
+    }
+
+    private fun getDifferenceText(
+        statusResult: BmiStatusResult
+    ): String? {
+
+        val difference =
+            statusResult.weightDifference
+                ?: return null
+
+        return when (statusResult.status) {
+
+            BmiStatus.UNDERWEIGHT ->
+                "(-${String.format("%.1f", difference)}kg)"
+
+            BmiStatus.OVERWEIGHT ->
+                "(+${String.format("%.1f", difference)}kg)"
+
+            BmiStatus.NORMAL ->
+                null
+        }
     }
 
 
