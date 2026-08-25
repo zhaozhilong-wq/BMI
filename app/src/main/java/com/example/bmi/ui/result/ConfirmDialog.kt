@@ -1,7 +1,6 @@
 package com.example.bmi.ui.result
 
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.view.Gravity
 import android.view.ViewGroup

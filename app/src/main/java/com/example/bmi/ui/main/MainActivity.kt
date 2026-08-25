@@ -1,31 +1,21 @@
 package com.example.bmi.ui.main
 
-import android.app.Activity
 import android.app.ComponentCaller
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.view.Menu
 import android.view.MotionEvent
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.ViewPager2
 import com.example.bmi.R
 import com.example.bmi.databinding.ActivityMainBinding
-import com.example.bmi.ui.BmiDialConfig
-import com.example.bmi.ui.BmiSection
-import kotlinx.coroutines.launch
-import com.example.bmi.ui.input.InputFragment
-import com.example.bmi.ui.result.ResultFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 

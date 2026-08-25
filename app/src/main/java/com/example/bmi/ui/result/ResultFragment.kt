@@ -256,6 +256,11 @@ class ResultFragment : Fragment() {
                                     binding.root.context.getString(times[record.time])
                     }
 
+                    if (binding.time.visibility == View.VISIBLE) {
+                        binding.time.text =
+                            "${months[record.month]} ${record.day}, ${record.year} "
+                    }
+
                     setPersonInfo(record)
 
                     binding.BmiPointer.post {

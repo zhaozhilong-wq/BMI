@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bmi.R
 import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.databinding.ItemRecentRecordBinding
-import com.example.bmi.ui.result.category.BmiCategory
 import com.example.bmi.ui.result.category.BmiClassifier
 
 class RecentlistAdapter : ListAdapter<BmiRecord,RecentlistAdapter.RecentViewHolder>(DIFF_CALLBACK) {

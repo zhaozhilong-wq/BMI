@@ -1,7 +1,6 @@
 package com.example.bmi.ui.setting
 
-import android.app.Dialog
-import android.content.Context
+
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -10,11 +9,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import androidx.activity.ComponentActivity
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProvider
 import com.example.bmi.databinding.DialogLogBinding
-import com.example.bmi.ui.result.ResultViewModel
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class LogDialog: DialogFragment() {

@@ -1,7 +1,5 @@
 package com.example.bmi.ui.setting
 
-import android.app.Dialog
-import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -9,11 +7,9 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.example.bmi.databinding.DialogSyncBinding
-import com.example.bmi.databinding.DialogLogBinding
 
 class SyncDialog : DialogFragment() {
     private var _binding: DialogSyncBinding? = null
