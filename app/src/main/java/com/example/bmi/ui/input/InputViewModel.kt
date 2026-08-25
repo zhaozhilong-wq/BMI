@@ -3,6 +3,7 @@ package com.example.bmi.ui.input
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.bmi.R
 import com.example.bmi.data.entity.BmiRecord
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,7 +29,7 @@ class InputViewModel (
 
     val uiState = _uiState.asStateFlow()
 
-    private val _toastEvent = MutableSharedFlow<String>()
+    private val _toastEvent = MutableSharedFlow<Pair<Int, String>>()
     val toastEvent = _toastEvent.asSharedFlow()//用来监听事件
 
     fun onWeightChanged(text: String) {
@@ -606,7 +607,7 @@ class InputViewModel (
 
         viewModelScope.launch {
             _toastEvent.emit(
-                "Please input a valid weight ($range) to calculate your BMI accurately."
+                R.string.input_valid_weight_toast to range
             )
         }
     }
@@ -621,7 +622,7 @@ class InputViewModel (
 
         viewModelScope.launch {
             _toastEvent.emit(
-                "Please input a valid height ($range) to calculate your BMI accurately."
+                R.string.input_valid_height_toast to range
             )
         }
     }

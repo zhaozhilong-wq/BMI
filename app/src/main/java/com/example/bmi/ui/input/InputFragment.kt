@@ -94,11 +94,11 @@ class InputFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
-                viewModel.toastEvent.collect { message ->
+                viewModel.toastEvent.collect { (resId,range) ->
 
                     Toast.makeText(
                         requireContext(),
-                        message,
+                        getString(resId, range),
                         Toast.LENGTH_SHORT
                     ).show()
                 }

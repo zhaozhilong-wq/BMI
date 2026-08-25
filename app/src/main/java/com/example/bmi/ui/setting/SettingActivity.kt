@@ -1,5 +1,6 @@
 package com.example.bmi.ui.setting
 
+import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -7,8 +8,10 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -108,11 +111,17 @@ class SettingActivity : AppCompatActivity() {
             }
         }
         binding.synButton.setOnClickListener {
-
+            val dialog = SyncDialog(this, viewModel)
+            dialog.show()
         }
         binding.language.setOnClickListener {
             intent = Intent(this, LauSettingActivity::class.java)
             startActivity(intent)
+        }
+        binding.feedback.setOnClickListener {
+            resultLauncher.launch(
+                Intent(this, FeedbackActivity::class.java)
+            )
         }
 
 
@@ -120,4 +129,27 @@ class SettingActivity : AppCompatActivity() {
     private fun dpToPx(dp: Float): Float {
         return dp * resources.displayMetrics.density
     }
+
+    private val resultLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+
+            if (result.resultCode == Activity.RESULT_OK) {
+
+                val saveSuccess =
+                    result.data?.getBooleanExtra(
+                        "save_success",
+                        false
+                    ) ?: false
+
+                if (saveSuccess) {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.toast_feedback_text),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
 }

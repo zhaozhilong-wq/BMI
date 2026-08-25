@@ -435,8 +435,8 @@ class ResultFragment : Fragment() {
         } else {
             getString(
                 R.string.bmi_height_ft_in_format,
-                feet,
-                inches
+                "$feet",
+                "$inches"
             )
         }
 
@@ -445,7 +445,7 @@ class ResultFragment : Fragment() {
             weight,
             height,
             record.gender,
-            record.age
+            record.age.toString()
         )
     }
 
