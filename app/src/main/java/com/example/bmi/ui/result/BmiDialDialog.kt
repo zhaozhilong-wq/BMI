@@ -7,49 +7,135 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
+import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.bmi.R
 import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.databinding.DialogBmiDialBinding
 import com.example.bmi.ui.result.category.BmiCategoryViewHelper
 import com.example.bmi.ui.result.category.BmiClassifier
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import kotlin.getValue
 
-class BmiDialDialog(
-    context: Context,
-    private val record: BmiRecord
-) : Dialog(context) {
+class BmiDialDialog: DialogFragment() {
 
     private var _binding: DialogBmiDialBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: ResultViewModel by lazy {
-        ViewModelProvider(
-            (context as ComponentActivity)
-        )[ResultViewModel::class.java]
+    private val viewModel: ResultViewModel by activityViewModel()
+
+    private var recordId: Long = -1L
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        recordId = requireArguments().getLong(ARG_RECORD_ID)
     }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
 
-    private fun setupCategories() {
+        _binding = DialogBmiDialBinding.inflate(
+            inflater,
+            container,
+            false
+        )
+
+        return binding.root
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(
+                Lifecycle.State.STARTED
+            ) {
+                viewModel.record.collect { record ->
+
+                    if (record == null) return@collect
+
+                    if (record.id != recordId) return@collect
+
+                    setupContent(record)
+                }
+            }
+        }
+    }
+
+    private fun setupContent(record: BmiRecord) {
+
+        binding.bmiDialView.setConfig(
+            viewModel.getDialConfig(record)
+        )
+
+        setupCategories(record)
+
+        binding.gotButton.setOnClickListener {
+            dismiss()
+        }
+
+        if (record.isChild) {
+
+            binding.title.text =
+                getString(R.string.bmi_teenager_tip)
+
+            val gender = if (record.gender == "Male") {
+                getString(R.string.gender_boy)
+            } else {
+                getString(R.string.gender_girl)
+            }
+
+            binding.subTitle.text = getString(
+                R.string.bmi_teenager_info_tip,
+                record.age.toString(),
+                gender
+            )
+
+            binding.subTitle.visibility = View.VISIBLE
+
+        } else {
+
+            binding.title.text =
+                getString(R.string.bmi_adult_tip)
+
+            binding.subTitle.visibility = View.GONE
+        }
+    }
+
+    private fun setupCategories(record: BmiRecord) {
+
         val container =
             binding.bmiCategoryLayout.bmiCategoryContainer
+
+        val selectedCategory =
+            BmiClassifier.classify(record)
+
         if (record.isChild) {
-            val childThreshold = BmiClassifier.getChildThreshold(record)
-            if (childThreshold == null) {
-                Log.e(
-                    "ResultFragment",
-                    "No BMI threshold found: gender=${record.gender}, age=${record.age}"
-                )
-                return
-            }
+
+            val threshold =
+                BmiClassifier.getChildThreshold(record)
+                    ?: return
+
             val items =
                 BmiCategoryViewHelper.createChildCategoryItems(
-                    childThreshold
+                    threshold
                 )
-            val selectedCategory =
-                BmiClassifier.classify(record)
 
             BmiCategoryViewHelper.setup(
                 container = container,
@@ -63,9 +149,6 @@ class BmiDialDialog(
             val items =
                 BmiCategoryViewHelper.createAdultCategoryItems()
 
-            val selectedCategory =
-                BmiClassifier.classify(record)
-
             BmiCategoryViewHelper.setup(
                 container = container,
                 items = items,
@@ -75,52 +158,40 @@ class BmiDialDialog(
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        _binding = DialogBmiDialBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        binding.bmiDialView.setConfig(
-            viewModel.getDialConfig(record)
-        )
-
-        setupCategories()
-        binding.gotButton.setOnClickListener {
-            dismiss()
-        }
-        if (record.isChild) {
-            binding.title.text = "BMI for teenagers"
-            val gender = if (record.gender == "Male") "Boy" else "Girl"
-            binding.subTitle.text = context.getString(
-                R.string.bmi_teenager_info_tip,
-                record.age.toString(),
-                gender
-            )
-            binding.subTitle.visibility = android.view.View.VISIBLE
-        }else{
-            binding.title.text = "BMI for adults"
-            binding.subTitle.visibility = android.view.View.GONE
-        }
-    }
-
     override fun onStart() {
         super.onStart()
 
-        window?.apply {
-            // 放到底部
+        dialog?.window?.apply {
+
             setGravity(Gravity.BOTTOM)
-            // Dialog 本身透明
-            setBackgroundDrawableResource(
-                android.R.color.transparent
+
+            setBackgroundDrawable(
+                ColorDrawable(Color.TRANSPARENT)
             )
-            // Window 宽度占满屏幕
+
             setLayout(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.WRAP_CONTENT
             )
-            window?.setBackgroundDrawable(
-                ColorDrawable(Color.TRANSPARENT)
-            )
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    companion object {
+
+        private const val ARG_RECORD_ID = "arg_record_id"
+
+        fun newInstance(recordId: Long): BmiDialDialog {
+            return BmiDialDialog().apply {
+
+                arguments = Bundle().apply {
+                    putLong(ARG_RECORD_ID, recordId)
+                }
+            }
         }
     }
 

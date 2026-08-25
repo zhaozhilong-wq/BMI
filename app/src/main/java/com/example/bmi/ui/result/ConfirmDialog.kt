@@ -5,70 +5,82 @@ import android.content.Context
 import android.os.Bundle
 import android.view.Gravity
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
+import androidx.fragment.app.DialogFragment
+import com.example.bmi.R
 import com.example.bmi.databinding.DialogConfirmBinding
 
-class ConfirmDialog(
-    context: Context,
-    private val onDeleteClick: () -> Unit
-) : Dialog(context) {
+class ConfirmDialog: DialogFragment() {
 
-    private lateinit var binding: DialogConfirmBinding
+    private var _binding: DialogConfirmBinding? = null
+    private val binding get() = _binding!!
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = Dialog(
+            requireContext(),
+            R.style.DatePickerDialogStyle
+        )
 
-        binding = DialogConfirmBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        _binding = DialogConfirmBinding.inflate(layoutInflater)
 
-        setupDialog()
+        dialog.setContentView(binding.root)
 
         binding.cancel.setOnClickListener {
             dismiss()
         }
+
         binding.delete.setOnClickListener {
-            onDeleteClick()
+            parentFragmentManager.setFragmentResult(
+                REQUEST_KEY,
+                bundleOf(
+                    RESULT_KEY to true
+                )
+            )
             dismiss()
         }
+        dialog.setCanceledOnTouchOutside(true)
+        dialog.setCancelable(true)
+
+        return dialog
     }
 
-    private fun setupDialog() {
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
-        window?.apply {
+    override fun onStart() {
+        super.onStart()
 
-            // 整个 Dialog 居中
+        dialog?.window?.apply {
             setGravity(Gravity.CENTER)
-
-            // 去掉系统默认 Dialog 背景
             setBackgroundDrawableResource(
                 android.R.color.transparent
             )
-
-            // 左右各留 24dp
             val margin = dp(37)
-
             val screenWidth =
-                context.resources.displayMetrics.widthPixels
-
+                resources.displayMetrics.widthPixels
             val dialogWidth =
                 screenWidth - margin * 2
-
             setLayout(
                 dialogWidth,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
         }
-
-        // 点击外部是否关闭
-        setCanceledOnTouchOutside(true)
-
-        // 返回键是否关闭
-        setCancelable(true)
     }
 
     private fun dp(value: Int): Int {
         return (
-                value * context.resources.displayMetrics.density
+                value * resources.displayMetrics.density
                 ).toInt()
+    }
+
+    companion object {
+
+        const val TAG = "ConfirmDialog"
+
+        const val REQUEST_KEY = "confirm_dialog_result"
+        const val RESULT_KEY = "delete_confirmed"
     }
 }

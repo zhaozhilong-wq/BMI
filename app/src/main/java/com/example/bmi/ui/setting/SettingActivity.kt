@@ -88,8 +88,10 @@ class SettingActivity : AppCompatActivity() {
         }
 
         binding.personalContainer.setOnClickListener {
-            val dialog = LogDialog(this, viewModel)
-            dialog.show()
+            LogDialog().show(
+                supportFragmentManager,
+                "LogDialog"
+            )
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -111,8 +113,10 @@ class SettingActivity : AppCompatActivity() {
             }
         }
         binding.synButton.setOnClickListener {
-            val dialog = SyncDialog(this, viewModel)
-            dialog.show()
+            SyncDialog().show(
+                supportFragmentManager,
+                "SyncDialog"
+            )
         }
         binding.language.setOnClickListener {
             intent = Intent(this, LauSettingActivity::class.java)

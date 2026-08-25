@@ -7,41 +7,68 @@ import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.fragment.app.DialogFragment
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bmi.R
 import com.example.bmi.databinding.DialogTimePickerBinding
 
-class TimePickerDialog(
-    context: Context,
-    private val onDoneClick: (Int) -> Unit
-) : Dialog(context, R.style.DatePickerDialogStyle) {
+class TimePickerDialog: DialogFragment() {
 
-    private lateinit var binding: DialogTimePickerBinding
+    private var _binding: DialogTimePickerBinding? = null
+    private val binding get() = _binding!!
 
     private lateinit var timeAdapter: PickerAdapter
 
-    private val times = listOf(
-        context.getString(R.string.morning),
-        context.getString(R.string.afternoon),
-        context.getString(R.string.evening),
-        context.getString(R.string.night)
+    private val times by lazy {
+        listOf(
+        getString(R.string.morning),
+        getString(R.string.afternoon),
+        getString(R.string.evening),
+        getString(R.string.night)
     )
+    }
 
     private var selectedTime = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding =
-            DialogTimePickerBinding.inflate(
-                layoutInflater
-            )
+        selectedTime = arguments?.getInt(
+            ARG_SELECTED_TIME,
+            getCurrentTimeSlot()
+        ) ?: getCurrentTimeSlot()
+    }
 
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+
+        _binding = DialogTimePickerBinding.inflate(
+            inflater,
+            container,
+            false
+        )
+
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
 
         setupTimePicker()
 
@@ -50,7 +77,17 @@ class TimePickerDialog(
         }
 
         binding.done.setOnClickListener {
-            onDoneClick(selectedTime)
+
+            parentFragmentManager.setFragmentResult(
+                REQUEST_KEY,
+                Bundle().apply {
+                    putInt(
+                        KEY_TIME_SLOT,
+                        selectedTime
+                    )
+                }
+            )
+
             dismiss()
         }
     }
@@ -58,27 +95,23 @@ class TimePickerDialog(
     override fun onStart() {
         super.onStart()
 
-        window?.apply {
+        dialog?.window?.apply {
 
             setGravity(Gravity.BOTTOM)
 
-            setBackgroundDrawableResource(
-                android.R.color.transparent
+            setBackgroundDrawable(
+                ColorDrawable(Color.TRANSPARENT)
             )
 
             setLayout(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 dpToPx(380)
             )
-
-            window?.setBackgroundDrawable(
-                ColorDrawable(Color.TRANSPARENT)
-            )
         }
     }
 
     private fun dpToPx(dp: Int): Int {
-        return (dp * context.resources.displayMetrics.density).toInt()
+        return (dp * resources.displayMetrics.density).toInt()
     }
 
     private fun setupTimePicker() {
@@ -334,6 +367,33 @@ class TimePickerDialog(
             in 12..17 -> 1      // Afternoon
             in 18..21 -> 2      // Evening
             else -> 3           // Night
+        }
+    }
+
+    companion object {
+
+        const val REQUEST_KEY =
+            "TimePickerDialogResult"
+
+        const val KEY_TIME_SLOT =
+            "time_slot"
+
+        private const val ARG_SELECTED_TIME =
+            "selected_time"
+
+        fun newInstance(
+            selectedTime: Int
+        ): TimePickerDialog {
+
+            return TimePickerDialog().apply {
+
+                arguments = Bundle().apply {
+                    putInt(
+                        ARG_SELECTED_TIME,
+                        selectedTime
+                    )
+                }
+            }
         }
     }
 

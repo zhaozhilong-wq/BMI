@@ -6,50 +6,64 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.bmi.databinding.DialogLogBinding
 import com.example.bmi.ui.result.ResultViewModel
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
-class LogDialog (
-    context: Context,
-    private val viewModel: SettingViewModel
-) : Dialog(context) {
+class LogDialog: DialogFragment() {
     private var _binding: DialogLogBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: SettingViewModel by activityViewModel()
 
 
 
     override fun onStart() {
         super.onStart()
 
-        window?.apply {
-            // 放到底部
+        dialog?.window?.apply {
+
             setGravity(Gravity.BOTTOM)
-            // Dialog 本身透明
-            setBackgroundDrawableResource(
-                android.R.color.transparent
+
+            setBackgroundDrawable(
+                ColorDrawable(Color.TRANSPARENT)
             )
-            // Window 宽度占满屏幕
+
             setLayout(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.WRAP_CONTENT
             )
-            window?.setBackgroundDrawable(
-                ColorDrawable(Color.TRANSPARENT)
-            )
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        _binding = DialogLogBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
 
+        _binding = DialogLogBinding.inflate(
+            inflater,
+            container,
+            false
+        )
+
+        return binding.root
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(view, savedInstanceState)
         updateLoginState()
-
         binding.close.setOnClickListener {
             dismiss()
         }
@@ -64,19 +78,27 @@ class LogDialog (
             viewModel.logout()
             dismiss()
         }
-
-
-
     }
 
     private fun updateLoginState() {
         val isLogin = viewModel.isLogin.value
-
         binding.login.visibility =
-            if (isLogin) View.GONE else View.VISIBLE
-
+            if (isLogin) {
+                View.GONE
+            } else {
+                View.VISIBLE
+            }
         binding.logout.visibility =
-            if (isLogin) View.VISIBLE else View.GONE
+            if (isLogin) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 

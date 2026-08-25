@@ -7,26 +7,27 @@ import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
+import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bmi.R
 import com.example.bmi.databinding.DialogDatePickerBinding
 import java.util.Calendar
 
-class DatePickerDialog(
-    context: Context,
-    private val onDoneClick: (Int, Int, Int) -> Unit
-) : Dialog(context, R.style.DatePickerDialogStyle) {
+class DatePickerDialog: DialogFragment() {
 
     private lateinit var monthAdapter: PickerAdapter
     private lateinit var dayAdapter: PickerAdapter
     private lateinit var yearAdapter: PickerAdapter
 
 
-    private lateinit var binding: DialogDatePickerBinding
+    private var _binding: DialogDatePickerBinding? = null
+    private val binding get() = _binding!!
 
     private val calendar = Calendar.getInstance()
 
@@ -66,19 +67,56 @@ class DatePickerDialog(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        selectedYear =
+            savedInstanceState?.getInt(KEY_YEAR)
+                ?: arguments?.getInt(KEY_YEAR)
+                        ?: currentYear
+        selectedMonth =
+            savedInstanceState?.getInt(KEY_MONTH)
+                ?: arguments?.getInt(KEY_MONTH)
+                        ?: currentMonth
+        selectedDay =
+            savedInstanceState?.getInt(KEY_DAY)
+                ?: arguments?.getInt(KEY_DAY)
+                        ?: currentDay
+    }
 
-        binding = DialogDatePickerBinding.inflate(layoutInflater)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
 
-        setContentView(binding.root)
+        _binding = DialogDatePickerBinding.inflate(
+            inflater,
+            container,
+            false
+        )
 
+        return binding.root
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(
+            view,
+            savedInstanceState
+        )
         setupDatePicker()
-
         binding.cancel.setOnClickListener {
             dismiss()
         }
-
         binding.done.setOnClickListener {
-            onDoneClick(selectedYear, selectedMonth, selectedDay)
+            parentFragmentManager.setFragmentResult(
+                REQUEST_KEY,
+                Bundle().apply {
+                    putInt(KEY_YEAR, selectedYear)
+                    putInt(KEY_MONTH, selectedMonth)
+                    putInt(KEY_DAY, selectedDay)
+                }
+            )
             dismiss()
         }
     }
@@ -86,26 +124,23 @@ class DatePickerDialog(
     override fun onStart() {
         super.onStart()
 
-        window?.apply {
-            // 放到底部
+        dialog?.window?.apply {
+
             setGravity(Gravity.BOTTOM)
-            // Dialog 本身透明
-            setBackgroundDrawableResource(
-                android.R.color.transparent
+
+            setBackgroundDrawable(
+                ColorDrawable(Color.TRANSPARENT)
             )
-            // Window 宽度占满屏幕
+
             setLayout(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 dpToPx(380)
-            )
-            window?.setBackgroundDrawable(
-                ColorDrawable(Color.TRANSPARENT)
             )
         }
     }
 
     private fun dpToPx(dp: Int): Int {
-        return (dp * context.resources.displayMetrics.density).toInt()
+        return (dp * resources.displayMetrics.density).toInt()
     }
     private fun setupDatePicker() {
 
@@ -409,21 +444,6 @@ class DatePickerDialog(
 
         // 记录原来的月份
         val oldSelectedMonth = selectedMonth
-
-        /*
-         * 只有原来的月份在新年份中不存在，
-         * 才修正月份。
-         *
-         * 例如：
-         *
-         * 2025 December
-         *     ↓
-         * 2026
-         *
-         * 2026 年目前只有到 August，
-         * December 不合法，
-         * 所以才需要变成 August。
-         */
         if (selectedMonth > availableMonths.lastIndex) {
             selectedMonth =
                 availableMonths.lastIndex
@@ -434,11 +454,6 @@ class DatePickerDialog(
             availableMonths
         )
 
-
-        /*
-         * 只有月份真的发生变化，
-         * 才让 month RecyclerView 滚动。
-         */
         if (selectedMonth != oldSelectedMonth) {
 
             binding.month.post {
@@ -481,37 +496,11 @@ class DatePickerDialog(
             selectedDay - 1
         )
 
-        /*
-         * 如果日期没有发生变化，
-         * 就不要让 RecyclerView 滚动。
-         *
-         * 例如：
-         *
-         * August 14
-         *     ↓
-         * July 14
-         *
-         * 14 号仍然存在，
-         * 所以 day RecyclerView 保持原位置。
-         */
+
         if (selectedDay == oldSelectedDay) {
             return
         }
 
-        /*
-         * 只有原来的日期已经不存在，
-         * 才需要把日期滚动到新的日期。
-         *
-         * 例如：
-         *
-         * August 31
-         *     ↓
-         * February
-         *
-         * February 没有 31，
-         * selectedDay 会变成 28，
-         * 所以需要把 RecyclerView 滚到 28。
-         */
         binding.day.post {
 
             val layoutManager =
@@ -523,6 +512,50 @@ class DatePickerDialog(
                 layoutManager,
                 selectedDay - 1
             )
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    companion object {
+
+        const val REQUEST_KEY =
+            "date_picker_result"
+
+        const val KEY_YEAR =
+            "year"
+
+        const val KEY_MONTH =
+            "month"
+
+        const val KEY_DAY =
+            "day"
+
+        fun newInstance(
+            year: Int,
+            month: Int,
+            day: Int
+        ): DatePickerDialog {
+
+            return DatePickerDialog().apply {
+                arguments = Bundle().apply {
+                    putInt(
+                        KEY_YEAR,
+                        year
+                    )
+                    putInt(
+                        KEY_MONTH,
+                        month
+                    )
+                    putInt(
+                        KEY_DAY,
+                        day
+                    )
+                }
+            }
         }
     }
 

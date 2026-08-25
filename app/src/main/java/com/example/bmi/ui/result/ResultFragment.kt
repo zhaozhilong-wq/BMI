@@ -265,11 +265,12 @@ class ResultFragment : Fragment() {
 
         binding.bmiHelp.setOnClickListener {
             currentRecord?.let { record ->
-                val dialog = BmiDialDialog(
-                    requireContext(),
-                    record
-                )
-                dialog.show()
+                BmiDialDialog
+                    .newInstance(record.id)
+                    .show(
+                        parentFragmentManager,
+                        "BmiDialDialog"
+                    )
             }
         }
         binding.discord.setOnClickListener {
@@ -311,39 +312,59 @@ class ResultFragment : Fragment() {
     }
 
     private fun showConfirmDialog() {
-        val dialog = ConfirmDialog(requireContext()) {
-            viewModel.deleteRecord(recordId) { isNewUser ->
-                if (isNewUser && mode==ResultMode.HISTORY) {
-                    // 已经没有任何记录了
-                    startActivity(
-                        Intent(
-                            requireContext(),
-                            InputActivity::class.java
-                        ).apply {
+        childFragmentManager.setFragmentResultListener(
+            ConfirmDialog.REQUEST_KEY,
+            viewLifecycleOwner
+        ) { _, bundle ->
+            val confirmed =
+                bundle.getBoolean(
+                    ConfirmDialog.RESULT_KEY
+                )
 
-                            putExtra("show_delete_toast", true)
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
-                                    Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        }
-                    )
-                    requireActivity().finish()
-                } else{
-                    // 历史结果页删除后还有记录
-                    // 不要重新打开 RecentActivity
-                    // 直接关闭当前 ResultActivity
-
-                    requireActivity().setResult(
-                        Activity.RESULT_OK,
-                        Intent().apply {
-                            putExtra("delete_success", true)
-                        }
-                    )
-                    requireActivity().finish()
+            if (confirmed) {
+                viewModel.deleteRecord(recordId) { isNewUser ->
+                    if (isNewUser && mode == ResultMode.HISTORY) {
+                        startActivity(
+                            Intent(
+                                requireContext(),
+                                InputActivity::class.java
+                            ).apply {
+                                putExtra(
+                                    "show_delete_toast",
+                                    true
+                                )
+                                flags =
+                                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                                            Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            }
+                        )
+                        requireActivity().finish()
+                    } else {
+                        requireActivity().setResult(
+                            Activity.RESULT_OK,
+                            Intent().apply {
+                                putExtra(
+                                    "delete_success",
+                                    true
+                                )
+                            }
+                        )
+                        requireActivity().finish()
+                    }
                 }
             }
         }
 
-        dialog.show()
+        if (
+            childFragmentManager.findFragmentByTag(
+                ConfirmDialog.TAG
+            ) == null
+        ) {
+            ConfirmDialog().show(
+                childFragmentManager,
+                ConfirmDialog.TAG
+            )
+        }
     }
 
     companion object {

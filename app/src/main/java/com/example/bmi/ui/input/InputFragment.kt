@@ -185,24 +185,59 @@ class InputFragment : Fragment() {
 
 
         binding.date.setOnClickListener {
-            val datePickerDialog =
-                DatePickerDialog(requireContext()) { year, month, day ->
-                    viewModel.selectDate(
-                        year,
-                        month,
-                        day
-                    )
-                }
-            datePickerDialog.show()
+
+            DatePickerDialog
+                .newInstance(
+                    year = viewModel.uiState.value.year,
+                    month = viewModel.uiState.value.month,
+                    day = viewModel.uiState.value.day
+                )
+                .show(
+                    parentFragmentManager,
+                    "DatePickerDialog"
+                )
+        }
+
+        parentFragmentManager.setFragmentResultListener(
+            DatePickerDialog.REQUEST_KEY,
+            viewLifecycleOwner
+        ) { _, result ->
+
+            val year =
+                result.getInt(DatePickerDialog.KEY_YEAR)
+
+            val month =
+                result.getInt(DatePickerDialog.KEY_MONTH)
+
+            val day =
+                result.getInt(DatePickerDialog.KEY_DAY)
+
+            viewModel.selectDate(year, month, day)
         }
         binding.timeSlot.setOnClickListener {
-            val timeSlotDialog =
-                TimePickerDialog(requireContext()) { timeSlot ->
 
-                    viewModel.selectTimeSlot(timeSlot)
-                }
-            timeSlotDialog.show()
+            TimePickerDialog
+                .newInstance(
+                    selectedTime = viewModel.uiState.value.timeSlot
+                )
+                .show(
+                    parentFragmentManager,
+                    "TimePickerDialog"
+                )
         }
+        parentFragmentManager.setFragmentResultListener(
+            TimePickerDialog.REQUEST_KEY,
+            viewLifecycleOwner
+        ) { _, result ->
+
+            val timeSlot =
+                result.getInt(
+                    TimePickerDialog.KEY_TIME_SLOT
+                )
+
+            viewModel.selectTimeSlot(timeSlot)
+        }
+
         setupAgePicker()
 
         binding.maleContainer.setOnClickListener {
