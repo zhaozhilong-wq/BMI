@@ -10,8 +10,8 @@ class SettingViewModel(
 ) : ViewModel() {
     var isChecked = false
 
-    fun check() {
-        isChecked = !isChecked
+    fun updateChecked(checked: Boolean) {
+        isChecked = checked
     }
 
     private val _isLogin = MutableStateFlow(false)

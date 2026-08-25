@@ -3,13 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/rectangle9"
+    android:background="@drawable/radius_24_top"
     android:id="@+id/bmiDialDialog">
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
-        android:layout_height="24dp"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="20dp"
@@ -23,7 +23,7 @@
     <TextView
         android:id="@+id/subTitle"
         android:layout_width="wrap_content"
-        android:layout_height="17dp"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title"
         android:layout_marginStart="20dp"
@@ -85,7 +85,7 @@
         android:gravity="center"
         android:textSize="20sp"
         android:textColor="#FFFFFF"
-        android:background="@drawable/rectangle12"
+        android:background="@drawable/radius_27"
         android:fontFamily="@font/montserrat_extrabold" />
 
 

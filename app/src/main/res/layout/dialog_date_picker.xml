@@ -4,13 +4,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="380dp"
-    android:background="@drawable/rectangle9"
+    android:background="@drawable/radius_24_top"
     android:id="@+id/datePickerDialog"
     android:clipToOutline="true">
     
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="24dp"
+        android:layout_height="wrap_content"
         android:textSize="20sp"
         android:letterSpacing="-0.01"
         android:textColor="#000000"
@@ -123,7 +123,7 @@
     <TextView
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:background="@drawable/rectangle10"
+        android:background="@drawable/radius_25"
         android:id="@+id/cancel"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="20dp"
@@ -140,7 +140,7 @@
     <TextView
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:background="@drawable/rectangle11"
+        android:background="@drawable/radius_25"
         android:id="@+id/done"
         app:layout_constraintStart_toEndOf="@id/cancel"
         android:layout_marginStart="15dp"
@@ -153,7 +153,8 @@
         android:textColor="#FFFFFF"
         android:gravity="center"
         android:text="@string/done"
-        android:fontFamily="@font/montserrat_extrabold"/>
+        android:fontFamily="@font/montserrat_extrabold"
+        android:backgroundTint="#3659CF"/>
     
 
 </androidx.constraintlayout.widget.ConstraintLayout>

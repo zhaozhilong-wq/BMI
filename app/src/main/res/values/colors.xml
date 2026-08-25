@@ -25,5 +25,16 @@
     <color name="gridColor">#80EEEEEE</color>
     <color name="rail_un_checked">#DDDDDD</color>
     <color name="rail_checked">#354AD8</color>
+    <color name="thumb_checked">#3659CF</color>
+    
+
+    <color name="oc1_checked">#FF9A4C</color>
+    <color name="oc2_checked">#ff8940</color>
+    <color name="oc3_checked">#ed5925</color>
+    <color name="su_checked">#1b85e8</color>
+    <color name="underweight_checked">#59b3fa</color>
+    <color name="vsu_checked">#4c6bcf</color>
+    <color name="overweight_checked">#ffc205</color>
+
 
 </resources>

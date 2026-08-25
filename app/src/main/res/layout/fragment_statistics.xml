@@ -34,7 +34,7 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="40dp"
-        android:background="@drawable/rectangle1"
+        android:background="@drawable/radius_18"
         android:layout_marginTop="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -48,7 +48,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:alpha="1"
-            android:background="@drawable/rectangle2"
+            android:background="@drawable/radius_18"
             android:fontFamily="@font/montserrat_extrabold"
             android:gravity="center"
             android:text="@string/day"
@@ -62,7 +62,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:alpha="0.3"
-            android:background="@drawable/rectangle2"
+            android:background="@drawable/radius_18"
             android:fontFamily="@font/montserrat_extrabold"
             android:gravity="center"
             android:text="@string/week"
@@ -76,7 +76,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:alpha="0.3"
-            android:background="@drawable/rectangle2"
+            android:background="@drawable/radius_18"
             android:fontFamily="@font/montserrat_extrabold"
             android:gravity="center"
             android:text="@string/month"
@@ -88,8 +88,8 @@
 
     <TextView
         android:id="@+id/BmiTitle"
-        android:layout_width="37dp"
-        android:layout_height="22dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:fontFamily="@font/montserrat_extrabold"
         android:gravity="center"
         android:text="@string/bmi"
@@ -103,8 +103,8 @@
 
     <TextView
         android:id="@+id/update1"
-        android:layout_width="59dp"
-        android:layout_height="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:fontFamily="@font/montserrat_regular"
         android:gravity="center"
         android:text="@string/update"
@@ -119,8 +119,8 @@
 
     <TextView
         android:id="@+id/WeightTitle"
-        android:layout_width="70dp"
-        android:layout_height="22dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:fontFamily="@font/montserrat_extrabold"
         android:gravity="center"
         android:text="@string/weight"
@@ -134,8 +134,8 @@
 
     <TextView
         android:id="@+id/update2"
-        android:layout_width="59dp"
-        android:layout_height="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:fontFamily="@font/montserrat_regular"
         android:gravity="center"
         android:text="@string/update"
@@ -162,7 +162,7 @@
             android:id="@+id/BmiChart"
             android:layout_width="match_parent"
             android:layout_height="243dp"
-            android:background="@drawable/mask1"/>
+            android:background="@drawable/bg_statistics_bmi"/>
 
         <com.example.bmi.ui.statistics.TimeAxisView
             android:id="@+id/bmiTimeAxis"
@@ -193,7 +193,7 @@
             android:id="@+id/WeightChart"
             android:layout_width="match_parent"
             android:layout_height="243dp"
-            android:background="@drawable/mask2"/>
+            android:background="@drawable/bg_statistics_weight"/>
 
         <com.example.bmi.ui.statistics.TimeAxisView
             android:id="@+id/weightTimeAxis"

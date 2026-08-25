@@ -3,7 +3,8 @@
     android:layout_width="335dp"
     android:layout_height="79dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/rectangle14">
+    android:background="@drawable/radius_15"
+    android:backgroundTint="#F4F4F4">
     
     <ImageView
         android:id="@+id/cover"
@@ -18,7 +19,7 @@
     <TextView
         android:id="@id/title"
         android:layout_width="wrap_content"
-        android:layout_height="17dp"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="@id/cover"
         app:layout_constraintStart_toEndOf="@id/cover"
         android:layout_marginStart="14dp"
@@ -89,7 +90,7 @@
     <TextView
         android:id="@+id/score"
         android:layout_width="wrap_content"
-        android:layout_height="15dp"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@id/cover"
         app:layout_constraintStart_toEndOf="@id/star5"
         android:layout_marginStart="5dp"
@@ -109,7 +110,7 @@
         android:textSize="8sp"
         android:textColor="#FFFFFF"
         android:gravity="center"
-        android:background="@drawable/rectangle16"
+        android:background="#54A529"
         android:alpha="0.3"/>
 
     

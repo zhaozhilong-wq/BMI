@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- 四个角都是 12dp -->
+    <corners android:radius="12dp" />
+
+    <!-- 从左到右渐变 -->
+    <gradient
+        android:type="linear"
+        android:angle="0"
+        android:startColor="#264CCA"
+        android:endColor="#5077FA" />
+
+</shape>

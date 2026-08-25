@@ -48,40 +48,8 @@ class SettingActivity : AppCompatActivity() {
 
         binding.back.setOnClickListener { finish() }
 
-        binding.toggleButton.setOnClickListener {
-            if (viewModel.isChecked) {
-                // 右 → 左
-                binding.toggleCircle.animate()
-                    .translationX(0f)
-                    .setDuration(200)
-                    .start()
-                binding.rail.backgroundTintList =
-                    ColorStateList.valueOf(
-                        getColor(R.color.rail_un_checked)
-                    )
-                binding.toggleCircle.backgroundTintList =
-                    ColorStateList.valueOf(
-                        getColor(R.color.white)
-                    )
-                viewModel.check()
-            } else {
-                // 左 → 右
-                binding.toggleCircle.animate()
-                    .translationX(
-                        dpToPx(14f)
-                    )
-                    .setDuration(200)
-                    .start()
-                binding.rail.backgroundTintList =
-                    ColorStateList.valueOf(
-                        getColor(R.color.rail_checked)
-                    )
-                binding.toggleCircle.backgroundTintList =
-                    ColorStateList.valueOf(
-                        getColor(R.color.rail_checked)
-                    )
-                viewModel.check()
-            }
+        binding.toggleButton.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.updateChecked(isChecked)
         }
 
         binding.personalContainer.setOnClickListener {

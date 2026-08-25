@@ -1,7 +1,10 @@
 package com.example.bmi.ui.recent
 
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -48,9 +51,21 @@ class RecentlistAdapter : ListAdapter<BmiRecord,RecentlistAdapter.RecentViewHold
                 context.getString(category.displayName)
 
             // 分类图标
-            binding.typeCycle.setImageResource(
-                category.iconRes
-            )
+            // 所有分类共用一个圆形 Drawable
+            binding.typeCycle.background =
+                AppCompatResources.getDrawable(
+                    binding.root.context,
+                    R.drawable.bg_type_cycle
+                )
+
+            // 根据分类设置圆形颜色
+            binding.typeCycle.backgroundTintList =
+                ColorStateList.valueOf(
+                    ContextCompat.getColor(
+                        binding.root.context,
+                        category.colorRes
+                    )
+                )
 
             // 日期
             binding.time.text =

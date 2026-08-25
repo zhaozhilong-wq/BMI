@@ -172,11 +172,11 @@ class ResultFragment : Fragment() {
                         return@collect
                     }
 
-                    val config = viewModel.getDialConfig(record)
-                    binding.bmiDialView.setConfig(config)
+                    val config = viewModel.getDialConfig(record)//获取表盘配置，分为儿童和成人
+                    binding.bmiDialView.setConfig(config)//设置表盘配置
                     if (record.isChild) {
 
-                        val childThreshold = viewModel.getChildThreshold(record)
+                        val childThreshold = viewModel.getChildThreshold(record)//根据年龄获取对应的各个节点的阈值
                         if (childThreshold == null) {
                             Log.e(
                                 "ResultFragment",
@@ -184,9 +184,9 @@ class ResultFragment : Fragment() {
                             )
                             return@collect
                         }
-                        val category = viewModel.getCategory(record)
+                        val category = viewModel.getCategory(record)//得到dmi对应的分类
                         setupChildCategories(childThreshold,
-                            selectedCategory = category)
+                            selectedCategory = category)//设置所有分类并选中对应的分类
                         binding.bmiStatus.text = getString(category.displayName)
                         if (category.displayName == R.string.bmi_obese_class_i){
                             binding.bmiStatus.text = "Obese"
@@ -221,16 +221,16 @@ class ResultFragment : Fragment() {
 
                     } else {
                         // 成年人显示分类
-                        val category = viewModel.getCategory(record)
-                        setupAdultCategories(category)
+                        val category = viewModel.getCategory(record)//拿到计算得到的dmi对应的分类
+                        setupAdultCategories(category)//设置所有分类，并且选中对应的分类
                         binding.bmiStatus.text = getString(category.displayName)
                         setStatusBackground(category.colorRes)
-                        val statusResult = viewModel.getStatus(record)
+                        val statusResult = viewModel.getStatus(record)//计算正常体重范围，以及与正常范围的差值
                         val weightRange =
-                            getWeightRangeText(statusResult)
+                            getWeightRangeText(statusResult)//获取正常体重范围的文本
 
                         val differenceText =
-                            getDifferenceText(statusResult)
+                            getDifferenceText(statusResult)//获取与正常范围的差值文本
                         val text = when (statusResult.status) {
                             BmiStatus.UNDERWEIGHT,
                             BmiStatus.OVERWEIGHT -> {
