@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewConfiguration
 import android.view.WindowManager
 import android.widget.EditText
 import android.widget.Toast
@@ -34,6 +35,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {//使得点击输入框外，就失去焦点
         if (ev.action == MotionEvent.ACTION_DOWN) {
+            // 记录手指按下的位置
+            downX = ev.rawX
+            downY = ev.rawY
             val currentFocus = currentFocus
             if (currentFocus is EditText) {
                 val location = IntArray(2)
@@ -61,7 +65,8 @@ class MainActivity : AppCompatActivity() {
             val distance = kotlin.math.sqrt(
                 dx * dx + dy * dy
             )
-            if(binding.viewPager.currentItem == 1 && distance < 20)
+            val touchSlop = ViewConfiguration.get(this).scaledTouchSlop
+            if(binding.viewPager.currentItem == 1 && distance < touchSlop)
             {
                 val recent = binding.root.findViewById<View>(R.id.recent)
                 if (recent != null) {
