@@ -93,8 +93,8 @@ class StatisticsFragment : Fragment() {
         }
         binding.day.setOnClickListener {
             binding.day.alpha = 1f
-            binding.week.alpha = 0.3f
-            binding.month.alpha = 0.3f
+            binding.week.alpha = 0.2f
+            binding.month.alpha = 0.2f
             currentInterval = ChartInterval.DAY
             updateCurrentCharts()
             viewModel.setInterval(ChartInterval.DAY)
@@ -106,8 +106,8 @@ class StatisticsFragment : Fragment() {
         }
         binding.week.setOnClickListener {
             binding.week.alpha = 1f
-            binding.day.alpha = 0.3f
-            binding.month.alpha = 0.3f
+            binding.day.alpha = 0.2f
+            binding.month.alpha = 0.2f
             currentInterval = ChartInterval.WEEK
             updateCurrentCharts()
             viewModel.setInterval(ChartInterval.WEEK)
@@ -118,8 +118,8 @@ class StatisticsFragment : Fragment() {
         }
         binding.month.setOnClickListener {
             binding.month.alpha = 1f
-            binding.day.alpha = 0.3f
-            binding.week.alpha = 0.3f
+            binding.day.alpha = 0.2f
+            binding.week.alpha = 0.2f
             currentInterval = ChartInterval.MONTH
             updateCurrentCharts()
             viewModel.setInterval(ChartInterval.MONTH)

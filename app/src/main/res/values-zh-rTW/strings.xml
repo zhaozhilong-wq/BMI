@@ -10,7 +10,7 @@
 	<string name="bmi_range_obese_class1">肥胖 I 級（中等肥胖）</string>
 	<string name="bmi_range_obese_class2">肥胖 II 級（嚴重肥胖）</string>
 	<string name="bmi_range_obese_class3">肥胖 III 級（非常嚴重肥胖）</string>
-	<string name="bmi_result_suggest_start">您身高的正常體重</string>
+	<string name="bmi_result_suggest_start">您身高的正常體重 (%s cm):\n</string>
 	<string name="bmi_severely_underweight">嚴重偏瘦</string>
 	<string name="bmi_teenager_tip">青少年的 BMI</string>
 	<string name="bmi_tip_description">您的 BMI 為 %s</string>

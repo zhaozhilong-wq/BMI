@@ -84,7 +84,7 @@
 	<string name="privacy_policy">سياسة الخصوصية</string>
 	<string name="sync_failed_try_again">تعذّرت المزامنة. يرجى التحقق من الشبكة أو تحاول ذلك في وقت لاحق.</string>
 	<string name="select_right_date_toast">يرجى تحديد تاريخ أقدم من اليوم</string>
-	<string name="bmi_result_suggest_start">وزن طبيعي بالنسبة لطولك (%s):\n</string>
+	<string name="bmi_result_suggest_start">وزن طبيعي بالنسبة لطولك (mc %s):\n</string>
 	<string name="bmi_range_normal_adult_description">تهانينا! أنت في مكان رائع الآن. حافظ على عاداتك الصحية للحفاظ على وزنك الصحي.</string>
 	<string name="habit_morning">الصباح</string>
 	<string name="app_recommend_30_day">تحدي اللياقة في 30 يوماً</string>

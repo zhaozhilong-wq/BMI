@@ -192,32 +192,7 @@ class ResultFragment : Fragment() {
                             binding.bmiStatus.text = "Obese"
                         }
                         setStatusBackground(category.colorRes)
-
-                        val statusResult = viewModel.getStatus(record)
-
-                        val weightRange =
-                            getWeightRangeText(statusResult)
-
-                        val differenceText =
-                            getDifferenceText(statusResult)
-
-                        val text = when (statusResult.status) {
-                            BmiStatus.UNDERWEIGHT,
-                            BmiStatus.OVERWEIGHT -> {
-                                "Normal Weight for your height (${record.heightCm.toInt()}cm):\n" +
-                                        "$weightRange $differenceText"
-                            }
-
-                            BmiStatus.NORMAL -> {
-                                "\uD83D\uDC4D Thumbs Up! You’ve done a great job and now only need to keep your lifestyle healthy to stay in this range."
-                            }
-                        }
-
-                        setBmiAdviceText(
-                            text = text,
-                            weightRange = weightRange,
-                            differenceText = differenceText
-                        )
+                        setAdviceText(record)
 
                     } else {
                         // 成年人显示分类
@@ -225,29 +200,7 @@ class ResultFragment : Fragment() {
                         setupAdultCategories(category)//设置所有分类，并且选中对应的分类
                         binding.bmiStatus.text = getString(category.displayName)
                         setStatusBackground(category.colorRes)
-                        val statusResult = viewModel.getStatus(record)//计算正常体重范围，以及与正常范围的差值
-                        val weightRange =
-                            getWeightRangeText(statusResult)//获取正常体重范围的文本
-
-                        val differenceText =
-                            getDifferenceText(statusResult)//获取与正常范围的差值文本
-                        val text = when (statusResult.status) {
-                            BmiStatus.UNDERWEIGHT,
-                            BmiStatus.OVERWEIGHT -> {
-                                "Normal Weight for your height (${record.heightCm.toInt()}cm):\n" +
-                                        "$weightRange $differenceText"
-                            }
-                            BmiStatus.NORMAL -> {
-                                "😎 Congratulations! You’re in a great place now. " +
-                                        "Keep up your healthy habits to maintain your healthy weight."
-                            }
-                        }
-
-                        setBmiAdviceText(
-                            text = text,
-                            weightRange = weightRange,
-                            differenceText = differenceText
-                        )
+                        setAdviceText(record)
                     }
 
                     if(binding.lineText.visibility == View.VISIBLE){
@@ -514,70 +467,6 @@ class ResultFragment : Fragment() {
         return -68.6f + ratio * 180f
     }
 
-    private fun setBmiAdviceText(
-        text: String,
-        weightRange: String,
-        differenceText: String?
-    ) {
-
-        val spannable = SpannableString(text)
-
-        val boldTypeface = ResourcesCompat.getFont(
-            requireContext(),
-            R.font.montserrat_extrabold
-        ) ?: return
-
-        // 正常体重范围
-        val rangeStart = text.indexOf(weightRange)
-
-        if (rangeStart != -1) {
-
-            val rangeEnd =
-                rangeStart + weightRange.length
-
-            spannable.setSpan(
-                CustomTypefaceSpan(boldTypeface),
-                rangeStart,
-                rangeEnd,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-        }
-
-        // 超重 / 体重不足的差值
-        if (differenceText != null) {
-
-            val differenceStart =
-                text.indexOf(differenceText)
-
-            if (differenceStart != -1) {
-
-                val differenceEnd =
-                    differenceStart + differenceText.length
-
-                spannable.setSpan(
-                    CustomTypefaceSpan(boldTypeface),
-                    differenceStart,
-                    differenceEnd,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                // 颜色
-                spannable.setSpan(
-                    ForegroundColorSpan(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            R.color.adviceWeight
-                        )
-                    ),
-                    differenceStart,
-                    differenceEnd,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-            }
-        }
-
-        binding.advice.text = spannable
-    }
-
     private fun animateBmiValue(
         targetBmi: Float
     ) {
@@ -649,6 +538,95 @@ class ResultFragment : Fragment() {
             BmiStatus.NORMAL ->
                 null
         }
+    }
+
+    private fun setAdviceText(record: BmiRecord)
+    {
+        val statusResult = viewModel.getStatus(record)//计算正常体重范围，以及与正常范围的差值
+        val weightRange =
+            getWeightRangeText(statusResult)//获取正常体重范围的文本
+
+        val differenceText =
+            getDifferenceText(statusResult)//获取与正常范围的差值文本
+        val text = when (statusResult.status) {
+            BmiStatus.UNDERWEIGHT,
+            BmiStatus.OVERWEIGHT -> {
+                if(record.heightUnit == "cm"){
+                    getString(R.string.bmi_result_suggest_start,record.heightCm.toInt().toString() + "cm") +
+                            "$weightRange $differenceText"
+                } else {
+                    val totalInches = (record.heightCm / 2.54).roundToInt()
+                    val feet = totalInches / 12
+                    val inches = totalInches % 12
+                    getString(R.string.bmi_result_suggest_start, feet.toString() + "ft " + inches.toString() + "in") +
+                            "$weightRange $differenceText"
+                }
+            }
+            BmiStatus.NORMAL -> {
+                if (!record.isChild)
+                {
+                    getString(R.string.bmi_range_normal_adult_description)
+                }else{
+                    getString(R.string.bmi_range_normal_child_description)
+                }
+            }
+        }
+        val spannable = SpannableString(text)
+
+        val boldTypeface = ResourcesCompat.getFont(
+            requireContext(),
+            R.font.montserrat_extrabold
+        ) ?: return
+
+        // 正常体重范围
+        val rangeStart = text.indexOf(weightRange)
+
+        if (rangeStart != -1) {
+
+            val rangeEnd =
+                rangeStart + weightRange.length
+
+            spannable.setSpan(
+                CustomTypefaceSpan(boldTypeface),
+                rangeStart,
+                rangeEnd,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        // 超重 / 体重不足的差值
+        if (differenceText != null) {
+
+            val differenceStart =
+                text.indexOf(differenceText)
+
+            if (differenceStart != -1) {
+
+                val differenceEnd =
+                    differenceStart + differenceText.length
+
+                spannable.setSpan(
+                    CustomTypefaceSpan(boldTypeface),
+                    differenceStart,
+                    differenceEnd,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                // 颜色
+                spannable.setSpan(
+                    ForegroundColorSpan(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.adviceWeight
+                        )
+                    ),
+                    differenceStart,
+                    differenceEnd,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+        }
+
+        binding.advice.text = spannable
     }
 
 

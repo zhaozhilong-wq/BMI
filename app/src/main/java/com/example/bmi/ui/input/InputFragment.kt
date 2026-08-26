@@ -267,9 +267,9 @@ class InputFragment : Fragment() {
     private fun updateWeightUi(uiState: InputUiState) {
         if (uiState.isWeightKg) {
             binding.kg.alpha = 1f
-            binding.lb.alpha = 0.3f
+            binding.lb.alpha = 0.2f
         } else {
-            binding.kg.alpha = 0.3f
+            binding.kg.alpha = 0.2f
             binding.lb.alpha = 1f
         }
         if (binding.weightInput.text.toString() != uiState.weightText) {
@@ -285,7 +285,7 @@ class InputFragment : Fragment() {
         isUpdatingHeightInput = true
         if (uiState.isHeightCm) {
             binding.cm.alpha = 1f
-            binding.ftin.alpha = 0.3f
+            binding.ftin.alpha = 0.2f
             binding.heightInput.visibility = View.VISIBLE
             binding.heightFtInput.visibility = View.GONE
             binding.heightInInput.visibility = View.GONE
@@ -298,7 +298,7 @@ class InputFragment : Fragment() {
                 )
             }
         } else {
-            binding.cm.alpha = 0.3f
+            binding.cm.alpha = 0.2f
             binding.ftin.alpha = 1f
             binding.heightInput.visibility = View.GONE
             binding.heightFtInput.visibility = View.VISIBLE
