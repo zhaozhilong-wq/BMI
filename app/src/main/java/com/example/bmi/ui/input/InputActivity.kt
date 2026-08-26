@@ -80,6 +80,7 @@ class InputActivity : AppCompatActivity(){
                     R.drawable.success_icon
                 )
             }
+            intent.removeExtra("show_delete_toast")
         }
     }
 

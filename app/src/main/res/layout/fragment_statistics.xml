@@ -31,184 +31,203 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:background="@drawable/radius_18"
-        android:layout_marginTop="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/top"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp"
-        android:backgroundTint="#80FFFFFF"
-        >
-
-        <TextView
-            android:id="@+id/day"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:alpha="1"
-            android:background="@drawable/radius_18"
-            android:fontFamily="@font/montserrat_extrabold"
-            android:gravity="center"
-            android:text="@string/day"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            android:letterSpacing="-0.01"/>
-
-        <TextView
-            android:id="@+id/week"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:alpha="0.2"
-            android:background="@drawable/radius_18"
-            android:fontFamily="@font/montserrat_extrabold"
-            android:gravity="center"
-            android:text="@string/week"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            android:letterSpacing="-0.01"/>
-
-        <TextView
-            android:id="@+id/month"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:alpha="0.2"
-            android:background="@drawable/radius_18"
-            android:fontFamily="@font/montserrat_extrabold"
-            android:gravity="center"
-            android:text="@string/month"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            android:letterSpacing="-0.01"/>
-
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/BmiTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/montserrat_extrabold"
-        android:gravity="center"
-        android:text="@string/bmi"
-        android:textColor="#000000"
-        android:textSize="18sp"
-        android:letterSpacing="-0.01"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="15dp"
-        app:layout_constraintTop_toBottomOf="@id/top"
-        android:layout_marginTop="61dp"/>
-
-    <TextView
-        android:id="@+id/update1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/montserrat_regular"
-        android:gravity="center"
-        android:text="@string/update"
-        android:textColor="#3659CF"
-        android:textSize="16sp"
-        android:letterSpacing="-0.01"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="15dp"
-        app:layout_constraintTop_toBottomOf="@id/top"
-        android:layout_marginTop="61dp"/>
-
-
-    <TextView
-        android:id="@+id/WeightTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/montserrat_extrabold"
-        android:gravity="center"
-        android:text="@string/weight"
-        android:textColor="#000000"
-        android:textSize="18sp"
-        android:letterSpacing="-0.01"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="15dp"
-        app:layout_constraintTop_toBottomOf="@id/top"
-        android:layout_marginTop="350.5dp"/>
-
-    <TextView
-        android:id="@+id/update2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/montserrat_regular"
-        android:gravity="center"
-        android:text="@string/update"
-        android:textColor="#3659CF"
-        android:textSize="16sp"
-        android:letterSpacing="-0.01"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="15dp"
-        app:layout_constraintTop_toBottomOf="@id/top"
-        android:layout_marginTop="350.5dp"/>
-
-    <FrameLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/BmiTitle"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp"
-        android:id="@+id/BmiChartContainer">
+        app:layout_constraintBottom_toBottomOf="parent">
 
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/BmiChart"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="243dp"
-            android:background="@drawable/bg_statistics_bmi"/>
+            android:layout_height="wrap_content">
 
-        <com.example.bmi.ui.statistics.TimeAxisView
-            android:id="@+id/bmiTimeAxis"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_gravity="top" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:background="@drawable/radius_18"
+                android:layout_marginTop="5dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:backgroundTint="#80FFFFFF"
+                >
 
-        <com.example.bmi.ui.statistics.ChartSelectionView
-            android:id="@+id/bmiSelectionView"
-            android:layout_width="match_parent"
-            android:layout_height="243dp"
-            android:clickable="false"
-            android:focusable="false"/>
-    </FrameLayout>
+                <TextView
+                    android:id="@+id/day"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:alpha="1"
+                    android:background="@drawable/radius_18"
+                    android:fontFamily="@font/montserrat_extrabold"
+                    android:gravity="center"
+                    android:text="@string/day"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:letterSpacing="-0.01"/>
 
-    <FrameLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/WeightTitle"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp"
-        android:id="@+id/WeightChartContainer">
+                <TextView
+                    android:id="@+id/week"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:alpha="0.2"
+                    android:background="@drawable/radius_18"
+                    android:fontFamily="@font/montserrat_extrabold"
+                    android:gravity="center"
+                    android:text="@string/week"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:letterSpacing="-0.01"/>
 
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/WeightChart"
-            android:layout_width="match_parent"
-            android:layout_height="243dp"
-            android:background="@drawable/bg_statistics_weight"/>
+                <TextView
+                    android:id="@+id/month"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:alpha="0.2"
+                    android:background="@drawable/radius_18"
+                    android:fontFamily="@font/montserrat_extrabold"
+                    android:gravity="center"
+                    android:text="@string/month"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:letterSpacing="-0.01"/>
 
-        <com.example.bmi.ui.statistics.TimeAxisView
-            android:id="@+id/weightTimeAxis"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_gravity="top" />
-        <com.example.bmi.ui.statistics.ChartSelectionView
-            android:id="@+id/weightSelectionView"
-            android:layout_width="match_parent"
-            android:layout_height="243dp"
-            android:clickable="false"
-            android:focusable="false" />
-    </FrameLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/BmiTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_extrabold"
+                android:gravity="center"
+                android:text="@string/bmi"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:letterSpacing="-0.01"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="15dp"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="61dp"/>
+
+            <TextView
+                android:id="@+id/update1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_regular"
+                android:gravity="center"
+                android:text="@string/update"
+                android:textColor="#3659CF"
+                android:textSize="16sp"
+                android:letterSpacing="-0.01"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="15dp"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="61dp"/>
+
+
+            <TextView
+                android:id="@+id/WeightTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_extrabold"
+                android:gravity="center"
+                android:text="@string/weight"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:letterSpacing="-0.01"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="15dp"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="350.5dp"/>
+
+            <TextView
+                android:id="@+id/update2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_regular"
+                android:gravity="center"
+                android:text="@string/update"
+                android:textColor="#3659CF"
+                android:textSize="16sp"
+                android:letterSpacing="-0.01"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="15dp"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="350.5dp"/>
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/BmiTitle"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:id="@+id/BmiChartContainer">
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/BmiChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="243dp"
+                    android:background="@drawable/bg_statistics_bmi"/>
+
+                <com.example.bmi.ui.statistics.TimeAxisView
+                    android:id="@+id/bmiTimeAxis"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_gravity="top" />
+
+                <com.example.bmi.ui.statistics.ChartSelectionView
+                    android:id="@+id/bmiSelectionView"
+                    android:layout_width="match_parent"
+                    android:layout_height="243dp"
+                    android:clickable="false"
+                    android:focusable="false"/>
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/WeightTitle"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:id="@+id/WeightChartContainer">
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/WeightChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="243dp"
+                    android:background="@drawable/bg_statistics_weight"/>
+
+                <com.example.bmi.ui.statistics.TimeAxisView
+                    android:id="@+id/weightTimeAxis"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_gravity="top" />
+                <com.example.bmi.ui.statistics.ChartSelectionView
+                    android:id="@+id/weightSelectionView"
+                    android:layout_width="match_parent"
+                    android:layout_height="243dp"
+                    android:clickable="false"
+                    android:focusable="false" />
+            </FrameLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+
+
 
 
 
