@@ -278,7 +278,12 @@ class ResultFragment : Fragment() {
                     ) {
                         showConfirmDialog()
                     }else if (mode == ResultMode.HISTORY)
-                        requireActivity().finish()
+                    {requireActivity().finish()}
+                    else {
+                        isEnabled = false
+                        requireActivity().onBackPressedDispatcher.onBackPressed()
+                        isEnabled = true
+                    }
                 }
             }
         )
