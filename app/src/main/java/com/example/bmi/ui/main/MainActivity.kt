@@ -26,6 +26,9 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel : MainViewModel by viewModel()
 
+    private var downX = 0f
+    private var downY = 0f
+
 
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {//使得点击输入框外，就失去焦点
@@ -51,25 +54,34 @@ class MainActivity : AppCompatActivity() {
             ev.action == MotionEvent.ACTION_UP &&
             binding.viewPager.currentItem == 1
         ) {
-            val recent = binding.root.findViewById<View>(R.id.recent)
-            if (recent != null) {
-                val location = IntArray(2)
-                recent.getLocationOnScreen(location)
-                val left = location[0]
-                val top = location[1]
-                val right = left + recent.width
-                val bottom = top + recent.height
-                val isInsideRecent =
-                    ev.rawX >= left &&
-                            ev.rawX <= right &&
-                            ev.rawY >= top &&
-                            ev.rawY <= bottom
-                if (!isInsideRecent) {
+            val dx = ev.rawX - downX
+            val dy = ev.rawY - downY
+
+            val distance = kotlin.math.sqrt(
+                dx * dx + dy * dy
+            )
+            if(binding.viewPager.currentItem == 1 && distance < 20)
+            {
+                val recent = binding.root.findViewById<View>(R.id.recent)
+                if (recent != null) {
+                    val location = IntArray(2)
+                    recent.getLocationOnScreen(location)
+                    val left = location[0]
+                    val top = location[1]
+                    val right = left + recent.width
+                    val bottom = top + recent.height
+                    val isInsideRecent =
+                        ev.rawX >= left &&
+                                ev.rawX <= right &&
+                                ev.rawY >= top &&
+                                ev.rawY <= bottom
+                    if (!isInsideRecent) {
+                        goToInputPage()
+                    }
+                } else {
+                    // 找不到 Recent，就直接跳转
                     goToInputPage()
                 }
-            } else {
-                // 找不到 Recent，就直接跳转
-                goToInputPage()
             }
         }
 
@@ -123,10 +135,16 @@ class MainActivity : AppCompatActivity() {
 
         bottomNav.setOnItemSelectedListener {
             when (it.itemId) {
-                R.id.navigation_calculator -> viewPager2.currentItem = 0
-                R.id.navigation_bmi -> viewPager2.currentItem = 1
-                R.id.navigation_statistics -> viewPager2.currentItem = 2
+                R.id.navigation_calculator ->
+                    viewPager2.setCurrentItem(0, false)
+
+                R.id.navigation_bmi ->
+                    viewPager2.setCurrentItem(1, false)
+
+                R.id.navigation_statistics ->
+                    viewPager2.setCurrentItem(2, false)
             }
+
             true
         }//底部导航栏监听，用户点击底部导航栏，viewPage2跳转到对应页面：更新页面
 

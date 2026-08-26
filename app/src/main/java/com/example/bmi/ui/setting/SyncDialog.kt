@@ -39,9 +39,6 @@ class SyncDialog : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.done.setOnClickListener {
-
-            dismiss()
-
             requireActivity().window.decorView.post {
                 CustomPopup.show(
                     requireActivity(),
@@ -50,6 +47,7 @@ class SyncDialog : DialogFragment() {
                     R.drawable.success_icon
                 )
             }
+            dismiss()
         }
     }
 
