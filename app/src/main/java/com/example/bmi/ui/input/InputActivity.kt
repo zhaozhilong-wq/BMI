@@ -72,11 +72,14 @@ class InputActivity : AppCompatActivity(){
         )
 
         if (showDeleteToast) {
-            CustomPopup.show(
-                this,
-                getString(R.string.delete_successfully),
-                R.drawable.success_icon
-            )
+            binding.root.post {
+                CustomPopup.show(
+                    this,
+                    binding.root,
+                    getString(R.string.delete_successfully),
+                    R.drawable.success_icon
+                )
+            }
         }
     }
 

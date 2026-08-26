@@ -14,6 +14,7 @@ object CustomPopup {
 
     fun show(
         context: Context,
+        anchor: View,
         message: String,
         iconRes: Int? = null
     ) {
@@ -61,10 +62,10 @@ object CustomPopup {
         )
 
         popupWindow.showAtLocation(
-            view,
+            anchor,
             Gravity.TOP or Gravity.CENTER_HORIZONTAL,
             0,
-            200
+            150
         )
 
         view.postDelayed({

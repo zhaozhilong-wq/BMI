@@ -100,6 +100,7 @@ class InputFragment : Fragment() {
 
                     CustomPopup.show(
                         requireContext(),
+                        binding.root,
                         getString(resId, range),
                         R.drawable.warning_icon
                     )
@@ -254,7 +255,6 @@ class InputFragment : Fragment() {
             viewModel.calculateAndSave { mode, recordId ->
                 resultLauncher.launch(
                     ResultActivity.newIntent(requireContext(), mode, recordId)
-
                 )
             }
         }
@@ -499,6 +499,7 @@ class InputFragment : Fragment() {
                 if (deleteSuccess) {
                     CustomPopup.show(
                         requireContext(),
+                        binding.root,
                         getString(R.string.delete_successfully),
                         R.drawable.success_icon
                     )

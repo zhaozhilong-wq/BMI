@@ -40,13 +40,16 @@ class SyncDialog : DialogFragment() {
 
         binding.done.setOnClickListener {
 
-            CustomPopup.show(
-                requireContext(),
-                getString(R.string.sync_success_toast),
-                R.drawable.success_icon
-            )
-
             dismiss()
+
+            requireActivity().window.decorView.post {
+                CustomPopup.show(
+                    requireActivity(),
+                    requireActivity().window.decorView,
+                    getString(R.string.sync_success_toast),
+                    R.drawable.success_icon
+                )
+            }
         }
     }
 

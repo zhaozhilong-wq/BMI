@@ -93,6 +93,7 @@ class RecentActivity : AppCompatActivity() {
                 if (deleteSuccess) {
                     CustomPopup.show(
                         this,
+                        binding.root,
                         getString(R.string.delete_successfully),
                         R.drawable.success_icon
                     )

@@ -116,7 +116,8 @@ class SettingActivity : AppCompatActivity() {
                 if (saveSuccess) {
                     CustomPopup.show(
                         this,
-                        getString(R.string.save_successfully),
+                        binding.root,
+                        getString(R.string.toast_feedback_text),
                         R.drawable.success_icon
                     )
                 }
