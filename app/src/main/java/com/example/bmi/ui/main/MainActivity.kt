@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
+import android.view.WindowManager
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.SystemBarStyle
@@ -92,6 +93,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.setSoftInputMode(
+            WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING
+        )
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(
                 Color.TRANSPARENT,

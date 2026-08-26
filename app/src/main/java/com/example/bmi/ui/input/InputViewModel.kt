@@ -633,9 +633,6 @@ class InputViewModel (
     ): Double {
 
         val heightM = heightCm / 100.0
-        val state = _uiState.value
-        if (!state.isWeightKg) return (weightKg / 0.45359237 * 0.453) / (heightM * heightM)
-
         return weightKg / (heightM * heightM)
     }
 
