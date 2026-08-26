@@ -187,7 +187,9 @@ class MainActivity : AppCompatActivity() {
 
 
     fun goToInputPage() {
-        binding.viewPager.currentItem = 0
+        if (binding.viewPager.currentItem != 0) {
+            binding.viewPager.setCurrentItem(0, false)
+        }
     }
 
 
