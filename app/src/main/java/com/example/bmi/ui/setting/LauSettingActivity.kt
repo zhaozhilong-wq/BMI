@@ -1,6 +1,8 @@
 package com.example.bmi.ui.setting
 
+import android.graphics.Color
 import android.os.Bundle
+import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -27,12 +29,29 @@ class LauSettingActivity : AppCompatActivity() {
         LanguageItem("es", "Español"),
         LanguageItem("it", "Italiano"),
         LanguageItem("ko", "한국어"),
-        LanguageItem("ar", "العربية")
+        LanguageItem("ar", "العربية"),
+        LanguageItem("fa", "فارسی"),
+        LanguageItem("in", "Bahasa Indonesia"),
+        LanguageItem("ja", "日本語"),
+        LanguageItem("nl", "Nederlands"),
+        LanguageItem("pl", "Polski"),
+        LanguageItem("th", "ไทย"),
+        LanguageItem("tr", "Türkçe"),
+        LanguageItem("vi", "Tiếng Việt"),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(
+                Color.TRANSPARENT,
+                Color.TRANSPARENT
+            ),
+            navigationBarStyle = SystemBarStyle.light(
+                Color.TRANSPARENT,
+                Color.TRANSPARENT
+            )
+        )
         binding = ActivityLauSettingBinding.inflate(layoutInflater)
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->

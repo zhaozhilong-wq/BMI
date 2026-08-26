@@ -20,6 +20,8 @@ import com.example.bmi.databinding.ActivitySplashBinding
 import com.example.bmi.ui.input.InputActivity
 import com.example.bmi.ui.main.MainActivity
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -56,9 +58,11 @@ class SplashActivity : AppCompatActivity() {
 
         binding.dial.alpha = 0f
         binding.title.alpha = 0f//初始化透明度
+        binding.pointer.alpha = 0f
 
         binding.dial.translationY = dpToPx(20f)
         binding.title.translationY = dpToPx(20f)//初始化位移，
+        binding.pointer.translationY = dpToPx(20f)
 
 
         startSplashAnimation()
@@ -97,6 +101,16 @@ class SplashActivity : AppCompatActivity() {
             this.interpolator = interpolator
         }
 
+        val pointerMove = ObjectAnimator.ofFloat(
+            binding.pointer,
+            View.TRANSLATION_Y,
+            dpToPx(100f),
+            0f
+        ).apply {
+            duration = 1000L
+            this.interpolator = interpolator
+        }
+
         val dialAlpha = ObjectAnimator.ofFloat(
             binding.dial,
             View.ALPHA,//透明度从0-1
@@ -114,12 +128,23 @@ class SplashActivity : AppCompatActivity() {
         ).apply {
             duration = 1000L
         }
+
+        val pointerAlpha = ObjectAnimator.ofFloat(
+            binding.pointer,
+            View.ALPHA,
+            0f,
+            1f
+        ).apply {
+            duration = 1000L
+        }
         return AnimatorSet().apply {
             playTogether(//同时开始
                 dialMove,
                 titleMove,
+                pointerMove,
                 dialAlpha,
-                titleAlpha
+                titleAlpha,
+                pointerAlpha
             )
         }
     }
@@ -180,26 +205,25 @@ class SplashActivity : AppCompatActivity() {
                     override fun onAnimationEnd(animation: Animator) {
 
                         lifecycleScope.launch {
-                            delay(1000L)
-                            viewModel.isNewUser.collect { isNewUser ->
+//                            delay(1000L)
+                            val isNewUser = viewModel.isNewUser()
 
-                                val targetActivity = if (isNewUser) {
-                                    InputActivity::class.java
-                                } else {
-                                    MainActivity::class.java
-                                }
-
-                                startActivity(
-                                    Intent(
-                                        this@SplashActivity,
-                                        targetActivity
-                                    ).apply {
-                                        putExtra("open_page", 1)
-                                    }
-                                )
-
-                                finish()
+                            val targetActivity = if (isNewUser) {
+                                InputActivity::class.java
+                            } else {
+                                MainActivity::class.java
                             }
+
+                            startActivity(
+                                Intent(
+                                    this@SplashActivity,
+                                    targetActivity
+                                ).apply {
+                                    putExtra("open_page", 1)
+                                }
+                            )
+
+                            finish()
                         }
                     }
                 }

@@ -18,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.bmi.R
 import com.example.bmi.databinding.ActivitySettingBinding
+import com.example.bmi.ui.CustomPopup
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -113,11 +114,11 @@ class SettingActivity : AppCompatActivity() {
                     ) ?: false
 
                 if (saveSuccess) {
-                    Toast.makeText(
+                    CustomPopup.show(
                         this,
                         getString(R.string.save_successfully),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        R.drawable.success_icon
+                    )
                 }
             }
         }

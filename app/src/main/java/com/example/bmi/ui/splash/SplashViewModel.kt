@@ -12,14 +12,7 @@ class SplashViewModel(
     private val repository: BmiRepository
 ) : ViewModel() {
 
-    val isNewUser: StateFlow<Boolean> =
-        repository.getCount()
-            .map { count ->
-                count == 0
-            }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = true
-            )
+    suspend fun isNewUser(): Boolean {
+        return repository.getCount() == 0
+    }
 }

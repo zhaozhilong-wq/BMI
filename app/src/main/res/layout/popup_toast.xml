@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:background="@drawable/radius_20"
+    android:backgroundTint="@color/white">
+
+    <ImageView
+        android:id="@+id/toastIcon"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:src="@drawable/check_circle"
+        />
+
+    <TextView
+        android:id="@+id/toastText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        android:fontFamily="@font/montserrat_regular"
+        android:text="删除成功"
+        android:letterSpacing="-0.01"
+        android:layout_marginStart="10dp"/>
+
+</LinearLayout>

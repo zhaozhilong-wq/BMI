@@ -92,38 +92,10 @@ class DatePickerSnapHelper : LinearSnapHelper() {
         velocityY: Int
     ): Int {
 
-        if (
-            layoutManager !is LinearLayoutManager
-        ) {
-            return RecyclerView.NO_POSITION
-        }
-
-        val currentView =
-            findSnapView(layoutManager)
-                ?: return RecyclerView.NO_POSITION
-
-        val currentPosition =
-            layoutManager.getPosition(
-                currentView
-            )
-
-        if (velocityY == 0) {
-            return currentPosition
-        }
-
-        return if (velocityY > 0) {
-
-            minOf(
-                currentPosition + 1,
-                layoutManager.itemCount - 1
-            )
-
-        } else {
-
-            maxOf(
-                currentPosition - 1,
-                0
-            )
-        }
+        return super.findTargetSnapPosition(
+            layoutManager,
+            velocityX,
+            velocityY
+        )
     }
 }

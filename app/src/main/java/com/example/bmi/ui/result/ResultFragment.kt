@@ -34,6 +34,7 @@ import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import kotlin.math.roundToInt
 import android.animation.ValueAnimator
 import android.app.Activity
+import android.view.ViewPropertyAnimator
 import com.example.bmi.ui.result.category.BmiStatus
 import com.example.bmi.ui.result.category.BmiStatusResult
 
@@ -54,6 +55,10 @@ class ResultFragment : Fragment() {
     private var recordId: Long = -1L
 
     private var currentRecord: BmiRecord? = null
+
+    private var bmiValueAnimator: ValueAnimator? = null
+
+    private var pointerAnimator: ViewPropertyAnimator? = null
 
     private val months = listOf(
         "Jan",
@@ -81,6 +86,7 @@ class ResultFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("ResultFragment", "ResultFragment onCreate")
         val args = arguments
 
         if (args != null) {
@@ -293,6 +299,10 @@ class ResultFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        bmiValueAnimator?.cancel()
+        bmiValueAnimator = null
+        pointerAnimator?.cancel()
+        pointerAnimator = null
         super.onDestroyView()
         _binding = null
     }
@@ -470,29 +480,39 @@ class ResultFragment : Fragment() {
     private fun animateBmiValue(
         targetBmi: Float
     ) {
-        val animator = ValueAnimator.ofFloat(0f, targetBmi)
 
-        animator.duration = 800L
+        bmiValueAnimator?.cancel()
 
-        animator.addUpdateListener {
-            val value = it.animatedValue as Float
+        bmiValueAnimator = ValueAnimator.ofFloat(
+            0f,
+            targetBmi
+        ).apply {
 
-            binding.bmiResult.text =
-                String.format("%.1f", value)
+            duration = 800L
+
+            addUpdateListener {
+                val value = it.animatedValue as Float
+
+                _binding?.bmiResult?.text =
+                    String.format("%.1f", value)
+            }
+
+            start()
         }
-
-        animator.start()
     }//bmi数值动画
 
     private fun animatePointer(
         targetRotation: Float
     ) {
-        binding.BmiPointer.rotation = -71f
+        pointerAnimator?.cancel()
+        _binding?.BmiPointer?.rotation = -68.6f
 
-        binding.BmiPointer.animate()
-            .rotation(targetRotation)
-            .setDuration(1200L)
-            .start()
+        pointerAnimator = _binding?.BmiPointer
+            ?.animate()
+            ?.rotation(targetRotation)
+            ?.setDuration(1200L)
+
+        pointerAnimator?.start()
     }//指针动画
 
     private fun showResultWithAnimation(
@@ -503,7 +523,7 @@ class ResultFragment : Fragment() {
         // BMI 从 0 开始
         binding.bmiResult.text = "0.0"
         // 指针从最左边开始
-        binding.BmiPointer.rotation = -71f
+        binding.BmiPointer.rotation = -68.6f
         // BMI 数字动画
         animateBmiValue(bmi)
         // 指针动画

@@ -16,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.example.bmi.R
 import com.example.bmi.databinding.ActivityMainBinding
+import com.example.bmi.ui.CustomPopup
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 
@@ -166,11 +167,11 @@ class MainActivity : AppCompatActivity() {
             false
         )
         if (showSavedToast) {
-            Toast.makeText(
+            CustomPopup.show(
                 this,
                 getString(R.string.save_successfully),
-                Toast.LENGTH_SHORT
-            ).show()
+                R.drawable.success_icon
+            )
         }
         intent.removeExtra("show_saved_toast")
         intent.removeExtra("open_page")

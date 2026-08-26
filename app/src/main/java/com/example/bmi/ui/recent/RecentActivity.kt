@@ -15,6 +15,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bmi.R
 import com.example.bmi.databinding.ActivityRecentBinding
+import com.example.bmi.ui.CustomPopup
 import com.example.bmi.ui.result.ResultActivity
 import com.example.bmi.ui.result.ResultMode
 import kotlinx.coroutines.launch
@@ -90,11 +91,11 @@ class RecentActivity : AppCompatActivity() {
                     ) ?: false
 
                 if (deleteSuccess) {
-                    Toast.makeText(
+                    CustomPopup.show(
                         this,
-                        "Deleted successfully",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        getString(R.string.delete_successfully),
+                        R.drawable.success_icon
+                    )
                 }
             }
         }

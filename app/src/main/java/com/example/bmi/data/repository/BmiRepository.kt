@@ -7,7 +7,7 @@ class BmiRepository(
     private val bmiRecordDao: BmiRecordDao
 ) {
 
-    fun getCount() =
+    suspend fun getCount() =
         bmiRecordDao.getCount()
 
     suspend fun hasRecords(): Boolean {

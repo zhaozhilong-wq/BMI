@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface BmiRecordDao {
     @Query("SELECT COUNT(*) FROM bmi_records")
-    fun getCount(): Flow<Int>
+    suspend fun getCount(): Int
 
     // 点击 Calculate 时，瞬间判断当前是不是新用户
     @Query("SELECT COUNT(*) FROM bmi_records")

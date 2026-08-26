@@ -117,7 +117,7 @@ class TimePickerDialog: DialogFragment() {
         timeAdapter = setupRecyclerView(
             binding.time,
             times,
-            getCurrentTimeSlot()
+            selectedTime
         ) { position ->
 
             selectedTime = position

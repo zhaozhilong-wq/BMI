@@ -23,6 +23,9 @@ class LanguageAdapter(
 
         val check: ImageView =
             itemView.findViewById(R.id.check)
+
+        val divider: View =
+            itemView.findViewById(R.id.divider)
     }
 
     override fun onCreateViewHolder(
@@ -52,6 +55,13 @@ class LanguageAdapter(
                 View.VISIBLE
             } else {
                 View.GONE
+            }
+
+        holder.divider.visibility =
+            if (position == languages.size - 1) {
+                View.GONE
+            } else {
+                View.VISIBLE
             }
 
         holder.itemView.setOnClickListener {

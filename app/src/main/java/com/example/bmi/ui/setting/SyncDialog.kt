@@ -9,7 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import com.example.bmi.R
 import com.example.bmi.databinding.DialogSyncBinding
+import com.example.bmi.ui.CustomPopup
 
 class SyncDialog : DialogFragment() {
     private var _binding: DialogSyncBinding? = null
@@ -38,11 +40,11 @@ class SyncDialog : DialogFragment() {
 
         binding.done.setOnClickListener {
 
-            Toast.makeText(
+            CustomPopup.show(
                 requireContext(),
-                "Sync successful!",
-                Toast.LENGTH_SHORT
-            ).show()
+                getString(R.string.sync_success_toast),
+                R.drawable.success_icon
+            )
 
             dismiss()
         }

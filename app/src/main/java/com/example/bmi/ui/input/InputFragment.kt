@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper
 import com.example.bmi.R
 import com.example.bmi.databinding.FragmentInputBinding
+import com.example.bmi.ui.CustomPopup
 import com.example.bmi.ui.result.ResultActivity
 import com.example.bmi.ui.setting.SettingActivity
 import kotlinx.coroutines.launch
@@ -69,6 +70,7 @@ class InputFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("InputFragment", "InputFragment onCreate")
     }
 
     override fun onCreateView(
@@ -96,11 +98,11 @@ class InputFragment : Fragment() {
 
                 viewModel.toastEvent.collect { (resId,range) ->
 
-                    Toast.makeText(
+                    CustomPopup.show(
                         requireContext(),
                         getString(resId, range),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        R.drawable.warning_icon
+                    )
                 }
             }
         }
@@ -495,11 +497,11 @@ class InputFragment : Fragment() {
                     ) ?: false
 
                 if (deleteSuccess) {
-                    Toast.makeText(
+                    CustomPopup.show(
                         requireContext(),
-                        "Deleted successfully",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        getString(R.string.delete_successfully),
+                        R.drawable.success_icon
+                    )
                 }
             }
         }

@@ -78,7 +78,7 @@ class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
                 repository.delete(record)
             }
 
-            val count = repository.getCount().first()
+            val count = repository.getCount()
 
             onDeleted(count == 0)
         }
