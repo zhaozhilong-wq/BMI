@@ -12,6 +12,7 @@ import android.view.WindowManager
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bmi.R
 import com.example.bmi.databinding.DialogDatePickerBinding
@@ -132,18 +133,18 @@ class DatePickerDialog: DialogFragment() {
 
             setLayout(
                 WindowManager.LayoutParams.MATCH_PARENT,
-                dpToPx(380)
+                dpToPx(380f)
             )
         }
     }
 
-    private fun dpToPx(dp: Int): Int {
+    private fun dpToPx(dp: Float): Int {
         return (dp * resources.displayMetrics.density).toInt()
     }
     private fun setupDatePicker() {
 
         val space15dp =
-            dpToPx(15)
+            dpToPx(15f)
 
         // 月份
         monthAdapter = setupRecyclerView(
@@ -210,15 +211,7 @@ class DatePickerDialog: DialogFragment() {
             itemLayoutId = R.layout.item_date_picker,
             textViewId = R.id.tvDate) { position ->
 
-            adapter.setSelectedPosition(position)
-
-            onItemSelected(position)
-
-            smoothScrollToCenter(
-                recyclerView,
-                layoutManager,
-                position
-            )
+            recyclerView.smoothScrollToPosition(position)
         }
 
         recyclerView.adapter = adapter
@@ -227,36 +220,14 @@ class DatePickerDialog: DialogFragment() {
 
         recyclerView.setPadding(
             0,
-            dpToPx(102),
+            dpToPx(97f),
             0,
-            dpToPx(102)
+            dpToPx(97f)
         )
 
-        val snapHelper = DatePickerSnapHelper()
+        val snapHelper = LinearSnapHelper()
         snapHelper.attachToRecyclerView(recyclerView)
 
-        recyclerView.addItemDecoration(
-            object : RecyclerView.ItemDecoration() {
-
-                override fun getItemOffsets(
-                    outRect: Rect,
-                    view: View,
-                    parent: RecyclerView,
-                    state: RecyclerView.State
-                ) {
-
-                    val position =
-                        parent.getChildAdapterPosition(view)
-
-                    if (
-                        position != RecyclerView.NO_POSITION &&
-                        position < parent.adapter!!.itemCount - 1
-                    ) {
-                        outRect.bottom = space15dp
-                    }
-                }
-            }
-        )
 
         recyclerView.addOnScrollListener(
             object : RecyclerView.OnScrollListener() {
@@ -291,104 +262,19 @@ class DatePickerDialog: DialogFragment() {
             }
         )
 
-        // 初始化
         recyclerView.post {
 
             layoutManager.scrollToPosition(
                 initialPosition
             )
 
-            recyclerView.post {
-
-                val targetView =
-                    layoutManager.findViewByPosition(
-                        initialPosition
-                    ) ?: return@post
-
-                val recyclerViewCenter =
-                    recyclerView.paddingTop +
-                            (
-                                    recyclerView.height -
-                                            recyclerView.paddingTop -
-                                            recyclerView.paddingBottom
-                                    ) / 2
-
-                val textView =
-                    targetView.findViewById<TextView>(
-                        R.id.tvDate
-                    )
-
-                val textViewCenter =
-                    targetView.top +
-                            textView.top +
-                            textView.height / 2
-
-                val dy =
-                    textViewCenter -
-                            recyclerViewCenter
-
-                recyclerView.scrollBy(
-                    0,
-                    dy
-                )
-
-            }
         }
 
         return adapter
     }
 
 
-    private fun smoothScrollToCenter(
-        recyclerView: RecyclerView,
-        layoutManager: LinearLayoutManager,
-        position: Int
-    ) {
 
-        recyclerView.post {
-
-            val targetView =
-                layoutManager.findViewByPosition(position)
-
-            if (targetView == null) {
-
-                layoutManager.scrollToPosition(position)
-
-                recyclerView.post {
-                    smoothScrollToCenter(
-                        recyclerView,
-                        layoutManager,
-                        position
-                    )
-                }
-
-                return@post
-            }
-
-            val recyclerViewCenter =
-                recyclerView.paddingTop +
-                        (
-                                recyclerView.height -
-                                        recyclerView.paddingTop -
-                                        recyclerView.paddingBottom
-                                ) / 2
-
-            val targetCenter =
-                targetView.top +
-                        targetView.height / 2
-
-            val dy =
-                targetCenter -
-                        recyclerViewCenter
-
-            if (dy != 0) {
-                recyclerView.smoothScrollBy(
-                    0,
-                    dy
-                )
-            }
-        }
-    }
 
     private fun getAvailableMonths(): List<String> {
 
@@ -454,17 +340,9 @@ class DatePickerDialog: DialogFragment() {
 
         if (selectedMonth != oldSelectedMonth) {
 
+
             binding.month.post {
-
-                val layoutManager =
-                    binding.month.layoutManager
-                            as LinearLayoutManager
-
-                smoothScrollToCenter(
-                    binding.month,
-                    layoutManager,
-                    selectedMonth
-                )
+                binding.month.smoothScrollToPosition(selectedMonth)
             }
         }
 
@@ -501,15 +379,10 @@ class DatePickerDialog: DialogFragment() {
 
         binding.day.post {
 
-            val layoutManager =
-                binding.day.layoutManager
-                        as LinearLayoutManager
-
-            smoothScrollToCenter(
-                binding.day,
-                layoutManager,
+            binding.day.smoothScrollToPosition(
                 selectedDay - 1
             )
+
         }
     }
 

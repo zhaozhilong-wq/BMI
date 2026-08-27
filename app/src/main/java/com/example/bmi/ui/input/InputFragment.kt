@@ -16,6 +16,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper
 import com.example.bmi.R
@@ -386,101 +387,40 @@ class InputFragment : Fragment() {
                 sidePadding,
                 0
             )
-            val snapHelper = OneItemSnapHelper()//滚动停止，让当前item居中
+            val snapHelper = LinearSnapHelper()//滚动停止，让当前item居中
             val adapter = AgePickerAdapter(
                 ages = ages
-            ) { position ->
-                // 用户点击的数字
-                val targetView =
-                    layoutManager.findViewByPosition(position)
-                if (targetView != null) {
-                    // RecyclerView 中心
-                    val recyclerCenter =
-                        binding.agePicker.width / 2
-                    // 被点击数字的中心
-                    val itemCenter =
-                        targetView.left +
-                                targetView.width / 2
-                    // 需要移动的距离
-                    val distance =
-                        itemCenter - recyclerCenter
-                    // 平滑移动到中间
-                    binding.agePicker.smoothScrollBy(
-                        distance,
-                        0
-                    )
-                } else {
-                    // 当前 item 不在屏幕上
-                    binding.agePicker.scrollToPosition(
-                        position
-                    )
-                    binding.agePicker.post {
-                        snapHelper.snapToCenter(
-                            binding.agePicker
-                        )
-                    }
-                }
+            ){ position ->
+                binding.agePicker.smoothScrollToPosition(position)
+
             }
             binding.agePicker.adapter = adapter
             snapHelper.attachToRecyclerView(
                 binding.agePicker
             )//绑定snaphelper和adapter
             val initialPosition = 25 - 2
-            layoutManager.scrollToPosition(
-                initialPosition
-            )
-            binding.agePicker.post {
-                snapHelper.snapToCenter(
-                    binding.agePicker
-                )//设置初始位置并让他居中
-                updateSelectedItem(
-                    binding.agePicker,
-                    layoutManager,
-                    snapHelper//更新选中的颜色
-                )
-            }
-            //滑动监听
+            binding.agePicker.smoothScrollToPosition(initialPosition)
+            //吸附后，更新选中
             binding.agePicker.addOnScrollListener(
                 object : RecyclerView.OnScrollListener() {
+
                     override fun onScrollStateChanged(
                         recyclerView: RecyclerView,
                         newState: Int
                     ) {
-                        super.onScrollStateChanged(
-                            recyclerView,
-                            newState
-                        )
-                        // 停止滑动
-                        if (
-                            newState ==
-                            RecyclerView.SCROLL_STATE_IDLE
-                        ) {
-                            // 更新黑色/灰色
+                        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                            // 滚动 + SnapHelper 吸附全部结束
                             updateSelectedItem(
                                 recyclerView,
                                 layoutManager,
                                 snapHelper
-                            )
-                            // 找到当前中心数字
-                            val snapView =
-                                snapHelper.findSnapView(
-                                    layoutManager
-                                ) ?: return
-                            val position =
-                                layoutManager.getPosition(
-                                    snapView
-                                )
-                            val age = ages[position]
-                            viewModel.selectAge(age)
-                            Log.d(
-                                "AgePicker",
-                                "当前年龄 = $age"
                             )
                         }
                     }
                 }
             )
         }
+
     }
 
     private val resultLauncher =

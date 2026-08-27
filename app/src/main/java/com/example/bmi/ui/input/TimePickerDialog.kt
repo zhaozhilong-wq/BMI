@@ -12,6 +12,7 @@ import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bmi.R
 import com.example.bmi.databinding.DialogTimePickerBinding
@@ -141,25 +142,16 @@ class TimePickerDialog: DialogFragment() {
         recyclerView.layoutManager =
             layoutManager
 
-        lateinit var adapter: PickerAdapter
-
-        adapter = PickerAdapter(
+        var adapter = PickerAdapter(
             data,
             itemLayoutId = R.layout.item_time_picker,
             textViewId = R.id.tvTime
         ) { position ->
 
-            adapter.setSelectedPosition(
+            // 点击后平滑滚动
+            recyclerView.smoothScrollToPosition(
                 position
             )
-
-            smoothScrollToCenter(
-                recyclerView,
-                layoutManager,
-                position
-            )
-
-            onItemSelected(position)
         }
 
         recyclerView.adapter = adapter
@@ -171,45 +163,18 @@ class TimePickerDialog: DialogFragment() {
         // 和日期选择器保持一致
         recyclerView.setPadding(
             0,
-            dpToPx(102),
+            dpToPx(97),
             0,
-            dpToPx(102)
+            dpToPx(97)
         )
 
         val snapHelper =
-            DatePickerSnapHelper()
+            LinearSnapHelper()
 
         snapHelper.attachToRecyclerView(
             recyclerView
         )
 
-        recyclerView.addItemDecoration(
-            object : RecyclerView.ItemDecoration() {
-
-                override fun getItemOffsets(
-                    outRect: Rect,
-                    view: View,
-                    parent: RecyclerView,
-                    state: RecyclerView.State
-                ) {
-
-                    val position =
-                        parent.getChildAdapterPosition(
-                            view
-                        )
-
-                    if (
-                        position != RecyclerView.NO_POSITION &&
-                        position <
-                        parent.adapter!!.itemCount - 1
-                    ) {
-
-                        outRect.bottom =
-                            dpToPx(15)
-                    }
-                }
-            }
-        )
 
         recyclerView.addOnScrollListener(
             object : RecyclerView.OnScrollListener() {
@@ -250,109 +215,19 @@ class TimePickerDialog: DialogFragment() {
         )
 
         // 初始化到 Morning
+
+        adapter.setSelectedPosition(
+            initialPosition
+        )
         recyclerView.post {
 
             layoutManager.scrollToPosition(
                 initialPosition
             )
 
-            recyclerView.post {
-
-                val targetView =
-                    layoutManager.findViewByPosition(
-                        initialPosition
-                    ) ?: return@post
-
-                val textView =
-                    targetView.findViewById<TextView>(
-                        R.id.tvTime
-                    )
-
-                val recyclerViewCenter =
-                    recyclerView.paddingTop +
-                            (
-                                    recyclerView.height -
-                                            recyclerView.paddingTop -
-                                            recyclerView.paddingBottom
-                                    ) / 2
-
-                val textViewCenter =
-                    targetView.top +
-                            textView.top +
-                            textView.height / 2
-
-                val dy =
-                    textViewCenter -
-                            recyclerViewCenter
-
-                recyclerView.scrollBy(
-                    0,
-                    dy
-                )
-            }
         }
 
         return adapter
-    }
-
-    private fun smoothScrollToCenter(
-        recyclerView: RecyclerView,
-        layoutManager: LinearLayoutManager,
-        position: Int
-    ) {
-
-        val targetView =
-            layoutManager.findViewByPosition(
-                position
-            )
-
-        if (targetView == null) {
-
-            layoutManager.scrollToPosition(
-                position
-            )
-
-            recyclerView.post {
-
-                smoothScrollToCenter(
-                    recyclerView,
-                    layoutManager,
-                    position
-                )
-            }
-
-            return
-        }
-
-        val textView =
-            targetView.findViewById<TextView>(
-                R.id.tvTime
-            )
-
-        val recyclerViewCenter =
-            recyclerView.paddingTop +
-                    (
-                            recyclerView.height -
-                                    recyclerView.paddingTop -
-                                    recyclerView.paddingBottom
-                            ) / 2
-
-        val textViewCenter =
-            targetView.top +
-                    textView.top +
-                    textView.height / 2
-
-        val dy =
-            textViewCenter -
-                    recyclerViewCenter
-
-        if (dy != 0) {
-
-            recyclerView.smoothScrollBy(
-                0,
-                dy
-            )
-        }
     }
 
     private fun getCurrentTimeSlot(): Int {
