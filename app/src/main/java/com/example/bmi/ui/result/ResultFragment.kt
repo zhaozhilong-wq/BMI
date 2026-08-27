@@ -255,14 +255,17 @@ class ResultFragment : Fragment() {
             }
         }
 
-        binding.bmiHelp.setOnClickListener {
-            currentRecord?.let { record ->
-                BmiDialDialog
-                    .newInstance(record.id)
-                    .show(
-                        parentFragmentManager,
-                        "BmiDialDialog"
-                    )
+        if(binding.bmiHelp.visibility == View.VISIBLE)
+        {
+            binding.bmiStatusContainer.setOnClickListener {
+                currentRecord?.let { record ->
+                    BmiDialDialog
+                        .newInstance(record.id)
+                        .show(
+                            parentFragmentManager,
+                            "BmiDialDialog"
+                        )
+                }
             }
         }
         binding.discord.setOnClickListener {
