@@ -10,6 +10,7 @@ object BmiClassifier {
     fun classify(record: BmiRecord): BmiCategory {
         return if (record.isChild) {
             val threshold = getChildThreshold(record)
+                ?: return BmiCategory.NORMAL
 
             classifyChild(
                 bmi = record.bmi.toFloat(),
@@ -80,7 +81,7 @@ object BmiClassifier {
      */
     fun getChildThreshold(
         record: BmiRecord
-    ): ChildBmiThreshold {
+    ): ChildBmiThreshold? {
 
         val table = if (record.gender == "Male") {
             maleChildBmi
@@ -90,9 +91,7 @@ object BmiClassifier {
 
         return table.firstOrNull {
             it.age == record.age
-        } ?: throw IllegalArgumentException(
-            "No BMI threshold found: " +
-                    "gender=${record.gender}, age=${record.age}"
-        )
+        }
+
     }
 }

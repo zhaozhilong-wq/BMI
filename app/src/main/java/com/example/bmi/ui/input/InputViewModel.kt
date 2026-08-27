@@ -32,6 +32,9 @@ class InputViewModel (
     private val _toastEvent = MutableSharedFlow<Pair<Int, String>>()
     val toastEvent = _toastEvent.asSharedFlow()//用来监听事件
 
+    private val _resultReady = MutableSharedFlow<Pair<ResultMode, Long>>()
+    val resultReady = _resultReady.asSharedFlow()
+
     fun onWeightChanged(text: String) {
 
         if (text.isEmpty()) {
@@ -636,8 +639,7 @@ class InputViewModel (
         return weightKg / (heightM * heightM)
     }
 
-    fun calculateAndSave(onResultReady: (mode: ResultMode,
-                                         recordId: Long) -> Unit) {
+    fun calculateAndSave() {
         val state = _uiState.value
         Log.d(
             "HEIGHT_TEST",
@@ -683,11 +685,13 @@ class InputViewModel (
             // 插入数据库
             val recordId = repository.insert(record)
 
-            if (isNewUser) {
-                onResultReady(ResultMode.NEW_USER, recordId)
+            val mode = if (isNewUser) {
+                ResultMode.NEW_USER
             } else {
-                onResultReady(ResultMode.NORMAL, recordId)
+                ResultMode.NORMAL
             }
+
+            _resultReady.emit(mode to recordId)
 
         }
     }

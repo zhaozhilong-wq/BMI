@@ -12,10 +12,6 @@ interface BmiRecordDao {
     @Query("SELECT COUNT(*) FROM bmi_records")
     suspend fun getCount(): Int
 
-    // 点击 Calculate 时，瞬间判断当前是不是新用户
-    @Query("SELECT COUNT(*) FROM bmi_records")
-    suspend fun getCountOnce(): Int
-
     @Insert
     suspend fun insert(record: BmiRecord): Long
 
@@ -34,7 +30,7 @@ interface BmiRecordDao {
         ORDER BY year DESC, month DESC, day DESC, time DESC,createdAt DESC
         LIMIT 1
     """)
-    fun getLatestRecord(): Flow<BmiRecord?>
+    suspend fun getLatestRecord(): BmiRecord
 
     @Query("SELECT * FROM bmi_records WHERE id = :id")
     suspend fun getById(id: Long): BmiRecord?

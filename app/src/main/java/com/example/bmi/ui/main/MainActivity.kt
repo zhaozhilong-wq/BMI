@@ -123,24 +123,7 @@ class MainActivity : AppCompatActivity() {
         val bottomNav = binding.bottomNav
         viewPager2.isUserInputEnabled = false
 
-
-        val initialPage = intent.getIntExtra(
-            "open_page",
-            0
-        )
-
         viewPager2.adapter = Adapter(this)
-
-        viewPager2.setCurrentItem(
-            initialPage,
-            false
-        )
-        bottomNav.selectedItemId = when (initialPage) {
-            0 -> R.id.navigation_calculator
-            1 -> R.id.navigation_bmi
-            2 -> R.id.navigation_statistics
-            else -> R.id.navigation_calculator
-        }
 
         bottomNav.setOnItemSelectedListener {
             when (it.itemId) {
@@ -193,6 +176,12 @@ class MainActivity : AppCompatActivity() {
         handleIntent(intent)
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
 
 
     fun goToInputPage() {
@@ -203,6 +192,26 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun handleIntent(intent: Intent) {
+
+        val openPage = intent.getIntExtra(
+            "open_page",
+            -1
+        )
+
+        if (openPage in 0..2) {
+            binding.viewPager.setCurrentItem(
+                openPage,
+                false
+            )
+
+            binding.bottomNav.selectedItemId = when (openPage) {
+                0 -> R.id.navigation_calculator
+                1 -> R.id.navigation_bmi
+                2 -> R.id.navigation_statistics
+                else -> return
+            }
+        }
+
         val showSavedToast = intent.getBooleanExtra(
             "show_saved_toast",
             false

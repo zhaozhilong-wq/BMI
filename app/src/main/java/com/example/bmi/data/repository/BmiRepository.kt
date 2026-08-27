@@ -11,13 +11,13 @@ class BmiRepository(
         bmiRecordDao.getCount()
 
     suspend fun hasRecords(): Boolean {
-        return bmiRecordDao.getCountOnce() > 0
+        return bmiRecordDao.getCount() > 0
     }
 
     fun getAllRecords() =
         bmiRecordDao.getAllRecords()
 
-    fun getLatestRecord() =
+    suspend fun getLatestRecord() =
         bmiRecordDao.getLatestRecord()
 
     suspend fun getById(id: Long) =

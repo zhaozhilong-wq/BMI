@@ -221,8 +221,11 @@ class StatisticsFragment : Fragment() {
                 }
             }
         }
+    }
 
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setupChart(chart: LineChart,timeAxis: TimeAxisView) {

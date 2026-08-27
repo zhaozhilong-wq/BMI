@@ -8,10 +8,12 @@ import kotlinx.coroutines.flow.asStateFlow
 class SettingViewModel(
     private val repository: BmiRepository
 ) : ViewModel() {
-    var isChecked = false
+
+    private val _isChecked = MutableStateFlow(false)
+    val isChecked = _isChecked.asStateFlow()
 
     fun updateChecked(checked: Boolean) {
-        isChecked = checked
+        _isChecked.value = checked
     }
 
     private val _isLogin = MutableStateFlow(false)

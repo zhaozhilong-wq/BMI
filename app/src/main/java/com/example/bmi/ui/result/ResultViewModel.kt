@@ -13,15 +13,23 @@ import com.example.bmi.ui.result.category.BmiStatusCalculator
 import com.example.bmi.ui.result.category.BmiStatusResult
 import com.example.bmi.ui.toDialConfig
 import com.example.bmi.ui.result.category.ChildBmiThreshold
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
 
     private val _record = MutableStateFlow<BmiRecord?>(null)
     val record = _record.asStateFlow()
+
+    private val _deleteResult = MutableSharedFlow<Boolean>()
+    val deleteResult = _deleteResult.asSharedFlow()
+
+    private var loadedRecordId: Long? = null
+
+
 
     val adultConfig = BmiDialConfig(
         minBmi = 15.6f,
@@ -49,14 +57,17 @@ class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
 
     fun getLatestRecord() {
         viewModelScope.launch {
-            repository.getLatestRecord().collect { record ->
-                _record.value = record
-            }
+            val record = repository.getLatestRecord()
+            _record.value = record
         }
     }
 
 
     fun loadRecord(recordId: Long) {
+        if (loadedRecordId == recordId){
+            return
+        }
+        loadedRecordId = recordId
         viewModelScope.launch {
 
             val record = repository.getById(recordId)
@@ -67,8 +78,7 @@ class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
 
 
     fun deleteRecord(
-        recordId: Long,
-        onDeleted: (Boolean) -> Unit
+        recordId: Long
     ) {
         viewModelScope.launch {
 
@@ -78,15 +88,15 @@ class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
                 repository.delete(record)
             }
 
-            val count = repository.getCount()
+            val isEmpty = repository.getCount() == 0
 
-            onDeleted(count == 0)
+            _deleteResult.emit(isEmpty)
         }
     }
 
 
 
-    fun getDialConfig(record: BmiRecord): BmiDialConfig {
+    fun getDialConfig(record: BmiRecord): BmiDialConfig? {
 
         if (!record.isChild) {
             return adultConfig
@@ -94,17 +104,20 @@ class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
 
         val threshold =
             BmiClassifier.getChildThreshold(record)
+                ?: return null
+
 
         return threshold.toDialConfig()
     }
 
     fun getStatus(
         record: BmiRecord
-    ): BmiStatusResult {
+    ): BmiStatusResult? {
 
         return if (record.isChild) {
 
             val threshold = BmiClassifier.getChildThreshold(record)
+                ?: return null
 
             BmiStatusCalculator.calculateChild(record, threshold)
 

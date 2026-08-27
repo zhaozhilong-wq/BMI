@@ -262,10 +262,16 @@ class InputFragment : Fragment() {
         }
 
         binding.calButton.setOnClickListener {
-            viewModel.calculateAndSave { mode, recordId ->
-                resultLauncher.launch(
-                    ResultActivity.newIntent(requireContext(), mode, recordId)
-                )
+            viewModel.calculateAndSave()
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                viewModel.resultReady.collect { (mode, recordId)->
+                    resultLauncher.launch(
+                        ResultActivity.newIntent(requireContext(), mode, recordId)
+                    )
+                }
             }
         }
 
@@ -452,9 +458,13 @@ class InputFragment : Fragment() {
 
                             val position =
                                 layoutManager.getPosition(snapView)
-                            viewModel.selectAge(
-                                ages[position]
-                            )
+
+                            if (position != -1)
+                            {
+                                viewModel.selectAge(
+                                    ages[position]
+                                )
+                            }
                         }
                     }
                 }

@@ -75,9 +75,11 @@ class BmiDialDialog: DialogFragment() {
 
     private fun setupContent(record: BmiRecord) {
 
-        binding.bmiDialView.setConfig(
-            viewModel.getDialConfig(record)
-        )
+        viewModel.getDialConfig(record)?.let {
+            binding.bmiDialView.setConfig(
+                it
+            )
+        }
 
         setupCategories(record)
 

@@ -85,13 +85,22 @@ class SettingActivity : AppCompatActivity() {
             )
         }
         binding.language.setOnClickListener {
-            intent = Intent(this, LauSettingActivity::class.java)
+            val intent = Intent(this, LauSettingActivity::class.java)
             startActivity(intent)
         }
         binding.feedback.setOnClickListener {
             resultLauncher.launch(
                 Intent(this, FeedbackActivity::class.java)
             )
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED)
+            {
+                viewModel.isChecked.collect { isChecked ->
+                    binding.toggleButton.isChecked = isChecked
+                }
+            }
         }
 
 

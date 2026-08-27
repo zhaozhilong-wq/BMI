@@ -61,9 +61,11 @@ class InputActivity : AppCompatActivity(){
             v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom)
             insets
         }
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragment_container, InputFragment())
-            commit()
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction().apply {
+                replace(R.id.fragment_container, InputFragment())
+                commit()
+            }
         }
 
         val showDeleteToast = intent.getBooleanExtra(

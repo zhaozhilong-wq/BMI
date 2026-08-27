@@ -37,6 +37,7 @@ import android.app.Activity
 import android.view.ViewPropertyAnimator
 import com.example.bmi.ui.result.category.BmiStatus
 import com.example.bmi.ui.result.category.BmiStatusResult
+import java.util.Locale
 
 
 /**
@@ -80,6 +81,14 @@ class ResultFragment : Fragment() {
         R.string.evening,
         R.string.night
     )
+
+    override fun onResume() {
+        super.onResume()
+
+        if (mode == ResultMode.LATEST) {
+            viewModel.getLatestRecord()
+        }
+    }
 
 
 
@@ -179,6 +188,13 @@ class ResultFragment : Fragment() {
                     }
 
                     val config = viewModel.getDialConfig(record)//获取表盘配置，分为儿童和成人
+                    if (config == null) {
+                        Log.e(
+                            "ResultFragment",
+                            "No dial config: gender=${record.gender}, age=${record.age}"
+                        )
+                        return@collect
+                    }
                     binding.bmiDialView.setConfig(config)//设置表盘配置
                     if (record.isChild) {
 
@@ -240,6 +256,7 @@ class ResultFragment : Fragment() {
                         } else {
                             binding.bmiResult.text =
                                 String.format(
+                                    Locale.US,
                                     "%.1f",
                                     record.bmi
                                 )
@@ -306,29 +323,10 @@ class ResultFragment : Fragment() {
             requireActivity().finish()
         }
 
-    }
-
-    override fun onDestroyView() {
-        bmiValueAnimator?.cancel()
-        bmiValueAnimator = null
-        pointerAnimator?.cancel()
-        pointerAnimator = null
-        super.onDestroyView()
-        _binding = null
-    }
-
-    private fun showConfirmDialog() {
-        childFragmentManager.setFragmentResultListener(
-            ConfirmDialog.REQUEST_KEY,
-            viewLifecycleOwner
-        ) { _, bundle ->
-            val confirmed =
-                bundle.getBoolean(
-                    ConfirmDialog.RESULT_KEY
-                )
-
-            if (confirmed) {
-                viewModel.deleteRecord(recordId) { isNewUser ->
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                viewModel.deleteResult.collect {
+                        isNewUser ->
                     if (isNewUser && mode == ResultMode.HISTORY) {
                         startActivity(
                             Intent(
@@ -358,6 +356,32 @@ class ResultFragment : Fragment() {
                         requireActivity().finish()
                     }
                 }
+            }
+        }
+
+    }
+
+    override fun onDestroyView() {
+        bmiValueAnimator?.cancel()
+        bmiValueAnimator = null
+        pointerAnimator?.cancel()
+        pointerAnimator = null
+        super.onDestroyView()
+        _binding = null
+    }
+
+    private fun showConfirmDialog() {
+        childFragmentManager.setFragmentResultListener(
+            ConfirmDialog.REQUEST_KEY,
+            viewLifecycleOwner
+        ) { _, bundle ->
+            val confirmed =
+                bundle.getBoolean(
+                    ConfirmDialog.RESULT_KEY
+                )
+
+            if (confirmed) {
+                viewModel.deleteRecord(recordId)
             }
         }
 
@@ -445,17 +469,17 @@ class ResultFragment : Fragment() {
 
         // 体重
         if (record.weightUnit == "kg") {
-            weight = String.format("%.2f kg", record.weightKg)
+            weight = String.format(Locale.US,"%.2f kg", record.weightKg)
         } else {
             val lb = record.weightKg / 0.45359237
-            weight = String.format("%.2f lb", lb)
+            weight = String.format(Locale.US,"%.2f lb", lb)
         }
 
         // 身高
         height = if (record.heightUnit == "cm") {
             getString(
                 R.string.bmi_height_cm_format,
-                String.format("%.1f", record.heightCm)
+                String.format(Locale.US,"%.1f", record.heightCm)
             )
         } else {
             getString(
@@ -504,7 +528,7 @@ class ResultFragment : Fragment() {
                 val value = it.animatedValue as Float
 
                 _binding?.bmiResult?.text =
-                    String.format("%.1f", value)
+                    String.format(Locale.US,"%.1f", value)
             }
 
             start()
@@ -545,8 +569,8 @@ class ResultFragment : Fragment() {
     private fun getWeightRangeText(
         statusResult: BmiStatusResult
     ): String {
-        return "${String.format("%.1f", statusResult.minHealthyWeight)}kg - " +
-                "${String.format("%.1f", statusResult.maxHealthyWeight)}kg"
+        return "${String.format(Locale.US,"%.1f", statusResult.minHealthyWeight)}kg - " +
+                "${String.format(Locale.US,"%.1f", statusResult.maxHealthyWeight)}kg"
     }
 
     private fun getDifferenceText(
@@ -560,10 +584,10 @@ class ResultFragment : Fragment() {
         return when (statusResult.status) {
 
             BmiStatus.UNDERWEIGHT ->
-                "(-${String.format("%.1f", difference)}kg)"
+                "(-${String.format(Locale.US,"%.1f", difference)}kg)"
 
             BmiStatus.OVERWEIGHT ->
-                "(+${String.format("%.1f", difference)}kg)"
+                "(+${String.format(Locale.US,"%.1f", difference)}kg)"
 
             BmiStatus.NORMAL ->
                 null
@@ -572,7 +596,8 @@ class ResultFragment : Fragment() {
 
     private fun setAdviceText(record: BmiRecord)
     {
-        val statusResult = viewModel.getStatus(record)//计算正常体重范围，以及与正常范围的差值
+        val statusResult = viewModel.getStatus(record)
+            ?: return//计算正常体重范围，以及与正常范围的差值
         val weightRange =
             getWeightRangeText(statusResult)//获取正常体重范围的文本
 

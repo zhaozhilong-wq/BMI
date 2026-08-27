@@ -21,9 +21,15 @@ object CustomPopup {
         iconRes: Int? = null
     ) {
 
+
+
         if (!anchor.isAttachedToWindow) {
             return
         }
+
+        // 如果之前还有 Popup，先关闭
+        popupWindow?.dismiss()
+        popupWindow = null
 
         val view = LayoutInflater.from(context)
             .inflate(
@@ -60,22 +66,36 @@ object CustomPopup {
         val popupWidth =
             screenWidth - horizontalMargin * 2
 
-        popupWindow = PopupWindow(
+        val popup = PopupWindow(
             view,
             popupWidth,
             ViewGroup.LayoutParams.WRAP_CONTENT,
             false
         )
+        popupWindow = popup
 
-        popupWindow?.showAtLocation(
+        // 显示前再次确认
+        if (!anchor.isAttachedToWindow) {
+            popup.dismiss()
+            popupWindow = null
+            return
+        }
+
+        popup?.showAtLocation(
             anchor,
             Gravity.TOP or Gravity.CENTER_HORIZONTAL,
             0,
-            150
+            (100 * displayMetrics.density).toInt()
         )
 
         view.postDelayed({
-            dismiss()
+            if (popup.isShowing) {
+                popup.dismiss()
+            }
+
+            if (popupWindow === popup) {
+                popupWindow = null
+            }
         }, 2000L)
     }
     fun dismiss() {

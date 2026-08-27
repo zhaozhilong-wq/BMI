@@ -21,7 +21,9 @@ val appModule = module {
             androidContext(),
             BmiDatabase::class.java,
             "bmi_database"
-        ).build()
+        ).fallbackToDestructiveMigration(true)
+            .build()
+
     }
 
     single {

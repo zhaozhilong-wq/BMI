@@ -346,24 +346,22 @@ class StatisticsViewModel( private val repository: BmiRepository
                     today.timeInMillis
                 )
             // 找到这一周的数据
+            val recordCalendar = Calendar.getInstance()
             val weekRecords =
                 dailyLatest.filter { record ->
 
-                    val recordCalendar =
-                        Calendar.getInstance().apply {
-                            set(
-                                record.year,
-                                record.month,
-                                record.day,
-                                0,
-                                0,
-                                0
-                            )
-                            set(
-                                Calendar.MILLISECOND,
-                                0
-                            )
-                        }
+                    recordCalendar.set(
+                        record.year,
+                        record.month,
+                        record.day,
+                        0,
+                        0,
+                        0
+                    )
+                    recordCalendar.set(
+                        Calendar.MILLISECOND,
+                        0
+                    )
                     val recordMillis =
                         recordCalendar.timeInMillis
                     recordMillis >= sundayMillis &&

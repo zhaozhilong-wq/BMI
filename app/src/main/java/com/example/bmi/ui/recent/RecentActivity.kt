@@ -63,7 +63,6 @@ class RecentActivity : AppCompatActivity() {
             )
         }
         binding.recentRecyclerView.layoutManager = LinearLayoutManager(this)
-        viewModel.loadRecords()
         lifecycleScope.launch {
             repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
                 viewModel.records.collect { records ->

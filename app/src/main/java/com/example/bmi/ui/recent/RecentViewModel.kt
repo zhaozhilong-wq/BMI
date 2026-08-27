@@ -5,21 +5,19 @@ import androidx.lifecycle.viewModelScope
 import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.data.repository.BmiRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class RecentViewModel(private val repository: BmiRepository)
     : ViewModel()
 {
-    private var _records = MutableStateFlow<List<BmiRecord>>(emptyList())
-    val records = _records.asStateFlow()
-
-    fun loadRecords() {
-        viewModelScope.launch {
-            repository.getAllRecords().collect { records->
-                _records.value = records
-            }
-        }
-    }
+    val records : StateFlow<List<BmiRecord>> =
+        repository.getAllRecords()
+            .stateIn(viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                emptyList())
 
 }

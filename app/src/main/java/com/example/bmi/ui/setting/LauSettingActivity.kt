@@ -31,7 +31,7 @@ class LauSettingActivity : AppCompatActivity() {
         LanguageItem("ko", "한국어"),
         LanguageItem("ar", "العربية"),
         LanguageItem("fa", "فارسی"),
-        LanguageItem("in", "Bahasa Indonesia"),
+        LanguageItem("id", "Bahasa Indonesia"),
         LanguageItem("ja", "日本語"),
         LanguageItem("nl", "Nederlands"),
         LanguageItem("pl", "Polski"),
