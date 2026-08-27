@@ -408,7 +408,29 @@ class InputFragment : Fragment() {
                 binding.agePicker
             )//绑定snaphelper和adapter
             val initialPosition = 25 - 2
-            binding.agePicker.smoothScrollToPosition(initialPosition)
+            binding.agePicker.post {
+                layoutManager.scrollToPosition(initialPosition)
+                binding.agePicker.post {
+                    snapHelper.findSnapView(layoutManager)?.let { view ->
+                        val distance =
+                            snapHelper.calculateDistanceToFinalSnap(
+                                layoutManager,
+                                view
+                            )
+
+                        binding.agePicker.scrollBy(
+                            distance?.get(0) ?: 0,
+                            distance?.get(1) ?: 0
+                        )
+                    }
+                    // 更新选中颜色
+                    updateSelectedItem(
+                        binding.agePicker,
+                        layoutManager,
+                        snapHelper
+                    )
+                }
+            }
             //吸附后，更新选中
             binding.agePicker.addOnScrollListener(
                 object : RecyclerView.OnScrollListener() {
@@ -423,6 +445,15 @@ class InputFragment : Fragment() {
                                 recyclerView,
                                 layoutManager,
                                 snapHelper
+                            )
+                            val snapView =
+                                snapHelper.findSnapView(layoutManager)
+                                    ?: return
+
+                            val position =
+                                layoutManager.getPosition(snapView)
+                            viewModel.selectAge(
+                                ages[position]
                             )
                         }
                     }
@@ -439,8 +470,6 @@ class InputFragment : Fragment() {
 
 
             if (result.resultCode == Activity.RESULT_OK) {
-
-
 
                 val deleteSuccess =
                     result.data?.getBooleanExtra(
