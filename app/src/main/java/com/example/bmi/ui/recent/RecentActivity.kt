@@ -90,7 +90,7 @@ class RecentActivity : AppCompatActivity() {
                         false
                     ) ?: false
 
-                if (deleteSuccess) {
+                if (deleteSuccess && !isFinishing && !isDestroyed) {
                     CustomPopup.show(
                         this,
                         binding.root,

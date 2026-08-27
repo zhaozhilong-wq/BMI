@@ -12,12 +12,18 @@ import com.example.bmi.R
 
 object CustomPopup {
 
+    private var popupWindow: PopupWindow? = null
+
     fun show(
         context: Context,
         anchor: View,
         message: String,
         iconRes: Int? = null
     ) {
+
+        if (!anchor.isAttachedToWindow) {
+            return
+        }
 
         val view = LayoutInflater.from(context)
             .inflate(
@@ -54,14 +60,14 @@ object CustomPopup {
         val popupWidth =
             screenWidth - horizontalMargin * 2
 
-        val popupWindow = PopupWindow(
+        popupWindow = PopupWindow(
             view,
             popupWidth,
             ViewGroup.LayoutParams.WRAP_CONTENT,
             false
         )
 
-        popupWindow.showAtLocation(
+        popupWindow?.showAtLocation(
             anchor,
             Gravity.TOP or Gravity.CENTER_HORIZONTAL,
             0,
@@ -69,7 +75,11 @@ object CustomPopup {
         )
 
         view.postDelayed({
-            popupWindow.dismiss()
+            dismiss()
         }, 2000L)
+    }
+    fun dismiss() {
+        popupWindow?.dismiss()
+        popupWindow = null
     }
 }

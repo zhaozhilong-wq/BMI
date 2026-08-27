@@ -71,7 +71,7 @@ class InputActivity : AppCompatActivity(){
             false
         )
 
-        if (showDeleteToast) {
+        if (showDeleteToast && !isFinishing && !isDestroyed) {
             binding.root.post {
                 CustomPopup.show(
                     this,

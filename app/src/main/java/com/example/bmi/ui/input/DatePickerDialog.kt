@@ -151,7 +151,6 @@ class DatePickerDialog: DialogFragment() {
             binding.month,
             getAvailableMonths(),
             selectedMonth,
-            space15dp
         ) { position ->
 
             selectedMonth = position
@@ -164,7 +163,6 @@ class DatePickerDialog: DialogFragment() {
             binding.day,
             getAvailableDays(),
             selectedDay - 1,
-            space15dp
         ) { position ->
 
             selectedDay = position + 1
@@ -179,7 +177,6 @@ class DatePickerDialog: DialogFragment() {
             binding.year,
             years,
             currentYear - 1900,
-            space15dp
         ) { position ->
 
             selectedYear =
@@ -193,7 +190,6 @@ class DatePickerDialog: DialogFragment() {
         recyclerView: RecyclerView,
         data: List<String>,
         initialPosition: Int,
-        space15dp: Int,
         onItemSelected: (Int) -> Unit
     ): PickerAdapter {
 

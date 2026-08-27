@@ -207,14 +207,15 @@ class MainActivity : AppCompatActivity() {
             "show_saved_toast",
             false
         )
-        if (showSavedToast) {
+        if (showSavedToast && !isFinishing && !isDestroyed) {
             binding.root.post {
-                CustomPopup.show(
-                    this,
-                    binding.root,
-                    getString(R.string.save_successfully),
-                    R.drawable.success_icon
-                )
+                    CustomPopup.show(
+                        this,
+                        binding.root,
+                        getString(R.string.save_successfully),
+                        R.drawable.success_icon
+                    )
+
             }
         }
         intent.removeExtra("show_saved_toast")

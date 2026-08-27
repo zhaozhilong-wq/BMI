@@ -88,6 +88,11 @@ class InputFragment : Fragment() {
         _binding = null
     }
 
+    override fun onStop() {
+        CustomPopup.dismiss()
+        super.onStop()
+    }
+
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -98,6 +103,10 @@ class InputFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
                 viewModel.toastEvent.collect { (resId,range) ->
+
+                    if (!isAdded || view == null) {
+                        return@collect
+                    }
 
                     CustomPopup.show(
                         requireContext(),
@@ -428,7 +437,10 @@ class InputFragment : Fragment() {
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
 
+
             if (result.resultCode == Activity.RESULT_OK) {
+
+
 
                 val deleteSuccess =
                     result.data?.getBooleanExtra(
@@ -436,7 +448,15 @@ class InputFragment : Fragment() {
                         false
                     ) ?: false
 
-                if (deleteSuccess) {
+                if (
+                    !deleteSuccess ||
+                    !isAdded ||
+                    view == null
+                ) {
+                    return@registerForActivityResult
+                }
+
+                if (deleteSuccess ) {
                     CustomPopup.show(
                         requireContext(),
                         binding.root,

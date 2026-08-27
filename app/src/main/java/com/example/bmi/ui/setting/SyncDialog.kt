@@ -39,14 +39,27 @@ class SyncDialog : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.done.setOnClickListener {
-            requireActivity().window.decorView.post {
+            val activity = requireActivity()
+            val decorView = activity.window.decorView
+
+            decorView.post {
+
+                if (!isAdded || view == null) {
+                    return@post
+                }
+
+                if (!decorView.isAttachedToWindow) {
+                    return@post
+                }
+
                 CustomPopup.show(
-                    requireActivity(),
-                    requireActivity().window.decorView,
+                    activity,
+                    decorView,
                     getString(R.string.sync_success_toast),
                     R.drawable.success_icon
                 )
             }
+
             dismiss()
         }
     }

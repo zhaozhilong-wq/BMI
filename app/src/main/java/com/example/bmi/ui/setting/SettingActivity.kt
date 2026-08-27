@@ -96,8 +96,10 @@ class SettingActivity : AppCompatActivity() {
 
 
     }
-    private fun dpToPx(dp: Float): Float {
-        return dp * resources.displayMetrics.density
+
+    override fun onStop() {
+        CustomPopup.dismiss()
+        super.onStop()
     }
 
     private val resultLauncher =
@@ -113,7 +115,7 @@ class SettingActivity : AppCompatActivity() {
                         false
                     ) ?: false
 
-                if (saveSuccess) {
+                if (saveSuccess && !isFinishing && !isDestroyed) {
                     CustomPopup.show(
                         this,
                         binding.root,
