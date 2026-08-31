@@ -12,11 +12,13 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import android.animation.AnimatorListenerAdapter
+import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
 import androidx.lifecycle.lifecycleScope
 import com.example.bmi.databinding.ActivitySplashBinding
+import com.example.bmi.ui.BaseActivity
 import com.example.bmi.ui.input.InputActivity
 import com.example.bmi.ui.main.MainActivity
 import kotlinx.coroutines.delay
@@ -25,30 +27,24 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SplashActivity : AppCompatActivity() {
+class SplashActivity : BaseActivity() {
 
     private val viewModel: SplashViewModel by viewModel()
 
     private lateinit var binding: ActivitySplashBinding
+
+    override fun getInsets(insets: WindowInsetsCompat): Insets {
+        val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+        return Insets.of(systemBars.left, systemBars.top, systemBars.right, 0)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(
-                Color.TRANSPARENT,
-                Color.TRANSPARENT
-            ),
-            navigationBarStyle = SystemBarStyle.light(
-                Color.TRANSPARENT,
-                Color.TRANSPARENT
-            )
-        )
+
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
-            insets
-        }
+        setupWindowInsets(binding.root)
+
 
         binding.pointer.doOnLayout {//等这个View完成layout后，再执行里面的代码
             binding.pointer.pivotX = binding.pointer.width / 2f

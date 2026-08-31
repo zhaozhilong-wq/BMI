@@ -1,22 +1,27 @@
 package com.example.bmi.ui.input
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.MotionEvent
-import android.view.View
 import android.widget.EditText
-import android.widget.Toast
-import androidx.activity.SystemBarStyle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
+import androidx.core.graphics.Insets
 import androidx.core.view.WindowInsetsCompat
 import com.example.bmi.R
 import com.example.bmi.databinding.ActivityInputBinding
+import com.example.bmi.ui.BaseActivity
 import com.example.bmi.ui.CustomPopup
 
-class InputActivity : AppCompatActivity(){
+class InputActivity : BaseActivity(){
     private lateinit var binding: ActivityInputBinding
+
+    override fun getInsets(insets: WindowInsetsCompat): Insets {
+        val systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+        return Insets.of(
+            systemBarInsets.left,
+            0,
+            systemBarInsets.right,
+            systemBarInsets.bottom
+        )
+    }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {//使得点击输入框外，就失去焦点
         if (ev.action == MotionEvent.ACTION_DOWN) {
@@ -43,24 +48,9 @@ class InputActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(
-                Color.TRANSPARENT,
-                Color.TRANSPARENT
-            ),
-            navigationBarStyle = SystemBarStyle.light(
-                Color.TRANSPARENT,
-                Color.TRANSPARENT
-            )
-        )
         binding = ActivityInputBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom)
-            insets
-        }
+        setupWindowInsets(binding.root)
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction().apply {
                 replace(R.id.fragment_container, InputFragment())

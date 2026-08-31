@@ -11,14 +11,14 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import com.example.bmi.R
 import com.example.bmi.databinding.ActivityFeedbackBinding
+import com.example.bmi.ui.BaseActivity
 
-class FeedbackActivity : AppCompatActivity() {
+class FeedbackActivity : BaseActivity() {
 
     private lateinit var binding: ActivityFeedbackBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         binding = ActivityFeedbackBinding.inflate(layoutInflater)
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->

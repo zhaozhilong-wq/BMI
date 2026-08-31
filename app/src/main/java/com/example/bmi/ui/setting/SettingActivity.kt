@@ -11,6 +11,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Lifecycle
@@ -19,35 +20,27 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.example.bmi.R
 import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.databinding.ActivitySettingBinding
+import com.example.bmi.ui.BaseActivity
 import com.example.bmi.ui.CustomPopup
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Calendar
 
-class SettingActivity : AppCompatActivity() {
+class SettingActivity : BaseActivity() {
 
     private val viewModel : SettingViewModel by viewModel()
 
     private lateinit var binding: ActivitySettingBinding
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(
-                Color.TRANSPARENT,
-                Color.TRANSPARENT
-            ),
-            navigationBarStyle = SystemBarStyle.light(
-                Color.TRANSPARENT,
-                Color.TRANSPARENT
-            )
-        )
+
         binding = ActivitySettingBinding.inflate(layoutInflater)
+
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+        setupWindowInsets(binding.root)
+
 
         binding.back.setOnClickListener { finish() }
 

@@ -13,16 +13,18 @@ import android.widget.Toast
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.example.bmi.R
 import com.example.bmi.databinding.ActivityMainBinding
+import com.example.bmi.ui.BaseActivity
 import com.example.bmi.ui.CustomPopup
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
@@ -115,30 +117,29 @@ class MainActivity : AppCompatActivity() {
         return super.dispatchTouchEvent(ev)
     }
 
+    override fun getInsets(insets: WindowInsetsCompat): Insets {
+        val systemBars = insets.getInsets(
+            WindowInsetsCompat.Type.systemBars()
+        )
+        return Insets.of(
+            systemBars.left,
+            0,
+            systemBars.right,
+            0
+        )
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setSoftInputMode(
             WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING
         )
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(
-                Color.TRANSPARENT,
-                Color.TRANSPARENT
-            ),
-            navigationBarStyle = SystemBarStyle.light(
-                Color.TRANSPARENT,
-                Color.TRANSPARENT
-            )
-        )
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, 0, systemBars.right, 0)
-            insets
-        }
+        setupWindowInsets(binding.root)
+
         val viewPager2 = binding.viewPager
         val bottomNav = binding.bottomNav
         viewPager2.isUserInputEnabled = false

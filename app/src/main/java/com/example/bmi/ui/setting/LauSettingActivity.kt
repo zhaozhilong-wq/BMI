@@ -7,6 +7,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.graphics.Insets
 import androidx.core.os.LocaleListCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -14,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bmi.R
 import com.example.bmi.databinding.ActivityLauSettingBinding
+import com.example.bmi.ui.BaseActivity
 import com.example.bmi.ui.input.InputActivity
 import com.example.bmi.ui.main.MainActivity
 import com.example.bmi.ui.splash.SplashViewModel
@@ -21,7 +23,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Locale
 
-class LauSettingActivity : AppCompatActivity() {
+class LauSettingActivity : BaseActivity() {
 
     private lateinit var binding: ActivityLauSettingBinding
 
@@ -51,23 +53,10 @@ class LauSettingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(
-                Color.TRANSPARENT,
-                Color.TRANSPARENT
-            ),
-            navigationBarStyle = SystemBarStyle.light(
-                Color.TRANSPARENT,
-                Color.TRANSPARENT
-            )
-        )
         binding = ActivityLauSettingBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+        setupWindowInsets(binding.root)
+
         val currentLocale = AppCompatDelegate
             .getApplicationLocales()
             .get(0)
