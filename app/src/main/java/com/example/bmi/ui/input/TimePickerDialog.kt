@@ -225,30 +225,8 @@ class TimePickerDialog: DialogFragment() {
 
             layoutManager.scrollToPosition(initialPosition)
 
-            recyclerView.post {
-
-                val snapView =
-                    snapHelper.findSnapView(layoutManager)
-
-                snapView?.let {
-
-                    val distance =
-                        snapHelper.calculateDistanceToFinalSnap(
-                            layoutManager,
-                            it
-                        )
-
-                    distance?.let { d ->
-                        recyclerView.scrollBy(
-                            d[0],
-                            d[1]
-                        )
-                    }
-                }
-
-                adapter.setSelectedPosition(initialPosition)
-                onItemSelected(initialPosition)
-            }
+            adapter.setSelectedPosition(initialPosition)
+            onItemSelected(initialPosition)
         }
 
         return adapter

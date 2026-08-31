@@ -24,22 +24,6 @@ class AgePickerAdapter(
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_picker_number, parent, false)
 
-        val itemWidth =
-            (55 * parent.resources.displayMetrics.density).toInt()
-
-        val params = RecyclerView.LayoutParams(
-            itemWidth,
-            RecyclerView.LayoutParams.MATCH_PARENT
-        )
-
-        val margin =
-            (9 * parent.resources.displayMetrics.density).toInt()
-
-        params.marginStart = margin
-        params.marginEnd = margin
-
-        view.layoutParams = params
-
         return ViewHolder(view)
     }
 

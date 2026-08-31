@@ -42,7 +42,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="@id/time"
         app:layout_constraintEnd_toEndOf="@id/time"
-        android:layout_marginTop="178dp" />
+        android:layout_marginTop="180dp" />
 
     <View
         android:id="@+id/monthBottomLine"
@@ -52,7 +52,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="@id/time"
         app:layout_constraintEnd_toEndOf="@id/time"
-        android:layout_marginTop="214dp" />
+        android:layout_marginTop="212dp" />
 
 
 

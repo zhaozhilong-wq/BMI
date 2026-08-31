@@ -268,35 +268,13 @@ class DatePickerDialog: DialogFragment() {
 
             layoutManager.scrollToPosition(initialPosition)
 
-            recyclerView.post {
+            adapter.setSelectedPosition(
+                initialPosition
+            )
 
-                val snapView =
-                    snapHelper.findSnapView(layoutManager)
-
-                if (snapView != null) {
-
-                    val distance =
-                        snapHelper.calculateDistanceToFinalSnap(
-                            layoutManager,
-                            snapView
-                        )
-
-                    if (distance != null) {
-                        recyclerView.scrollBy(
-                            distance[0],
-                            distance[1]
-                        )
-                    }
-                }
-
-                adapter.setSelectedPosition(
-                    initialPosition
-                )
-
-                onItemSelected(
-                    initialPosition
-                )
-            }
+            onItemSelected(
+                initialPosition
+            )
         }
 
         return adapter

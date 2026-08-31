@@ -392,7 +392,7 @@ class InputFragment : Fragment() {
         binding.agePicker.post {//等RecyclerView完成当前这一轮布局之后，再执行里面的代码。view当前可能还没完成测量和布局
             // 每个数字的实际宽度
             val itemWidth =
-                (55 * resources.displayMetrics.density).toInt()//这个只是为了计算下面的sidepadding
+                (70 * resources.displayMetrics.density).toInt()//这个只是为了计算下面的sidepadding
             // 每个 item 左右各 9dp
             val sidePadding =
                 (binding.agePicker.width - itemWidth) / 2
@@ -416,20 +416,9 @@ class InputFragment : Fragment() {
             val initialPosition = 25 - 2
             binding.agePicker.post {
                 layoutManager.scrollToPosition(initialPosition)
+                // 更新选中颜色
                 binding.agePicker.post {
-                    snapHelper.findSnapView(layoutManager)?.let { view ->
-                        val distance =
-                            snapHelper.calculateDistanceToFinalSnap(
-                                layoutManager,
-                                view
-                            )
 
-                        binding.agePicker.scrollBy(
-                            distance?.get(0) ?: 0,
-                            distance?.get(1) ?: 0
-                        )
-                    }
-                    // 更新选中颜色
                     updateSelectedItem(
                         binding.agePicker,
                         layoutManager,
