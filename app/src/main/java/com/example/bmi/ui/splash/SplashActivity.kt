@@ -27,11 +27,13 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SplashActivity : BaseActivity() {
+class SplashActivity : BaseActivity<ActivitySplashBinding>() {
+    override fun createBinding(): ActivitySplashBinding {
+        return ActivitySplashBinding.inflate(layoutInflater)
+    }
 
     private val viewModel: SplashViewModel by viewModel()
 
-    private lateinit var binding: ActivitySplashBinding
 
     override fun getInsets(insets: WindowInsetsCompat): Insets {
         val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -40,11 +42,6 @@ class SplashActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        binding = ActivitySplashBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setupWindowInsets(binding.root)
-
 
         binding.pointer.doOnLayout {//等这个View完成layout后，再执行里面的代码
             binding.pointer.pivotX = binding.pointer.width / 2f

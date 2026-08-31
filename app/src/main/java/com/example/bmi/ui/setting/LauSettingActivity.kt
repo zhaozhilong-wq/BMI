@@ -23,9 +23,10 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Locale
 
-class LauSettingActivity : BaseActivity() {
-
-    private lateinit var binding: ActivityLauSettingBinding
+class LauSettingActivity : BaseActivity<ActivityLauSettingBinding>() {
+    override fun createBinding(): ActivityLauSettingBinding {
+        return ActivityLauSettingBinding.inflate(layoutInflater)
+    }
 
     private val viewModel : SplashViewModel by viewModel()
 
@@ -53,9 +54,6 @@ class LauSettingActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityLauSettingBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setupWindowInsets(binding.root)
 
         val currentLocale = AppCompatDelegate
             .getApplicationLocales()

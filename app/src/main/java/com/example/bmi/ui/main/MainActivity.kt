@@ -18,17 +18,18 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.example.bmi.R
+import com.example.bmi.databinding.ActivityInputBinding
 import com.example.bmi.databinding.ActivityMainBinding
 import com.example.bmi.ui.BaseActivity
 import com.example.bmi.ui.CustomPopup
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 
-class MainActivity : BaseActivity() {
+class MainActivity : BaseActivity<ActivityMainBinding>() {
 
-    private lateinit var binding: ActivityMainBinding
-
-    private val viewModel : MainViewModel by viewModel()
+    override fun createBinding(): ActivityMainBinding {
+        return ActivityMainBinding.inflate(layoutInflater)
+    }
 
     private var downX = 0f
     private var downY = 0f
@@ -135,11 +136,6 @@ class MainActivity : BaseActivity() {
         window.setSoftInputMode(
             WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING
         )
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        setupWindowInsets(binding.root)
-
         val viewPager2 = binding.viewPager
         val bottomNav = binding.bottomNav
         viewPager2.isUserInputEnabled = false

@@ -10,9 +10,11 @@ import com.example.bmi.databinding.ActivityInputBinding
 import com.example.bmi.ui.BaseActivity
 import com.example.bmi.ui.CustomPopup
 
-class InputActivity : BaseActivity(){
-    private lateinit var binding: ActivityInputBinding
+class InputActivity : BaseActivity<ActivityInputBinding>(){
 
+    override fun createBinding(): ActivityInputBinding {
+        return ActivityInputBinding.inflate(layoutInflater)
+    }
     override fun getInsets(insets: WindowInsetsCompat): Insets {
         val systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
         return Insets.of(
@@ -48,9 +50,6 @@ class InputActivity : BaseActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityInputBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setupWindowInsets(binding.root)
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction().apply {
                 replace(R.id.fragment_container, InputFragment())

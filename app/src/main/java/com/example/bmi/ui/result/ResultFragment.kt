@@ -35,6 +35,8 @@ import kotlin.math.roundToInt
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.view.ViewPropertyAnimator
+import com.example.bmi.databinding.FragmentInputBinding
+import com.example.bmi.ui.BaseFragment
 import com.example.bmi.ui.result.category.BmiStatus
 import com.example.bmi.ui.result.category.BmiStatusResult
 import java.util.Locale
@@ -45,10 +47,7 @@ import java.util.Locale
  * Use the [ResultFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class ResultFragment : Fragment() {
-
-    private var _binding: FragmentResultBinding? = null
-    private val binding get() = _binding!!
+class ResultFragment : BaseFragment<FragmentResultBinding>() {
 
     private val viewModel: ResultViewModel by activityViewModel()
 
@@ -90,6 +89,18 @@ class ResultFragment : Fragment() {
         }
     }
 
+    override fun createBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentResultBinding {
+
+        return FragmentResultBinding.inflate(
+            inflater,
+            container,
+            false
+        )
+    }
+
 
 
 
@@ -107,16 +118,6 @@ class ResultFragment : Fragment() {
             mode = ResultMode.LATEST
         }
 
-
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        _binding = FragmentResultBinding.inflate(inflater, container, false)
-        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -367,7 +368,6 @@ class ResultFragment : Fragment() {
         pointerAnimator?.cancel()
         pointerAnimator = null
         super.onDestroyView()
-        _binding = null
     }
 
     private fun showConfirmDialog() {
@@ -527,7 +527,7 @@ class ResultFragment : Fragment() {
             addUpdateListener {
                 val value = it.animatedValue as Float
 
-                _binding?.bmiResult?.text =
+                binding?.bmiResult?.text =
                     String.format(Locale.US,"%.1f", value)
             }
 
@@ -539,9 +539,9 @@ class ResultFragment : Fragment() {
         targetRotation: Float
     ) {
         pointerAnimator?.cancel()
-        _binding?.BmiPointer?.rotation = -68.6f
+        binding?.BmiPointer?.rotation = -68.6f
 
-        pointerAnimator = _binding?.BmiPointer
+        pointerAnimator = binding?.BmiPointer
             ?.animate()
             ?.rotation(targetRotation)
             ?.setDuration(1200L)

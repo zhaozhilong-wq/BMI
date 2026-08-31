@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.bmi.R
 import com.example.bmi.databinding.FragmentStatisticsBinding
+import com.example.bmi.ui.BaseFragment
 import com.example.bmi.ui.main.MainActivity
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
@@ -39,10 +40,14 @@ import java.util.Locale
  * Use the [StatisticsFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class StatisticsFragment : Fragment() {
+class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
 
-    private var _binding: FragmentStatisticsBinding? = null
-    private val binding get() = _binding!!
+    override fun createBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentStatisticsBinding {
+        return FragmentStatisticsBinding.inflate(inflater, container, false)
+    }
 
     private val viewModel: StatisticsViewModel by activityViewModel()
 
@@ -77,14 +82,6 @@ class StatisticsFragment : Fragment() {
         Log.d("StatisticsFragment", "StatisticsFragment onCreate")
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        _binding = FragmentStatisticsBinding.inflate(inflater, container, false)
-        return binding.root
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -218,10 +215,6 @@ class StatisticsFragment : Fragment() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
 
     private fun setupChart(chart: LineChart,timeAxis: TimeAxisView) {
         chart.apply {

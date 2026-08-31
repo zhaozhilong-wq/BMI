@@ -14,8 +14,8 @@ import com.example.bmi.R
 import com.example.bmi.databinding.ActivityResultBinding
 import com.example.bmi.ui.BaseActivity
 
-class ResultActivity : BaseActivity() {
-    private lateinit var binding: ActivityResultBinding
+class ResultActivity : BaseActivity<ActivityResultBinding>() {
+    override fun createBinding() = ActivityResultBinding.inflate(layoutInflater)
 
     override fun getInsets(insets: WindowInsetsCompat): Insets {
         val systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -29,11 +29,6 @@ class ResultActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        binding = ActivityResultBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setupWindowInsets(binding.root)
-
 
         if (savedInstanceState == null) {
 

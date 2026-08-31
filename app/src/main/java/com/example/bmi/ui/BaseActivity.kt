@@ -9,8 +9,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.viewbinding.ViewBinding
 
-abstract class BaseActivity : AppCompatActivity() {
+abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
+    protected lateinit var binding: VB
+
+    abstract fun createBinding(): VB
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +29,10 @@ abstract class BaseActivity : AppCompatActivity() {
                 Color.TRANSPARENT
             )
         )
+        binding = createBinding()
+        setContentView(binding.root)
+
+        setupWindowInsets(binding.root)
     }
 
     protected open fun getInsets(

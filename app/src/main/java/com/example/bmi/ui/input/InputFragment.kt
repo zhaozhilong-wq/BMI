@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper
 import com.example.bmi.R
 import com.example.bmi.databinding.FragmentInputBinding
+import com.example.bmi.ui.BaseFragment
 import com.example.bmi.ui.CustomPopup
 import com.example.bmi.ui.result.ResultActivity
 import com.example.bmi.ui.setting.SettingActivity
@@ -33,7 +34,7 @@ import org.koin.androidx.viewmodel.ext.android.activityViewModel
  * Use the [InputFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class InputFragment : Fragment() {
+class InputFragment : BaseFragment<FragmentInputBinding>() {
 
     private val months = listOf(
         "Jan",
@@ -57,11 +58,6 @@ class InputFragment : Fragment() {
     )
     private val ages = (2..99).toList()
 
-    private var _binding: FragmentInputBinding? = null
-
-    private val binding
-        get() = _binding!!
-
     private val viewModel : InputViewModel by activityViewModel()
 
     private var isUpdatingWeightInput = false//区分用户修改和系统修改
@@ -69,23 +65,16 @@ class InputFragment : Fragment() {
     private var isUpdatingHeightInput = false//区分用户修改和系统修改
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Log.d("InputFragment", "InputFragment onCreate")
-    }
+    override fun createBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentInputBinding {
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        _binding = FragmentInputBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+        return FragmentInputBinding.inflate(
+            inflater,
+            container,
+            false
+        )
     }
 
     override fun onStop() {

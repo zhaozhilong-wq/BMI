@@ -13,14 +13,12 @@ import com.example.bmi.R
 import com.example.bmi.databinding.ActivityFeedbackBinding
 import com.example.bmi.ui.BaseActivity
 
-class FeedbackActivity : BaseActivity() {
+class FeedbackActivity : BaseActivity<ActivityFeedbackBinding>() {
+    override fun createBinding() = ActivityFeedbackBinding.inflate(layoutInflater)
 
-    private lateinit var binding: ActivityFeedbackBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityFeedbackBinding.inflate(layoutInflater)
-        setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
 
             val systemBars = insets.getInsets(

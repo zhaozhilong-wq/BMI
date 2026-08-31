@@ -26,21 +26,17 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Calendar
 
-class SettingActivity : BaseActivity() {
+class SettingActivity : BaseActivity<ActivitySettingBinding>() {
 
     private val viewModel : SettingViewModel by viewModel()
 
-    private lateinit var binding: ActivitySettingBinding
 
+    override fun createBinding(): ActivitySettingBinding {
+        return ActivitySettingBinding.inflate(layoutInflater)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        binding = ActivitySettingBinding.inflate(layoutInflater)
-
-        setContentView(binding.root)
-        setupWindowInsets(binding.root)
-
 
         binding.back.setOnClickListener { finish() }
 

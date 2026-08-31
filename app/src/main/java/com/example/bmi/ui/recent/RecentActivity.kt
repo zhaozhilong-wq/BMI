@@ -23,20 +23,17 @@ import com.example.bmi.ui.result.ResultMode
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class RecentActivity : BaseActivity() {
+class RecentActivity : BaseActivity<ActivityRecentBinding>() {
 
     private val viewModel : RecentViewModel by viewModel()
 
-    private lateinit var binding: ActivityRecentBinding
 
+    override fun createBinding(): ActivityRecentBinding {
+        return ActivityRecentBinding.inflate(layoutInflater)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        binding = ActivityRecentBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setupWindowInsets(binding.root)
-
         val adapter = RecentlistAdapter()
         binding.recentRecyclerView.adapter = adapter
         val space =
