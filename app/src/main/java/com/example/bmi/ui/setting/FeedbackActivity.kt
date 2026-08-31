@@ -41,7 +41,7 @@ class FeedbackActivity : AppCompatActivity() {
                 imeBottom
             )
 
-            binding.saveButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            binding.inputText.updateLayoutParams<ConstraintLayout.LayoutParams> {
                 bottomMargin = bottomInset + dpToPx(20)
             }
 
