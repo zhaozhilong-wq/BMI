@@ -27,6 +27,7 @@ import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.ChartTouchListener
 import com.github.mikephil.charting.listener.OnChartGestureListener
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.util.Calendar
@@ -98,9 +99,8 @@ class StatisticsFragment : Fragment() {
             binding.week.alpha = 0.2f
             binding.month.alpha = 0.2f
             currentInterval = ChartInterval.DAY
-            updateCurrentCharts()
             viewModel.setInterval(ChartInterval.DAY)
-
+            updateCurrentCharts()
             binding.BmiChart.highlightValue(null)
             binding.WeightChart.highlightValue(null)
             binding.bmiSelectionView.clearSelectedPoint()
@@ -111,8 +111,8 @@ class StatisticsFragment : Fragment() {
             binding.day.alpha = 0.2f
             binding.month.alpha = 0.2f
             currentInterval = ChartInterval.WEEK
-            updateCurrentCharts()
             viewModel.setInterval(ChartInterval.WEEK)
+            updateCurrentCharts()
             binding.BmiChart.highlightValue(null)
             binding.WeightChart.highlightValue(null)
             binding.bmiSelectionView.clearSelectedPoint()
@@ -123,8 +123,8 @@ class StatisticsFragment : Fragment() {
             binding.day.alpha = 0.2f
             binding.week.alpha = 0.2f
             currentInterval = ChartInterval.MONTH
-            updateCurrentCharts()
             viewModel.setInterval(ChartInterval.MONTH)
+            updateCurrentCharts()
             binding.BmiChart.highlightValue(null)
             binding.WeightChart.highlightValue(null)
             binding.bmiSelectionView.clearSelectedPoint()
@@ -154,8 +154,16 @@ class StatisticsFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.dailyBmi.collect { points ->
-                    dailyBmiPoints = points
+                combine(
+                    viewModel.dailyBmi,
+                    viewModel.dailyWeight
+                ) { bmi, weight ->
+                    bmi to weight
+                }.collect { (bmi, weight) ->
+
+                    dailyBmiPoints = bmi
+                    dailyWeightPoints = weight
+
                     if (currentInterval == ChartInterval.DAY) {
                         updateCurrentCharts()
                     }
@@ -165,48 +173,35 @@ class StatisticsFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.dailyWeight.collect { points ->
-                    dailyWeightPoints = points
-                    if (currentInterval == ChartInterval.DAY) {
-                        updateCurrentCharts()
-                    }
-                }
-            }
-        }
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.weeklyBmi.collect { points ->
-                    weeklyBmiPoints = points
+                combine(
+                    viewModel.weeklyBmi,
+                    viewModel.weeklyWeight
+                ) { bmi, weight ->
+                    bmi to weight
+                }.collect { (bmi, weight) ->
+
+                    weeklyBmiPoints = bmi
+                    weeklyWeightPoints = weight
+
                     if (currentInterval == ChartInterval.WEEK) {
                         updateCurrentCharts()
                     }
                 }
             }
         }
+
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.weeklyWeight.collect { points ->
-                    weeklyWeightPoints = points
-                    if (currentInterval == ChartInterval.WEEK) {
-                        updateCurrentCharts()
-                    }
-                }
-            }
-        }
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.monthlyBmi.collect { points ->
-                    monthlyBmiPoints = points
-                    if (currentInterval == ChartInterval.MONTH) {
-                        updateCurrentCharts()
-                    }
-                }
-            }
-        }
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.monthlyWeight.collect { points ->
-                    monthlyWeightPoints = points
+                combine(
+                    viewModel.monthlyBmi,
+                    viewModel.monthlyWeight
+                ) { bmi, weight ->
+                    bmi to weight
+                }.collect { (bmi, weight) ->
+
+                    monthlyBmiPoints = bmi
+                    monthlyWeightPoints = weight
+
                     if (currentInterval == ChartInterval.MONTH) {
                         updateCurrentCharts()
                     }
@@ -507,7 +502,15 @@ class StatisticsFragment : Fragment() {
         timeAxis: TimeAxisView,
     ) {
         if (points.isEmpty()) {
-                chart.clear()
+            chart.highlightValues(null)
+            chart.clear()
+            if (chart.id == R.id.BmiChart) {
+                binding.bmiSelectionView.clearSelectedPoint()
+            } else {
+                binding.weightSelectionView.clearSelectedPoint()
+            }
+
+            timeAxis.invalidate()
             return
         }
         val entries = points
@@ -524,6 +527,12 @@ class StatisticsFragment : Fragment() {
 
         chart.apply {
             setAutoScaleMinMaxEnabled(false)
+            highlightValues(null)
+            if (id == R.id.BmiChart) {
+                binding.bmiSelectionView.clearSelectedPoint()
+            } else {
+                binding.weightSelectionView.clearSelectedPoint()
+            }
             data = LineData(dataSet)
             // X轴
             xAxis.apply {
@@ -551,20 +560,20 @@ class StatisticsFragment : Fragment() {
                 chart.moveViewToX(
                     55.5f
                 )
-                chart.post {
-                    val minX = chart.lowestVisibleX
-                    val maxX = chart.highestVisibleX
-                    // 如果 Chart 已经正确移动，就同步 Chart 的真实范围
-                    timeAxis.setVisibleRange(
-                        minX,
-                        maxX
-                    )
-                    // 最新一个数据点
-                    val latestEntry =
-                        entries.maxByOrNull {
-                            it.x
-                        }
-
+                val minX = chart.lowestVisibleX
+                val maxX = chart.highestVisibleX
+                // 如果 Chart 已经正确移动，就同步 Chart 的真实范围
+                timeAxis.setVisibleRange(
+                    minX,
+                    maxX
+                )
+                invalidate()
+                // 最新一个数据点
+                val latestEntry =
+                    entries.maxByOrNull {
+                        it.x
+                    }
+                post {
                     latestEntry?.let {
 
                         chart.highlightValue(
@@ -573,7 +582,7 @@ class StatisticsFragment : Fragment() {
                             true
                         )
                     }
-                    chart.invalidate()
+                    invalidate()
                 }
             }
         }
@@ -637,9 +646,7 @@ class StatisticsFragment : Fragment() {
 
             notifyDataSetChanged()
 
-            // =========================
             // 默认显示最后一周附近
-            // =========================
 
             chart.post {
 
@@ -652,26 +659,23 @@ class StatisticsFragment : Fragment() {
                     chart.xAxis.axisMaximum
                 )
 
+                // 再 post 一次，等 Chart 的 viewport 真正更新完成
                 chart.post {
 
-                    val minX =
-                        chart.lowestVisibleX
-
-                    val maxX =
-                        chart.highestVisibleX
+                    val minX = chart.lowestVisibleX
+                    val maxX = chart.highestVisibleX
 
                     timeAxis.setVisibleRange(
                         minX,
                         maxX
                     )
-                    // 最新一个数据点
+
                     val latestEntry =
                         entries.maxByOrNull {
                             it.x
                         }
 
                     latestEntry?.let {
-
                         chart.highlightValue(
                             it.x,
                             0,
@@ -680,6 +684,7 @@ class StatisticsFragment : Fragment() {
                     }
 
                     chart.invalidate()
+                    timeAxis.invalidate()
                 }
             }
         }
@@ -767,7 +772,14 @@ class StatisticsFragment : Fragment() {
         timeAxis: TimeAxisView
     ) {
         if (points.isEmpty()) {
+            chart.highlightValues(null)
             chart.clear()
+            if (chart.id == R.id.BmiChart) {
+                binding.bmiSelectionView.clearSelectedPoint()
+            } else {
+                binding.weightSelectionView.clearSelectedPoint()
+            }
+
             timeAxis.invalidate()
             return
         }
@@ -787,9 +799,13 @@ class StatisticsFragment : Fragment() {
         chart.apply {
 
             setAutoScaleMinMaxEnabled(false)
-
+            highlightValues(null)
+            if (id == R.id.BmiChart) {
+                binding.bmiSelectionView.clearSelectedPoint()
+            } else {
+                binding.weightSelectionView.clearSelectedPoint()
+            }
             data = LineData(dataSet)
-
             xAxis.apply {
 
                 // 一个 X = 一个月
@@ -831,31 +847,26 @@ class StatisticsFragment : Fragment() {
                     7.6f
                 )
 
-                // 默认显示最后一个月附近
                 chart.moveViewToX(
                     chart.xAxis.axisMaximum
                 )
 
                 chart.post {
 
-                    val minX =
-                        chart.lowestVisibleX
-
-                    val maxX =
-                        chart.highestVisibleX
+                    val minX = chart.lowestVisibleX
+                    val maxX = chart.highestVisibleX
 
                     timeAxis.setVisibleRange(
                         minX,
                         maxX
                     )
-                    // 最新一个数据点
+
                     val latestEntry =
                         entries.maxByOrNull {
                             it.x
                         }
 
                     latestEntry?.let {
-
                         chart.highlightValue(
                             it.x,
                             0,
@@ -864,6 +875,7 @@ class StatisticsFragment : Fragment() {
                     }
 
                     chart.invalidate()
+                    timeAxis.invalidate()
                 }
             }
         }

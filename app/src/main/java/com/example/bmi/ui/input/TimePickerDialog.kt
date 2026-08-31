@@ -104,12 +104,12 @@ class TimePickerDialog: DialogFragment() {
 
             setLayout(
                 WindowManager.LayoutParams.MATCH_PARENT,
-                dpToPx(380)
+                dpToPx(380f)
             )
         }
     }
 
-    private fun dpToPx(dp: Int): Int {
+    private fun dpToPx(dp: Float): Int {
         return (dp * resources.displayMetrics.density).toInt()
     }
 
@@ -142,6 +142,9 @@ class TimePickerDialog: DialogFragment() {
         recyclerView.layoutManager =
             layoutManager
 
+        recyclerView.overScrollMode =
+            RecyclerView.OVER_SCROLL_NEVER
+
         var adapter = PickerAdapter(
             data,
             itemLayoutId = R.layout.item_time_picker,
@@ -163,9 +166,9 @@ class TimePickerDialog: DialogFragment() {
         // 和日期选择器保持一致
         recyclerView.setPadding(
             0,
-            dpToPx(97),
+            dpToPx(101f),
             0,
-            dpToPx(97)
+            dpToPx(101f)
         )
 
         val snapHelper =
@@ -216,15 +219,36 @@ class TimePickerDialog: DialogFragment() {
 
         // 初始化到 Morning
 
-        adapter.setSelectedPosition(
-            initialPosition
-        )
+        adapter.setSelectedPosition(initialPosition)
+
         recyclerView.post {
 
-            layoutManager.scrollToPosition(
-                initialPosition
-            )
+            layoutManager.scrollToPosition(initialPosition)
 
+            recyclerView.post {
+
+                val snapView =
+                    snapHelper.findSnapView(layoutManager)
+
+                snapView?.let {
+
+                    val distance =
+                        snapHelper.calculateDistanceToFinalSnap(
+                            layoutManager,
+                            it
+                        )
+
+                    distance?.let { d ->
+                        recyclerView.scrollBy(
+                            d[0],
+                            d[1]
+                        )
+                    }
+                }
+
+                adapter.setSelectedPosition(initialPosition)
+                onItemSelected(initialPosition)
+            }
         }
 
         return adapter

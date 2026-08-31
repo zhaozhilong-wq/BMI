@@ -31,4 +31,9 @@ class BmiRepository(
         bmiRecordDao.delete(record)
     }
 
+    suspend fun insertRecords(records: List<BmiRecord>) {
+        bmiRecordDao.insertRecords(records)
+    }
+
+
 }

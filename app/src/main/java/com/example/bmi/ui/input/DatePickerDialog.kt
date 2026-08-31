@@ -201,6 +201,9 @@ class DatePickerDialog: DialogFragment() {
 
         recyclerView.layoutManager = layoutManager
 
+        recyclerView.overScrollMode =
+            RecyclerView.OVER_SCROLL_NEVER
+
         lateinit var adapter: PickerAdapter
 
         adapter = PickerAdapter(data,
@@ -208,7 +211,10 @@ class DatePickerDialog: DialogFragment() {
             textViewId = R.id.tvDate) { position ->
 
             recyclerView.smoothScrollToPosition(position)
+
         }
+
+
 
         recyclerView.adapter = adapter
 
@@ -216,9 +222,9 @@ class DatePickerDialog: DialogFragment() {
 
         recyclerView.setPadding(
             0,
-            dpToPx(97f),
+            dpToPx(101f),
             0,
-            dpToPx(97f)
+            dpToPx(101f)
         )
 
         val snapHelper = LinearSnapHelper()
@@ -260,10 +266,37 @@ class DatePickerDialog: DialogFragment() {
 
         recyclerView.post {
 
-            layoutManager.scrollToPosition(
-                initialPosition
-            )
+            layoutManager.scrollToPosition(initialPosition)
 
+            recyclerView.post {
+
+                val snapView =
+                    snapHelper.findSnapView(layoutManager)
+
+                if (snapView != null) {
+
+                    val distance =
+                        snapHelper.calculateDistanceToFinalSnap(
+                            layoutManager,
+                            snapView
+                        )
+
+                    if (distance != null) {
+                        recyclerView.scrollBy(
+                            distance[0],
+                            distance[1]
+                        )
+                    }
+                }
+
+                adapter.setSelectedPosition(
+                    initialPosition
+                )
+
+                onItemSelected(
+                    initialPosition
+                )
+            }
         }
 
         return adapter

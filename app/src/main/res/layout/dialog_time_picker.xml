@@ -24,7 +24,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="100dp"
-        android:layout_height="225dp"
+        android:layout_height="238dp"
         android:id="@+id/time"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="76.5dp"
@@ -42,7 +42,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="@id/time"
         app:layout_constraintEnd_toEndOf="@id/time"
-        android:layout_marginTop="172.5dp" />
+        android:layout_marginTop="178dp" />
 
     <View
         android:id="@+id/monthBottomLine"
@@ -52,7 +52,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="@id/time"
         app:layout_constraintEnd_toEndOf="@id/time"
-        android:layout_marginTop="204dp" />
+        android:layout_marginTop="214dp" />
 
 
 

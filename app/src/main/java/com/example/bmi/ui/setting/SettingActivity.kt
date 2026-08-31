@@ -17,10 +17,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.bmi.R
+import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.databinding.ActivitySettingBinding
 import com.example.bmi.ui.CustomPopup
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.Calendar
 
 class SettingActivity : AppCompatActivity() {
 
@@ -103,6 +105,10 @@ class SettingActivity : AppCompatActivity() {
             }
         }
 
+        binding.ads.setOnClickListener {
+            viewModel.insertDebugData(generateDebugRecords())
+        }
+
 
     }
 
@@ -134,4 +140,59 @@ class SettingActivity : AppCompatActivity() {
                 }
             }
         }
+
+    private fun generateDebugRecords(): List<BmiRecord> {
+
+        val records = mutableListOf<BmiRecord>()
+
+        val calendar = Calendar.getInstance().apply {
+            set(
+                2026,
+                Calendar.JULY,
+                15,
+                23,
+                0,
+                0
+            )
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        repeat(47) { index ->
+
+            val weight = 65.0 + index * 0.05
+
+            val bmi = 21.2 + index * 0.02
+
+            records.add(
+                BmiRecord(
+                    weightKg = weight,
+                    heightCm = 175.0,
+
+                    weightUnit = "kg",
+                    heightUnit = "cm",
+
+                    bmi = bmi,
+
+                    age = 25,
+                    gender = "male",
+                    isChild = false,
+
+                    year = calendar.get(Calendar.YEAR),
+                    month = calendar.get(Calendar.MONTH),
+                    day = calendar.get(Calendar.DAY_OF_MONTH),
+
+                    time = 0,
+
+                    createdAt = calendar.timeInMillis
+                )
+            )
+
+            calendar.add(
+                Calendar.DAY_OF_YEAR,
+                1
+            )
+        }
+
+        return records
+    }
 }

@@ -24,7 +24,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="40dp"
-        android:layout_height="225dp"
+        android:layout_height="238dp"
         android:id="@+id/month"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="69dp"
@@ -42,7 +42,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="@id/month"
         app:layout_constraintEnd_toEndOf="@id/month"
-        android:layout_marginTop="167.5dp" />
+        android:layout_marginTop="170dp" />
 
     <View
         android:id="@+id/monthBottomLine"
@@ -52,11 +52,11 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="@id/month"
         app:layout_constraintEnd_toEndOf="@id/month"
-        android:layout_marginTop="198.5dp" />
+        android:layout_marginTop="206dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="40dp"
-        android:layout_height="225dp"
+        android:layout_height="238dp"
         android:id="@+id/day"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="69dp"
@@ -74,7 +74,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="@id/day"
         app:layout_constraintEnd_toEndOf="@id/day"
-        android:layout_marginTop="167.5dp" />
+        android:layout_marginTop="170dp" />
 
     <View
         android:id="@+id/dayBottomLine"
@@ -84,11 +84,11 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="@id/day"
         app:layout_constraintEnd_toEndOf="@id/day"
-        android:layout_marginTop="198.5dp" />
+        android:layout_marginTop="206dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="40dp"
-        android:layout_height="225dp"
+        android:layout_height="238dp"
         android:id="@+id/year"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="69dp"
@@ -107,7 +107,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="@id/year"
         app:layout_constraintEnd_toEndOf="@id/year"
-        android:layout_marginTop="167.5dp" />
+        android:layout_marginTop="170dp" />
 
     <View
         android:id="@+id/yearBottomLine"
@@ -117,7 +117,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="@id/year"
         app:layout_constraintEnd_toEndOf="@id/year"
-        android:layout_marginTop="198.5dp" />
+        android:layout_marginTop="206dp" />
 
     
     <TextView

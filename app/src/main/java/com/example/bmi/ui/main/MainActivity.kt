@@ -66,8 +66,28 @@ class MainActivity : AppCompatActivity() {
                 dx * dx + dy * dy
             )
             val touchSlop = ViewConfiguration.get(this).scaledTouchSlop
-            if(binding.viewPager.currentItem == 1 && distance < touchSlop)
+            if(distance < touchSlop)
             {
+
+                // 判断是不是点击了 BottomNavigation
+                val navLocation = IntArray(2)
+                binding.bottomNav.getLocationOnScreen(navLocation)
+
+                val navLeft = navLocation[0]
+                val navTop = navLocation[1]
+                val navRight = navLeft + binding.bottomNav.width
+                val navBottom = navTop + binding.bottomNav.height
+
+                val isInsideBottomNav =
+                    ev.rawX >= navLeft &&
+                            ev.rawX <= navRight &&
+                            ev.rawY >= navTop &&
+                            ev.rawY <= navBottom
+
+                if (isInsideBottomNav) {
+                    return super.dispatchTouchEvent(ev)
+                }
+
                 val recent = binding.root.findViewById<View>(R.id.recent)
                 if (recent != null) {
                     val location = IntArray(2)

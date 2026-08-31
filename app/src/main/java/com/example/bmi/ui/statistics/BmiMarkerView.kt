@@ -22,7 +22,7 @@ class BmiMarkerView(
             R.id.bmiValue
         )
 
-    override fun refreshContent(
+    override fun refreshContent(//根据选中的数据点，刷新view中的内容
         e: Entry?,
         highlight: Highlight?
     ) {
@@ -42,10 +42,10 @@ class BmiMarkerView(
         )
     }
 
-    override fun getOffset(): MPPointF {
+    override fun getOffset(): MPPointF {//显示的位置，
         return MPPointF(
-            -(width / 2f),
-            -height.toFloat() - 10f
+            -(width / 2f),//水平中心对准数据点
+            -height.toFloat() - 10f//向上移到自身高度+10dp
         )
     }
 }

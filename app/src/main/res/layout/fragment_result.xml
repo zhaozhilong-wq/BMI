@@ -270,6 +270,8 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/bmiCategoryLayout"
                 android:layout_marginTop="25dp"
+                app:layout_constraintBottom_toTopOf="@id/recommendation"
+                android:layout_marginBottom="28dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginStart="30dp"

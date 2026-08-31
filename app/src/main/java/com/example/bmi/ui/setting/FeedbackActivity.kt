@@ -5,8 +5,10 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import com.example.bmi.R
 import com.example.bmi.databinding.ActivityFeedbackBinding
 
@@ -19,9 +21,37 @@ class FeedbackActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityFeedbackBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+
+            val systemBars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars()
+            )
+
+            val ime = insets.getInsets(
+                WindowInsetsCompat.Type.ime()
+            )
+
+            // 键盘高度
+            val imeBottom = ime.bottom
+
+            // 正常情况下使用导航栏高度
+            // 键盘弹出后使用键盘高度
+            val bottomInset = maxOf(
+                systemBars.bottom,
+                imeBottom
+            )
+
+            binding.saveButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                bottomMargin = bottomInset + dpToPx(20)
+            }
+
+            binding.root.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                0
+            )
+
             insets
         }
         binding.back.setOnClickListener {
@@ -36,6 +66,10 @@ class FeedbackActivity : AppCompatActivity() {
             )
             finish()
         }
+    }
+
+    private fun dpToPx(dp: Int): Int {
+        return (dp * resources.displayMetrics.density).toInt()
     }
 
 
