@@ -142,9 +142,6 @@ class TimePickerDialog: DialogFragment() {
         recyclerView.layoutManager =
             layoutManager
 
-        recyclerView.overScrollMode =
-            RecyclerView.OVER_SCROLL_NEVER
-
         var adapter = PickerAdapter(
             data,
             itemLayoutId = R.layout.item_time_picker,

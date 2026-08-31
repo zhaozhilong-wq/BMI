@@ -55,11 +55,15 @@ class StatisticsViewModel( private val repository: BmiRepository
     val timeMarkers =
         _timeMarkers.asStateFlow()
 
+    private var currentInterval = ChartInterval.DAY
+
 
     fun setInterval(interval: ChartInterval) {
 
+        currentInterval = interval
+
         _timeMarkers.value =
-            buildTimeMarkers(interval)
+            buildTimeMarkers(currentInterval)
     }
 
 
@@ -93,7 +97,7 @@ class StatisticsViewModel( private val repository: BmiRepository
                         it.weightKg.toFloat()
                     }
 
-                _timeMarkers.value = buildTimeMarkers(ChartInterval.DAY)
+                _timeMarkers.value = buildTimeMarkers(currentInterval)
             }
         }
     }
@@ -285,26 +289,19 @@ class StatisticsViewModel( private val repository: BmiRepository
             set(Calendar.MILLISECOND, 0)
         }
 
-        val oneYearAgo = Calendar.getInstance().apply {
-            timeInMillis = today.timeInMillis
-            add(Calendar.YEAR, -1)
-        }
+// WEEK 模式统一使用这个起始周日
+        val startSunday = getStartSunday()
 
-        // 找到「一年以前」所在周的周日
-        val startSunday = Calendar.getInstance().apply {
-            timeInMillis = oneYearAgo.timeInMillis
-            while (get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
-                add(Calendar.DAY_OF_YEAR, -1)
-            }
-        }
+// 今天所在周的周日
+        val endSunday = today.clone() as Calendar
 
-        // 今天所在周的周日
-        val endSunday = Calendar.getInstance().apply {
-            timeInMillis = today.timeInMillis
-
-            while (get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
-                add(Calendar.DAY_OF_YEAR, -1)
-            }
+        while (
+            endSunday.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY
+        ) {
+            endSunday.add(
+                Calendar.DAY_OF_YEAR,
+                -1
+            )
         }
 
 
@@ -328,6 +325,7 @@ class StatisticsViewModel( private val repository: BmiRepository
         val result = mutableListOf<ChartPoint>()
         val weekStart =
             startSunday.clone() as Calendar
+        var weekIndex = 0L
         while (!weekStart.after(endSunday)) {
             // 本周日
             val sundayMillis =
@@ -380,15 +378,9 @@ class StatisticsViewModel( private val repository: BmiRepository
                         .average()
                         .toFloat()
                 // 周日距离起始周日多少天
-                val index =
-                    (
-                            (weekStart.timeInMillis -
-                                    startSunday.timeInMillis) /
-                                    (24L * 60L * 60L * 1000L)
-                            )
                 result.add(
                     ChartPoint(
-                        index = index,
+                        index = weekIndex,
                         value = average,
                         // 一周可能对应多个 record
                         // 所以这里暂时没有真正意义上的单个 recordId
@@ -406,6 +398,7 @@ class StatisticsViewModel( private val repository: BmiRepository
                 Calendar.DAY_OF_YEAR,
                 7
             )
+            weekIndex++
         }
 
         return result
@@ -439,6 +432,8 @@ class StatisticsViewModel( private val repository: BmiRepository
         val calendar =
             startSunday.clone() as Calendar
 
+        var weekIndex = 0L
+
         while (!calendar.after(endSunday)) {
 
             // 每个月的第一周：
@@ -446,14 +441,6 @@ class StatisticsViewModel( private val repository: BmiRepository
             // 就认为它是这个月的第一周
             if (calendar.get(Calendar.DAY_OF_MONTH) <= 7) {
 
-                val index =
-                    (
-                            (
-                                    calendar.timeInMillis -
-                                            startSunday.timeInMillis
-                                    ) /
-                                    (7L * 24L * 60L * 60L * 1000L)
-                            ).toFloat()
 
                 val monthName =
                     calendar.getDisplayName(
@@ -464,7 +451,7 @@ class StatisticsViewModel( private val repository: BmiRepository
 
                 markers.add(
                     TimeMarker(
-                        index = index.toLong(),
+                        index = weekIndex,
                         text = monthName
                     )
                 )
@@ -474,6 +461,7 @@ class StatisticsViewModel( private val repository: BmiRepository
                 Calendar.DAY_OF_YEAR,
                 7
             )
+            weekIndex++
         }
 
         return markers

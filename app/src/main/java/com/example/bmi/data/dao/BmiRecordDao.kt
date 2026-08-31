@@ -30,7 +30,7 @@ interface BmiRecordDao {
         ORDER BY year DESC, month DESC, day DESC, time DESC,createdAt DESC
         LIMIT 1
     """)
-    suspend fun getLatestRecord(): BmiRecord?
+    fun getLatestRecord(): Flow<BmiRecord?>
 
     @Query("SELECT * FROM bmi_records WHERE id = :id")
     suspend fun getById(id: Long): BmiRecord?

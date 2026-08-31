@@ -81,13 +81,6 @@ class ResultFragment : BaseFragment<FragmentResultBinding>() {
         R.string.night
     )
 
-    override fun onResume() {
-        super.onResume()
-
-        if (mode == ResultMode.LATEST) {
-            viewModel.getLatestRecord()
-        }
-    }
 
     override fun createBinding(
         inflater: LayoutInflater,
@@ -162,7 +155,6 @@ class ResultFragment : BaseFragment<FragmentResultBinding>() {
 
             ResultMode.LATEST -> {
                 Log.d("ResultFragment", "mode is LATEST")
-                viewModel.getLatestRecord()
                 binding.advice.visibility = View.GONE
                 binding.bmiHelp.visibility = View.GONE
                 binding.recommendation.visibility = View.GONE
@@ -181,7 +173,14 @@ class ResultFragment : BaseFragment<FragmentResultBinding>() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.record.collect { record ->
+                val recordFlow = when (mode) {
+                    ResultMode.LATEST -> viewModel.latestRecord
+
+                    ResultMode.NORMAL,
+                    ResultMode.NEW_USER,
+                    ResultMode.HISTORY -> viewModel.record
+                }
+                recordFlow.collect { record ->
                     currentRecord = record
                     Log.d("ResultFragment", "recordid: ${record?.id}")
                     if (record == null) {

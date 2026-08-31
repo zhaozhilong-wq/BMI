@@ -201,8 +201,6 @@ class DatePickerDialog: DialogFragment() {
 
         recyclerView.layoutManager = layoutManager
 
-        recyclerView.overScrollMode =
-            RecyclerView.OVER_SCROLL_NEVER
 
         lateinit var adapter: PickerAdapter
 

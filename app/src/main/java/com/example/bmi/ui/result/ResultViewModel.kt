@@ -15,14 +15,22 @@ import com.example.bmi.ui.toDialConfig
 import com.example.bmi.ui.result.category.ChildBmiThreshold
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
 
     private val _record = MutableStateFlow<BmiRecord?>(null)
     val record = _record.asStateFlow()
+
+    val latestRecord = repository.getLatestRecord().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        null
+    )
 
     private val _deleteResult = MutableSharedFlow<Boolean>()
     val deleteResult = _deleteResult.asSharedFlow()
@@ -55,12 +63,6 @@ class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
         )
     )
 
-    fun getLatestRecord() {
-        viewModelScope.launch {
-            val record = repository.getLatestRecord()
-            _record.value = record
-        }
-    }
 
 
     fun loadRecord(recordId: Long) {

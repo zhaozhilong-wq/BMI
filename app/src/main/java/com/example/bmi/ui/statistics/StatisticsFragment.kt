@@ -75,7 +75,6 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
     private var currentInterval =
         ChartInterval.DAY
 
-    private var isUpdatingCharts = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -434,10 +433,6 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
     }
 
     private fun updateCurrentCharts() {
-        if (isUpdatingCharts) {
-            return
-        }
-        isUpdatingCharts = true
 
         when (currentInterval) {
             ChartInterval.DAY -> {
@@ -484,7 +479,6 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                 )
             }
         }
-        isUpdatingCharts = false
     }
 
 
@@ -545,6 +539,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
             }
             notifyDataSetChanged()
             chart.post {
+                if (!isAdded || view == null) return@post
 
                 chart.setVisibleXRange(
                     7f,
@@ -567,6 +562,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                         it.x
                     }
                 post {
+                    if (!isAdded || view == null) return@post
                     latestEntry?.let {
 
                         chart.highlightValue(
@@ -588,14 +584,20 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
         timeAxis: TimeAxisView
     ) {
         if (points.isEmpty()) {
+            chart.highlightValues(null)
             chart.clear()
+            if (chart.id == R.id.BmiChart) {
+                binding.bmiSelectionView.clearSelectedPoint()
+            } else {
+                binding.weightSelectionView.clearSelectedPoint()
+            }
             timeAxis.invalidate()
             return
         }
 
         val entries = points.map {
             Entry(
-                it.index.toFloat() /7f,
+                it.index.toFloat(),
                 it.value
             )
         }
@@ -642,6 +644,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
             // 默认显示最后一周附近
 
             chart.post {
+                if (!isAdded || view == null) return@post
 
                 chart.setVisibleXRange(
                     7f,
@@ -654,6 +657,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
 
                 // 再 post 一次，等 Chart 的 viewport 真正更新完成
                 chart.post {
+                    if (!isAdded || view == null) return@post
 
                     val minX = chart.lowestVisibleX
                     val maxX = chart.highestVisibleX
@@ -826,7 +830,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                 // 2021年10月
                 axisMinimum = 0f
 
-                // 当前月份 + 下一个月
+                //最后一个数据点右侧预留 1 格
                 axisMaximum =
                     getTotalMonthCount().toFloat()
             }
@@ -834,6 +838,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
             notifyDataSetChanged()
 
             chart.post {
+                if (!isAdded || view == null) return@post
 
                 chart.setVisibleXRange(
                     7f,
@@ -845,6 +850,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                 )
 
                 chart.post {
+                    if (!isAdded || view == null) return@post
 
                     val minX = chart.lowestVisibleX
                     val maxX = chart.highestVisibleX
@@ -949,7 +955,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
             )
         }
 
-        return count - 1
+        return count
     }
 
 

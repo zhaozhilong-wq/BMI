@@ -17,7 +17,7 @@ class BmiRepository(
     fun getAllRecords() =
         bmiRecordDao.getAllRecords()
 
-    suspend fun getLatestRecord() =
+    fun getLatestRecord() =
         bmiRecordDao.getLatestRecord()
 
     suspend fun getById(id: Long) =
