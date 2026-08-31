@@ -166,10 +166,10 @@ class SettingActivity : AppCompatActivity() {
             64.5, 65.0, 65.7, 65.2, 64.7,
             65.3, 65.9, 65.4, 64.8, 65.1,
             65.6, 65.0, 64.6, 65.2, 65.8,
-            65.3, 64.9
+            65.3, 64.9, 65.6
         )
 
-        repeat(47) { index ->
+        repeat(48) { index ->
 
             val weight = weightValues[index]
 

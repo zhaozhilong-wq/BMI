@@ -37,8 +37,8 @@
     <View
         android:id="@+id/monthTopLine"
         android:layout_width="100dp"
-        android:layout_height="0.5dp"
-        android:background="#3659CF"
+        android:layout_height="1dp"
+        android:background="#803659CF"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="@id/time"
         app:layout_constraintEnd_toEndOf="@id/time"
@@ -47,8 +47,8 @@
     <View
         android:id="@+id/monthBottomLine"
         android:layout_width="100dp"
-        android:layout_height="0.5dp"
-        android:background="#3659CF"
+        android:layout_height="1dp"
+        android:background="#803659CF"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="@id/time"
         app:layout_constraintEnd_toEndOf="@id/time"
