@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -37,8 +38,9 @@ class TimeAxisView @JvmOverloads constructor(
     private var chart: LineChart? = null
 
     // 当前 TimeAxis 真正应该显示的 X 范围
-    private var visibleMinX = 0f
-    private var visibleMaxX = 7f
+    private var visibleMinX = 52f
+    private var visibleMaxX = 59f
+
 
     fun setChart(chart: LineChart) {
         this.chart = chart
@@ -58,13 +60,13 @@ class TimeAxisView @JvmOverloads constructor(
         maxX: Float
     ) {
 
-        // 防止边界附近非常小的浮动导致不断重绘
-        if (
-            kotlin.math.abs(visibleMinX - minX) < 0.01f &&
-            kotlin.math.abs(visibleMaxX - maxX) < 0.01f
-        ) {
-            return
-        }
+//        // 防止边界附近非常小的浮动导致不断重绘
+//        if (
+//            kotlin.math.abs(visibleMinX - minX) < 0.01f &&
+//            kotlin.math.abs(visibleMaxX - maxX) < 0.01f
+//        ) {
+//            return
+//        }
         visibleMinX = minX
         visibleMaxX = maxX
 
@@ -80,6 +82,13 @@ class TimeAxisView @JvmOverloads constructor(
 
             val index = marker.index.toFloat()
 
+            Log.d(
+                "TimeAxis",
+                "marker=${marker.text}, " +
+                        "index=$index, " +
+                        "range=$visibleMinX~$visibleMaxX"
+            )
+
             if (index < visibleMinX || index > visibleMaxX) {
                 return@forEach
             }
@@ -89,6 +98,7 @@ class TimeAxisView @JvmOverloads constructor(
                 0f,
                 YAxis.AxisDependency.LEFT
             )// 找到索引项对应的数据点
+
 
             val x = point.x// 数据点的 X 坐标
 

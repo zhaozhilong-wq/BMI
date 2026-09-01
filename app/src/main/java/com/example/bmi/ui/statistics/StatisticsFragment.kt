@@ -541,14 +541,6 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                 chart.moveViewToX(
                     55.5f
                 )//移动到最后7天的范围
-                val minX = chart.lowestVisibleX
-                val maxX = chart.highestVisibleX
-                // 如果 Chart 已经正确移动，就同步 Chart 的真实范围
-                timeAxis.setVisibleRange(
-                    minX,
-                    maxX
-                )
-                invalidate()
                 // 最新一个数据点
                 val latestEntry =
                     entries.maxByOrNull {
@@ -556,6 +548,15 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                     }
                 post {//再post一次，等hart的viewport真正更新完成
                     if (!isAdded || view == null) return@post
+
+                    val minX = chart.lowestVisibleX
+                    val maxX = chart.highestVisibleX
+                    // 如果 Chart 已经正确移动，就同步 Chart 的真实范围
+                    timeAxis.setVisibleRange(
+                        minX,
+                        maxX
+                    )
+                    invalidate()
                     latestEntry?.let {
 
                         chart.highlightValue(
