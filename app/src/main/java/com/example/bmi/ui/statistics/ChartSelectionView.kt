@@ -26,17 +26,17 @@ class ChartSelectionView @JvmOverloads constructor(
     ).apply {
         style = Paint.Style.FILL
         color = Color.WHITE
-    }
+    }//外圈画笔
 
     private val innerPaint = Paint(
         Paint.ANTI_ALIAS_FLAG
     ).apply {
         style = Paint.Style.FILL
-    }
+    }//内圈画笔
 
     fun setChart(chart: LineChart) {
         this.chart = chart
-    }
+    }//设置图表对象
 
     fun setSelectedPoint(
         x: Float,
@@ -47,13 +47,13 @@ class ChartSelectionView @JvmOverloads constructor(
         selectedY = y
         selectedColor = color
         invalidate()
-    }
+    }//设置选中点
 
     fun clearSelectedPoint() {
         selectedX = null
         selectedY = null
         invalidate()
-    }
+    }//清除选中点
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -67,7 +67,7 @@ class ChartSelectionView @JvmOverloads constructor(
             x,
             y,
             YAxis.AxisDependency.LEFT
-        )
+        )// 将数据点转换为屏幕坐标
 
         // 外圈：白色
         canvas.drawCircle(
@@ -75,7 +75,7 @@ class ChartSelectionView @JvmOverloads constructor(
             point.y.toFloat(),
             12f,
             outerPaint
-        )
+        )//画外圈
 
         // 内圈：BMI 对应颜色
         innerPaint.color = selectedColor
@@ -85,6 +85,6 @@ class ChartSelectionView @JvmOverloads constructor(
             point.y.toFloat(),
             8f,
             innerPaint
-        )
+        )//画内圈
     }
 }

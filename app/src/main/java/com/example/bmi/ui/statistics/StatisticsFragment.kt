@@ -75,13 +75,6 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
     private var currentInterval =
         ChartInterval.DAY
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Log.d("StatisticsFragment", "StatisticsFragment onCreate")
-    }
-
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.update1.setOnClickListener {
@@ -128,14 +121,14 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
         }
         setupChart(binding.BmiChart,binding.bmiTimeAxis)
         setupChart(binding.WeightChart,binding.weightTimeAxis)
-        binding.bmiSelectionView.setChart(
+        binding.bmiSelectionView.setChart(//绑定selectionView和chart，使得selectionView可以获取chart的坐标系信息
             binding.BmiChart
         )
 
         binding.weightSelectionView.setChart(
             binding.WeightChart
         )
-        binding.bmiTimeAxis.setChart(binding.BmiChart)
+        binding.bmiTimeAxis.setChart(binding.BmiChart)//绑定timeAxis和chart，使得timeAxis可以获取chart的坐标系信息
         binding.weightTimeAxis.setChart(binding.WeightChart)
 
         binding.bmiTimeAxis.setVisibleRange(
@@ -217,10 +210,10 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
 
     private fun setupChart(chart: LineChart,timeAxis: TimeAxisView) {
         chart.apply {
-            description.isEnabled = false
-            legend.isEnabled = false
-            setTouchEnabled(true)
-            setClipValuesToContent(false)
+            description.isEnabled = false//不显示图表描述
+            legend.isEnabled = false//不显示图例
+            setTouchEnabled(true)//启用触摸
+            setClipValuesToContent(false)//不裁剪值
             marker =
                 if (chart.id == R.id.WeightChart) {
                     BmiMarkerView(
@@ -232,7 +225,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                         requireContext(),
                         ""
                     )
-                }
+                }//绑定自定义的MarkerView
             chart.setOnChartValueSelectedListener(
                 object : OnChartValueSelectedListener {
 
@@ -266,7 +259,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                             e.y,
                             color
                         )
-                    }
+                    }//设置点击选中事件，弹出对应值的markview
                     override fun onNothingSelected() {
 
                         binding.bmiSelectionView
@@ -278,15 +271,15 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                 }
             )
 
-            isDragEnabled = true
-            setScaleEnabled(false)
+            isDragEnabled = true//启用拖拽
+            setScaleEnabled(false)//禁用缩放
 
             setExtraOffsets(
                 15f,
                 30f,
                 21f,
                 20f
-            )
+            )//设置图表边距，避免数据点被遮挡
             xAxis.apply {
                 position = XAxis.XAxisPosition.BOTTOM
                 // 最多显示8个标签
@@ -298,7 +291,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                     R.color.gridColor
                 )
                 gridLineWidth = 0.5f
-                setDrawAxisLine(false)
+                setDrawAxisLine(false)//不显示X轴线
                 textSize = 12f
                 typeface = ResourcesCompat.getFont(
                     context,
@@ -309,12 +302,12 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                     R.color.white
                 )
 
-                yOffset = 12f
+                yOffset = 12f//设置X轴标签距离X轴线的距离
             }
             axisLeft.apply {
                 setDrawGridLines(false)
                 setDrawAxisLine(false)
-                setDrawLabels(true)
+                setDrawLabels(true)//显示左侧Y轴标签
                 textSize = 12f
                 typeface = ResourcesCompat.getFont(
                     context,
@@ -337,17 +330,17 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                 }
                 // 5等分
                 setLabelCount(6, true)
-                xOffset = 10f
+                xOffset = 10f//y轴标签距离y轴线的距离
             }
             // 右侧Y轴
-            axisRight.apply {
+            axisRight.apply {//不显示右侧Y轴
                 setDrawLabels(false)
                 setDrawGridLines(false)
                 setDrawAxisLine(false)
             }
         }
         chart.setOnChartGestureListener(
-            object : OnChartGestureListener {
+            object : OnChartGestureListener {//设置图表手势监听器
                 override fun onChartTranslate(
                     me: MotionEvent?,
                     dX: Float,
@@ -367,10 +360,10 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
 
 
                     val minX = chart.lowestVisibleX
-                    val maxX = chart.highestVisibleX
+                    val maxX = chart.highestVisibleX//左右边界
 
-                    val axisMin = chart.xAxis.axisMinimum
-                    val axisMax = chart.xAxis.axisMaximum
+                    val axisMin = chart.xAxis.axisMinimum//X轴最小值
+                    val axisMax = chart.xAxis.axisMaximum//最大值
 
                     // 已经到左边界，并且还在继续往左拖
                     if (
@@ -391,7 +384,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                     timeAxis.setVisibleRange(
                         minX,
                         maxX
-                    )
+                    )//同步timeAxis的可见范围
                 }
                 override fun onChartGestureStart(
                     me: MotionEvent?,
@@ -499,7 +492,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
 
             timeAxis.invalidate()
             return
-        }
+        }//如果数据为空，清空图表并返回
         val entries = points
             .filter {
                 it.index in 0L..58L
@@ -509,23 +502,23 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                     it.index.toFloat(),
                     it.value
                 )
-            }
-        val dataSet = createLineDataSet(entries, label)
+            }//将数据点转成entry对象
+        val dataSet = createLineDataSet(entries, label) ?: return//创建数据集
 
         chart.apply {
-            setAutoScaleMinMaxEnabled(false)
+            setAutoScaleMinMaxEnabled(false)//禁用自动缩放
             highlightValues(null)
             if (id == R.id.BmiChart) {
                 binding.bmiSelectionView.clearSelectedPoint()
             } else {
                 binding.weightSelectionView.clearSelectedPoint()
             }
-            data = LineData(dataSet)
+            data = LineData(dataSet)//设置数据
             // X轴
             xAxis.apply {
                 // 每一天一个单位
                 granularity = 1f
-                isGranularityEnabled = true
+                isGranularityEnabled = true//启用粒度
                 valueFormatter = object : ValueFormatter() {
                     override fun getFormattedValue(
                         value: Float
@@ -537,17 +530,17 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                 axisMinimum = 0f
                 axisMaximum = 59f
             }
-            notifyDataSetChanged()
-            chart.post {
-                if (!isAdded || view == null) return@post
+            notifyDataSetChanged()//刷新图表
+            chart.post {//post一个任务，等图表绘制完成后再执行
+                if (!isAdded || view == null) return@post//如果fragment已经被移除，直接返回
 
                 chart.setVisibleXRange(
                     7f,
                     7.6f
-                )
+                )//设置可见范围为7天，最多显示7.6天
                 chart.moveViewToX(
                     55.5f
-                )
+                )//移动到最后7天的范围
                 val minX = chart.lowestVisibleX
                 val maxX = chart.highestVisibleX
                 // 如果 Chart 已经正确移动，就同步 Chart 的真实范围
@@ -561,7 +554,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                     entries.maxByOrNull {
                         it.x
                     }
-                post {
+                post {//再post一次，等hart的viewport真正更新完成
                     if (!isAdded || view == null) return@post
                     latestEntry?.let {
 
@@ -605,7 +598,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
         val dataSet = createLineDataSet(
             entries,
             label
-        )
+        ) ?: return
 
         chart.apply {
 
@@ -655,7 +648,6 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                     chart.xAxis.axisMaximum
                 )
 
-                // 再 post 一次，等 Chart 的 viewport 真正更新完成
                 chart.post {
                     if (!isAdded || view == null) return@post
 
@@ -696,19 +688,19 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
-        }
+        }// 58天前的日期
         startDate.add(
-            Calendar.DAY_OF_YEAR,
+            Calendar.DAY_OF_YEAR,//按照一年中的天数进行计算
             value.toInt()
-        )
-        return startDate.get(Calendar.DAY_OF_MONTH).toString()
+        )//根据传入的索引计算出对应的日期
+        return startDate.get(Calendar.DAY_OF_MONTH).toString()//获取这个月的几号
     }
 
     private fun weekIndexToDay(
         value: Float
     ): String {
 
-        val startSunday = viewModel.getStartSunday()
+        val startSunday = viewModel.getStartSunday()//找到起始周日
 
         val calendar =
             startSunday.clone() as Calendar
@@ -716,11 +708,11 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
         calendar.add(
             Calendar.DAY_OF_YEAR,
             value.toInt() * 7
-        )
+        )//根据传入的索引计算出对应的日期
 
         return calendar.get(
             Calendar.DAY_OF_MONTH
-        ).toString()
+        ).toString()//返回是当月的几号
     }
 
 
@@ -728,15 +720,15 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
     private fun createLineDataSet(
         entries: List<Entry>,
         label: String
-    ): LineDataSet {
-        val context = requireContext()
+    ): LineDataSet? {
+        val context = context ?: return null//获取上下文
         return LineDataSet(
             entries,
             label
         ).apply {
-            setDrawValues(false)
-            setDrawCircles(true)
-            setDrawCircleHole(false)
+            setDrawValues(false)//不显示数据点的值
+            setDrawCircles(true)//显示数据点的圆圈
+            setDrawCircleHole(false)//不显示圆圈的空心
             circleRadius = 3f
             lineWidth = 2f
             color = ContextCompat.getColor(
@@ -749,15 +741,15 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                     R.color.white
                 )
             )
-            setDrawHighlightIndicators(false)
-            mode = LineDataSet.Mode.HORIZONTAL_BEZIER
-            setDrawFilled(true)
+            setDrawHighlightIndicators(false)//不显示高亮线
+            mode = LineDataSet.Mode.HORIZONTAL_BEZIER//设置曲线模式为水平贝塞尔曲线
+            setDrawFilled(true)//设置曲线下方填充
             fillDrawable = GradientDrawable(
                 GradientDrawable.Orientation.TOP_BOTTOM,
                 intArrayOf(
                     Color.argb(100, 255, 255, 255),
                     Color.argb(0, 255, 255, 255)
-                )
+                )//设置渐变填充颜色
             )
         }
     }
@@ -791,7 +783,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
         val dataSet = createLineDataSet(
             entries,
             label
-        )
+        ) ?: return
 
         chart.apply {
 
@@ -832,7 +824,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
 
                 //最后一个数据点右侧预留 1 格
                 axisMaximum =
-                    getTotalMonthCount().toFloat()
+                    viewModel.getTotalMonthCount().toFloat()
             }
 
             notifyDataSetChanged()
@@ -900,62 +892,12 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
             add(
                 Calendar.MONTH,
                 value.toInt()
-            )
+            )//根据传入索引计算出对应月份
         }
 
         return (
                 calendar.get(Calendar.MONTH) + 1
-                ).toString()
-    }
-
-    private fun getTotalMonthCount(): Int {
-
-        val startCalendar =
-            Calendar.getInstance().apply {
-
-                set(
-                    2021,
-                    Calendar.OCTOBER,
-                    1,
-                    0,
-                    0,
-                    0
-                )
-
-                set(Calendar.MILLISECOND, 0)
-            }
-
-        val today =
-            Calendar.getInstance()
-
-        val endCalendar =
-            today.clone() as Calendar
-
-        endCalendar.set(
-            Calendar.DAY_OF_MONTH,
-            1
-        )
-
-        endCalendar.add(
-            Calendar.MONTH,
-            1
-        )
-
-        var count = 0
-
-        while (
-            startCalendar.before(endCalendar)
-        ) {
-
-            count++
-
-            startCalendar.add(
-                Calendar.MONTH,
-                1
-            )
-        }
-
-        return count
+                ).toString()//返回月份
     }
 
 

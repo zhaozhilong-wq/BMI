@@ -17,9 +17,9 @@ class BmiMarkerView(
     R.layout.view_bmi_view
 ) {
 
-    private val bmiValue =
+    private val value =
         findViewById<TextView>(
-            R.id.bmiValue
+            R.id.value
         )
 
     override fun refreshContent(//根据选中的数据点，刷新view中的内容
@@ -29,7 +29,7 @@ class BmiMarkerView(
 
         if (e == null) return
 
-        bmiValue.text = String.format(
+        value.text = String.format(
             Locale.US,
             "%.1f%s",
             e.y,

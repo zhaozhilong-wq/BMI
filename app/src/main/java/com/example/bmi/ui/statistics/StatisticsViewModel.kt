@@ -134,7 +134,7 @@ class StatisticsViewModel( private val repository: BmiRepository
             }
     }
 
-    private fun dateToIndex(
+    private fun dateToIndex(//将日期转换为索引
         year: Int,
         month: Int,
         day: Int
@@ -265,7 +265,7 @@ class StatisticsViewModel( private val repository: BmiRepository
                     TimeMarker(
                         index = index,
                         text = monthName
-                    )
+                    )//构建时间标记
                 )
             }
             calendar.add(
@@ -289,10 +289,10 @@ class StatisticsViewModel( private val repository: BmiRepository
             set(Calendar.MILLISECOND, 0)
         }
 
-// WEEK 模式统一使用这个起始周日
+        // WEEK 模式统一使用这个起始周日
         val startSunday = getStartSunday()
 
-// 今天所在周的周日
+        // 今天所在周的周日
         val endSunday = today.clone() as Calendar
 
         while (
@@ -302,7 +302,7 @@ class StatisticsViewModel( private val repository: BmiRepository
                 Calendar.DAY_OF_YEAR,
                 -1
             )
-        }
+        }// 找到今天所在周的周日
 
 
         // 先得到每天最新的一条记录
@@ -327,17 +327,17 @@ class StatisticsViewModel( private val repository: BmiRepository
             startSunday.clone() as Calendar
         var weekIndex = 0L
         while (!weekStart.after(endSunday)) {
-            // 本周日
+            // 周日开始
             val sundayMillis =
                 weekStart.timeInMillis
-            // 本周六
+            // 周六结束
             val saturday =
                 weekStart.clone() as Calendar
             saturday.add(
                 Calendar.DAY_OF_YEAR,
                 6
             )
-            // 今天所在周不能超过今天
+            // 结束的周六不能超过今天
             val weekEndMillis =
                 minOf(
                     saturday.timeInMillis,
@@ -364,7 +364,7 @@ class StatisticsViewModel( private val repository: BmiRepository
                         recordCalendar.timeInMillis
                     recordMillis >= sundayMillis &&
                             recordMillis <= weekEndMillis
-                }
+                }//找范围在这一周内的数据
 
 
             // 这一周有数据才生成 ChartPoint
@@ -529,6 +529,56 @@ class StatisticsViewModel( private val repository: BmiRepository
                         ) /
                         (7L * 24L * 60L * 60L * 1000L)
                 ).toInt()
+    }
+
+    fun getTotalMonthCount(): Int {
+
+        val startCalendar =
+            Calendar.getInstance().apply {
+
+                set(
+                    2021,
+                    Calendar.OCTOBER,
+                    1,
+                    0,
+                    0,
+                    0
+                )
+
+                set(Calendar.MILLISECOND, 0)
+            }
+
+        val today =
+            Calendar.getInstance()
+
+        val endCalendar =
+            today.clone() as Calendar
+
+        endCalendar.set(
+            Calendar.DAY_OF_MONTH,
+            1
+        )
+
+        endCalendar.add(
+            Calendar.MONTH,
+            1
+        )//设置为下个月的第一天
+
+        var count = 0
+
+        while (
+            startCalendar.before(endCalendar)
+        ) {
+
+            count++
+
+            startCalendar.add(
+                Calendar.MONTH,
+                1
+            )
+        }
+
+        return count - 1//减去最后一个月的预留空间
     }
 
     private fun buildMonthlyData(

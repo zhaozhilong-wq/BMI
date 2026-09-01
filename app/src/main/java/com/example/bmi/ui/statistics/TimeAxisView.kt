@@ -20,7 +20,7 @@ class TimeAxisView @JvmOverloads constructor(
         color = ContextCompat.getColor(
             context,
             R.color.white
-        )
+        )//画笔
 
         textSize = 12f * resources.displayMetrics.scaledDensity
 
@@ -32,7 +32,7 @@ class TimeAxisView @JvmOverloads constructor(
         textAlign = Paint.Align.CENTER
     }
 
-    private var markers: List<TimeMarker> = emptyList()
+    private var markers: List<TimeMarker> = emptyList()//时间标记列表
 
     private var chart: LineChart? = null
 
@@ -88,9 +88,9 @@ class TimeAxisView @JvmOverloads constructor(
                 index,
                 0f,
                 YAxis.AxisDependency.LEFT
-            )
+            )// 找到索引项对应的数据点
 
-            val x = point.x
+            val x = point.x// 数据点的 X 坐标
 
             if (x < 0f || x > width) {
                 return@forEach
@@ -101,7 +101,7 @@ class TimeAxisView @JvmOverloads constructor(
                 x.toFloat(),
                 paint.textSize,
                 paint
-            )
+            )// 在指定位置绘制文本
         }
     }
 }
