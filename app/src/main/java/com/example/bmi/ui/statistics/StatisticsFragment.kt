@@ -527,7 +527,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
 
                 chart.setVisibleXRange(
                     7f,
-                    7.6f
+                    7f
                 )//设置可见范围为7天，最多显示7.6天
                 chart.moveViewToX(
                     55.5f
@@ -640,7 +640,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
 
                 chart.setVisibleXRange(
                     7f,
-                    7.6f
+                    7f
                 )
 
                 chart.moveViewToX(
@@ -842,7 +842,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
 
                 chart.setVisibleXRange(
                     7f,
-                    7.6f
+                    7f
                 )
 
                 chart.moveViewToX(

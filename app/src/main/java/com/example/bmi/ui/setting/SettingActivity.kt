@@ -126,16 +126,12 @@ class SettingActivity : BaseActivity<ActivitySettingBinding>() {
         val records = mutableListOf<BmiRecord>()
 
         val calendar = Calendar.getInstance().apply {
-            set(
-                2026,
-                Calendar.JULY,
-                15,
-                23,
-                0,
-                0
-            )
+            set(Calendar.HOUR_OF_DAY, 23)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }
+
         val weightValues = listOf(
             65.2, 65.6, 65.1, 65.8, 65.4,
             64.9, 65.5, 65.9, 65.3, 64.8,
@@ -152,9 +148,7 @@ class SettingActivity : BaseActivity<ActivitySettingBinding>() {
         repeat(48) { index ->
 
             val weight = weightValues[index]
-
             val bmi = weight / (1.75 * 1.75)
-
 
             records.add(
                 BmiRecord(
@@ -180,9 +174,10 @@ class SettingActivity : BaseActivity<ActivitySettingBinding>() {
                 )
             )
 
+            // 往前一天
             calendar.add(
                 Calendar.DAY_OF_YEAR,
-                1
+                -1
             )
         }
 
