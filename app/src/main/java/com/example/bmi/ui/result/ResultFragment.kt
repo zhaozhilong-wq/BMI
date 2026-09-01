@@ -35,7 +35,6 @@ import kotlin.math.roundToInt
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.view.ViewPropertyAnimator
-import com.example.bmi.databinding.FragmentInputBinding
 import com.example.bmi.ui.BaseFragment
 import com.example.bmi.ui.result.category.BmiStatus
 import com.example.bmi.ui.result.category.BmiStatusResult

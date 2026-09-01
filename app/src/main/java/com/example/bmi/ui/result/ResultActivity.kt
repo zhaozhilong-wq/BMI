@@ -2,13 +2,8 @@ package com.example.bmi.ui.result
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
-import androidx.activity.SystemBarStyle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.Insets
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.bmi.R
 import com.example.bmi.databinding.ActivityResultBinding

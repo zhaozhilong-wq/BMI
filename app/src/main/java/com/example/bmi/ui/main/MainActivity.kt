@@ -2,29 +2,19 @@ package com.example.bmi.ui.main
 
 import android.app.ComponentCaller
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
 import android.view.WindowManager
 import android.widget.EditText
-import android.widget.Toast
-import androidx.activity.SystemBarStyle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.Insets
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.example.bmi.R
-import com.example.bmi.databinding.ActivityInputBinding
 import com.example.bmi.databinding.ActivityMainBinding
 import com.example.bmi.ui.BaseActivity
 import com.example.bmi.ui.CustomPopup
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.getValue
-
 class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     override fun createBinding(): ActivityMainBinding {

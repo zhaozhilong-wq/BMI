@@ -1,19 +1,11 @@
 package com.example.bmi.ui.setting
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
-import androidx.activity.SystemBarStyle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.graphics.Insets
 import androidx.core.os.LocaleListCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.bmi.R
 import com.example.bmi.databinding.ActivityLauSettingBinding
 import com.example.bmi.ui.BaseActivity
 import com.example.bmi.ui.input.InputActivity
