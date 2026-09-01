@@ -116,9 +116,10 @@ class StatisticsViewModel( private val repository: BmiRepository
             }//按照日期分组
             .map { (_, dayRecords) ->//每一项是日期和该日期下所有记录，_表示Triple(2026, 8, 20)
                 val latest =
-                    dayRecords.maxBy {
-                        it.createdAt
-                    }//找当天最新的
+                    dayRecords.maxWith(
+                        compareBy<BmiRecord> { it.time }
+                            .thenBy { it.createdAt }
+                    )//找当天最新的
                 ChartPoint(
                     index = dateToIndex(
                         latest.year,
@@ -317,9 +318,10 @@ class StatisticsViewModel( private val repository: BmiRepository
             }
             .mapNotNull { (_, dayRecords) ->
                 dayRecords
-                    .maxByOrNull {
-                        it.createdAt
-                    }
+                    .maxWith(
+                        compareBy<BmiRecord> { it.time }
+                            .thenBy { it.createdAt }
+                    )
             }
         // 按周统计
         val result = mutableListOf<ChartPoint>()
@@ -385,9 +387,10 @@ class StatisticsViewModel( private val repository: BmiRepository
                         // 一周可能对应多个 record
                         // 所以这里暂时没有真正意义上的单个 recordId
                         recordId = weekRecords
-                            .maxByOrNull {
-                                it.createdAt
-                            }!!
+                            .maxWith(
+                                compareBy<BmiRecord> { it.time }
+                                    .thenBy { it.createdAt }
+                            )
                             .id
                     )
                 )
@@ -629,9 +632,10 @@ class StatisticsViewModel( private val repository: BmiRepository
                 )
             }
             .mapNotNull { (_, dayRecords) ->
-                dayRecords.maxByOrNull {
-                    it.createdAt
-                }
+                dayRecords.maxWith(
+                    compareBy<BmiRecord> { it.time }
+                        .thenBy { it.createdAt }
+                )
             }
 
         val result = mutableListOf<ChartPoint>()
