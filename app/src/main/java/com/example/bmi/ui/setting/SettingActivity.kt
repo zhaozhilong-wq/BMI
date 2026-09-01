@@ -168,7 +168,7 @@ class SettingActivity : BaseActivity<ActivitySettingBinding>() {
                     month = calendar.get(Calendar.MONTH),
                     day = calendar.get(Calendar.DAY_OF_MONTH),
 
-                    time = 0,
+                    time = 2,
 
                     createdAt = calendar.timeInMillis
                 )

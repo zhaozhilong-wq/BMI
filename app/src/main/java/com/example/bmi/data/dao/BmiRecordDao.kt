@@ -17,13 +17,17 @@ interface BmiRecordDao {
 
     @Query("""
     SELECT * FROM bmi_records
-    ORDER BY
+    ORDER BY 
+        year DESC,
+        month DESC,
+        day DESC,
+        time DESC,
         createdAt DESC""")
     fun getAllRecords(): Flow<List<BmiRecord>>
 
     @Query("""
         SELECT * FROM bmi_records
-        ORDER BY createdAt DESC
+        ORDER BY year DESC, month DESC, day DESC, time DESC,createdAt DESC
         LIMIT 1
     """)
     fun getLatestRecord(): Flow<BmiRecord?>
