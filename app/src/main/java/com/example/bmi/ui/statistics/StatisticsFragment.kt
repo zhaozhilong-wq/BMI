@@ -51,9 +51,6 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
 
     private val viewModel: StatisticsViewModel by activityViewModel()
 
-    private val initialVisibleMinX = 52f
-    private val initialVisibleMaxX = 59f
-
     private var dailyBmiPoints =
         emptyList<ChartPoint>()
 
@@ -130,16 +127,6 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
         )
         binding.bmiTimeAxis.setChart(binding.BmiChart)//绑定timeAxis和chart，使得timeAxis可以获取chart的坐标系信息
         binding.weightTimeAxis.setChart(binding.WeightChart)
-
-        binding.bmiTimeAxis.setVisibleRange(
-            initialVisibleMinX,
-            initialVisibleMaxX
-        )
-
-        binding.weightTimeAxis.setVisibleRange(
-            initialVisibleMinX,
-            initialVisibleMaxX
-        )
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -564,7 +551,6 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                         minX,
                         maxX
                     )
-                    invalidate()
                     latestEntry?.let {
 
                         chart.highlightValue(
@@ -574,6 +560,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                         )
                     }
                     invalidate()
+                    timeAxis.invalidate()
                 }
             }
         }
