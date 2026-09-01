@@ -213,6 +213,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
             description.isEnabled = false//不显示图表描述
             legend.isEnabled = false//不显示图例
             setTouchEnabled(true)//启用触摸
+            setDragDecelerationEnabled(false)//禁用滑动惯性
             setClipValuesToContent(false)//不裁剪值
             marker =
                 if (chart.id == R.id.WeightChart) {
@@ -534,6 +535,10 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
             chart.post {//post一个任务，等图表绘制完成后再执行
                 if (!isAdded || view == null) return@post//如果fragment已经被移除，直接返回
 
+                if (currentInterval != ChartInterval.DAY) {
+                    return@post
+                }
+
                 chart.setVisibleXRange(
                     7f,
                     7.6f
@@ -548,6 +553,9 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                     }
                 post {//再post一次，等hart的viewport真正更新完成
                     if (!isAdded || view == null) return@post
+                    if (currentInterval != ChartInterval.DAY) {
+                        return@post
+                    }
 
                     val minX = chart.lowestVisibleX
                     val maxX = chart.highestVisibleX
@@ -640,6 +648,10 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
             chart.post {
                 if (!isAdded || view == null) return@post
 
+                if (currentInterval != ChartInterval.WEEK) {
+                    return@post
+                }
+
                 chart.setVisibleXRange(
                     7f,
                     7.6f
@@ -649,8 +661,13 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
                     chart.xAxis.axisMaximum
                 )
 
+
                 chart.post {
                     if (!isAdded || view == null) return@post
+
+                    if (currentInterval != ChartInterval.WEEK) {
+                        return@post
+                    }
 
                     val minX = chart.lowestVisibleX
                     val maxX = chart.highestVisibleX
@@ -833,6 +850,10 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
             chart.post {
                 if (!isAdded || view == null) return@post
 
+                if (currentInterval != ChartInterval.MONTH) {
+                    return@post
+                }
+
                 chart.setVisibleXRange(
                     7f,
                     7.6f
@@ -844,6 +865,10 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
 
                 chart.post {
                     if (!isAdded || view == null) return@post
+
+                    if (currentInterval != ChartInterval.MONTH) {
+                        return@post
+                    }
 
                     val minX = chart.lowestVisibleX
                     val maxX = chart.highestVisibleX

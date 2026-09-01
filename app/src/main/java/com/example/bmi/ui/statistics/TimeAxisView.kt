@@ -82,13 +82,6 @@ class TimeAxisView @JvmOverloads constructor(
 
             val index = marker.index.toFloat()
 
-            Log.d(
-                "TimeAxis",
-                "marker=${marker.text}, " +
-                        "index=$index, " +
-                        "range=$visibleMinX~$visibleMaxX"
-            )
-
             if (index < visibleMinX || index > visibleMaxX) {
                 return@forEach
             }
