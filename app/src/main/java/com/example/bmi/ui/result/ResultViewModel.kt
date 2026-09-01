@@ -28,7 +28,7 @@ class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
 
     val latestRecord = repository.getLatestRecord().stateIn(
         viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
+        SharingStarted.WhileSubscribed(5000),//使用场景
         null
     )
 

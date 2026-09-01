@@ -92,7 +92,7 @@ class InputFragment : BaseFragment<FragmentInputBinding>() {
 
                 viewModel.toastEvent.collect { (resId,range) ->
 
-                    if (!isAdded || view == null) {
+                    if (!isAdded) {
                         return@collect
                     }
 
