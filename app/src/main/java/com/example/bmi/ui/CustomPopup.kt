@@ -25,7 +25,7 @@ object CustomPopup {
 
         if (!anchor.isAttachedToWindow) {
             return
-        }
+        }//防止View生命周期已经结束后继续进行依赖Window的UI操作
 
         // 如果之前还有 Popup，先关闭
         popupWindow?.dismiss()

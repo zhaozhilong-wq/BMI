@@ -16,6 +16,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.example.bmi.R
 import com.example.bmi.databinding.FragmentStatisticsBinding
 import com.example.bmi.ui.BaseFragment
+import com.example.bmi.ui.CustomPopup
 import com.example.bmi.ui.main.MainActivity
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
@@ -910,6 +911,11 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>() {
         return (
                 calendar.get(Calendar.MONTH) + 1
                 ).toString()//返回月份
+    }
+
+    override fun onStop() {
+        CustomPopup.dismiss()
+        super.onStop()
     }
 
 

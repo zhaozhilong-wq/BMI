@@ -121,7 +121,7 @@ class BmiDialView @JvmOverloads constructor(
             val angleDegrees = bmiToAngle(
                 bmi,
                 config
-            )
+            )//根据bmi数值计算他的位置
             val angleRadians = Math.toRadians(//角度转弧度
                 angleDegrees.toDouble()
             )

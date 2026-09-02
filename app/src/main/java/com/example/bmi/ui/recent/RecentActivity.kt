@@ -19,6 +19,11 @@ class RecentActivity : BaseActivity<ActivityRecentBinding>() {
 
     private val viewModel : RecentViewModel by viewModel()
 
+    override fun onStop() {
+        CustomPopup.dismiss()
+        super.onStop()
+    }
+
 
     override fun createBinding(): ActivityRecentBinding {
         return ActivityRecentBinding.inflate(layoutInflater)

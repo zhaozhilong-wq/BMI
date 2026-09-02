@@ -4,7 +4,7 @@ import android.graphics.Typeface
 import android.text.TextPaint
 import android.text.style.MetricAffectingSpan
 
-class CustomTypefaceSpan(
+class CustomTypefaceSpan(//用来设置某段文字的字体
     private val typeface: Typeface
 ) : MetricAffectingSpan() {
 

@@ -81,7 +81,7 @@ class TimeAxisView @JvmOverloads constructor(
                 index,
                 0f,
                 YAxis.AxisDependency.LEFT
-            )// 找到索引项对应的数据点
+            )// 转换为屏幕坐标
 
 
             val x = point.x// 数据点的 X 坐标

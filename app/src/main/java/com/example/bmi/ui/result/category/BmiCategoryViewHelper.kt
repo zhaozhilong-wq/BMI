@@ -143,7 +143,7 @@ object BmiCategoryViewHelper {
                         item.backgroundColor
                     )
                 )
-                // 选中状态的圆也不用 cycle_selected 图片
+                // 选中状态的圆
                 itemBinding.typeCycle.backgroundTintList =
                     ColorStateList.valueOf(
                         ContextCompat.getColor(

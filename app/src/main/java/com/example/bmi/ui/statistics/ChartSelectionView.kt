@@ -26,13 +26,13 @@ class ChartSelectionView @JvmOverloads constructor(
     ).apply {
         style = Paint.Style.FILL
         color = Color.WHITE
-    }//外圈画笔
+    }//外圈画笔，白色外圈
 
     private val innerPaint = Paint(
         Paint.ANTI_ALIAS_FLAG
     ).apply {
         style = Paint.Style.FILL
-    }//内圈画笔
+    }//内圈画笔，BMI对应颜色
 
     fun setChart(chart: LineChart) {
         this.chart = chart

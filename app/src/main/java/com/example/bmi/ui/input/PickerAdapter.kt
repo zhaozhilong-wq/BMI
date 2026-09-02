@@ -70,7 +70,7 @@ class PickerAdapter(
 
     fun setSelectedPosition(position: Int) {
 
-        if (position !in data.indices) {
+        if (position !in data.indices) {//有效范围下标判断
             return
         }
 
@@ -80,7 +80,7 @@ class PickerAdapter(
 
         selectedPosition = position
 
-        notifyDataSetChanged()
+        notifyDataSetChanged()//重新检查一下整个列表并刷新
     }
 
     fun updateData(newData: List<String>) {

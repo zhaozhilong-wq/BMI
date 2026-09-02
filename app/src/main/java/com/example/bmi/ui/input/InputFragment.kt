@@ -117,7 +117,7 @@ class InputFragment : BaseFragment<FragmentInputBinding>() {
             }
         }
         binding.weightInput.doAfterTextChanged { text ->
-            if (isUpdatingWeightInput) {
+            if (isUpdatingWeightInput) {//判断是程序修改还是用户修改
                 return@doAfterTextChanged
             }
             viewModel.onWeightChanged(
@@ -279,9 +279,9 @@ class InputFragment : BaseFragment<FragmentInputBinding>() {
             binding.lb.alpha = 1f
         }
         if (binding.weightInput.text.toString() != uiState.weightText) {
-            isUpdatingWeightInput = true
+            isUpdatingWeightInput = true//这次不是用户输入，是我程序主动更新
             binding.weightInput.setText(uiState.weightText)
-            binding.weightInput.setSelection(
+            binding.weightInput.setSelection(//移动光标
                 binding.weightInput.text.length
             )
             isUpdatingWeightInput = false

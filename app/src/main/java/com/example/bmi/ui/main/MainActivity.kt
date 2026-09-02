@@ -125,10 +125,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         super.onCreate(savedInstanceState)
         window.setSoftInputMode(
             WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING
-        )
+        )//防止键盘弹出时，布局被顶起
         val viewPager2 = binding.viewPager
         val bottomNav = binding.bottomNav
-        viewPager2.isUserInputEnabled = false
+        viewPager2.isUserInputEnabled = false//禁止滑动切换页面
 
         viewPager2.adapter = Adapter(this)
 

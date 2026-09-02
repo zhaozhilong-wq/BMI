@@ -62,7 +62,7 @@ class DatePickerDialog: DialogFragment() {
     )
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {//处理Fragment重建后的状态恢复
         super.onCreate(savedInstanceState)
         selectedYear =
             savedInstanceState?.getInt(KEY_YEAR)
@@ -107,7 +107,7 @@ class DatePickerDialog: DialogFragment() {
         }
         binding.done.setOnClickListener {
             parentFragmentManager.setFragmentResult(
-                REQUEST_KEY,
+                REQUEST_KEY,//向监听这个请求的Fragment发送结果
                 Bundle().apply {
                     putInt(KEY_YEAR, selectedYear)
                     putInt(KEY_MONTH, selectedMonth)
@@ -141,8 +141,6 @@ class DatePickerDialog: DialogFragment() {
     }
     private fun setupDatePicker() {
 
-        val space15dp =
-            dpToPx(15f)
 
         // 月份
         monthAdapter = setupRecyclerView(
@@ -223,7 +221,7 @@ class DatePickerDialog: DialogFragment() {
             dpToPx(101f)
         )
 
-        val snapHelper = LinearSnapHelper()
+        val snapHelper = LinearSnapHelper()//实现滑动后自动吸附的辅助类
         snapHelper.attachToRecyclerView(recyclerView)
 
 
@@ -240,7 +238,7 @@ class DatePickerDialog: DialogFragment() {
                         newState
                     )
 
-                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {//判断是否停止滚动，找到到前中间的item吸附并选中
 
                         val snapView =
                             snapHelper.findSnapView(
@@ -311,7 +309,7 @@ class DatePickerDialog: DialogFragment() {
                 selectedYear,
                 selectedMonth + 1,
                 0
-            )
+            )//设置为下个月第0天会得到当前月的最后一天
 
             maxDay =
                 tempCalendar.get(
