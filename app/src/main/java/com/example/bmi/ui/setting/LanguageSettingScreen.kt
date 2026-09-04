@@ -110,7 +110,6 @@ fun LanguageItems()
                     name = language.name,
                     selected = true,
                     onClick = {
-
                     }
                 )
             }

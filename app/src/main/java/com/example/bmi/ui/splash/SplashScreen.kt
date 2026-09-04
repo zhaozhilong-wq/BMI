@@ -82,8 +82,8 @@ fun SplashScreen(
     val pointerRotation by animateFloatAsState(
         targetValue = when (pointerStage) {
             0 -> 0f
-            1 -> 25f
-            else -> -25f
+            1 -> 40f
+            else -> -40f
         },
         animationSpec = tween(
             durationMillis = 1000,
@@ -129,8 +129,12 @@ fun SplashScreen(
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxSize()
-                    .offset { IntOffset( x = 0, y = translationY.toPx().toInt() ) }
-                    .alpha(alpha)
+                    .graphicsLayer {
+                        this.alpha = alpha
+                        this.translationY = translationY.toPx()
+                    }
+
+
             )
 
             Image(
@@ -140,9 +144,9 @@ fun SplashScreen(
                     .fillMaxWidth()
                     .height(23.dp)
                     .offset(y = 17.5.dp)
-                    .offset { IntOffset( x = 0, y = translationY.toPx().toInt() ) }
-                    .alpha(alpha)
                     .graphicsLayer {
+                        this.alpha = alpha
+                        this.translationY = translationY.toPx()
                         rotationZ = pointerRotation
 
                         transformOrigin = TransformOrigin(
@@ -163,8 +167,10 @@ fun SplashScreen(
                     x = 32.dp,
                     y = 352.5.dp
                 )
-                .offset { IntOffset( x = 0, y = translationY.toPx().toInt() ) }
-                .alpha(alpha)
+                .graphicsLayer {
+                    this.alpha = alpha
+                    this.translationY = translationY.toPx()
+                }
         )
 
         Image(
@@ -174,7 +180,6 @@ fun SplashScreen(
                 .height(40.dp)
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth(0.4f)
-                .offset { IntOffset( x = 0, y = translationY.toPx().toInt() ) }
         )
     }
 }
