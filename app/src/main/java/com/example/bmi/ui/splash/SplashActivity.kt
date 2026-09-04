@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.animation.PathInterpolator
 import android.animation.AnimatorListenerAdapter
+import androidx.activity.compose.setContent
 import androidx.core.graphics.Insets
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
@@ -34,187 +35,38 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        binding.pointer.doOnLayout {//等这个View完成layout后，再执行里面的代码
-            binding.pointer.pivotX = binding.pointer.width / 2f
-            binding.pointer.pivotY = binding.pointer.height * 19f / 23f
-            binding.pointer.rotation = 0f
-        }//设置指针旋转中心x,y坐标
-
-        binding.dial.alpha = 0f
-        binding.title.alpha = 0f//初始化透明度
-        binding.pointer.alpha = 0f
-
-        binding.dial.translationY = dpToPx(20f)
-        binding.title.translationY = dpToPx(20f)//初始化位移，
-        binding.pointer.translationY = dpToPx(20f)
-
-
-        startSplashAnimation()
-    }
-
-    private fun dpToPx(dp: Float): Float {
-        return dp * resources.displayMetrics.density
-    }
-
-    private fun createEnterAnimation(): AnimatorSet {//返回的是动画集合
-
-        val interpolator = PathInterpolator(
-            0.25f,
-            0f,
-            0.1f,
-            0.1f
-        )//设置动画速度
-
-        val dialMove = ObjectAnimator.ofFloat(
-            binding.dial,
-            View.TRANSLATION_Y,//设置位移
-            dpToPx(100f),
-            0f
-        ).apply {
-            duration = 1000L
-            this.interpolator = interpolator
-        }
-
-        val titleMove = ObjectAnimator.ofFloat(
-            binding.title,
-            View.TRANSLATION_Y,
-            dpToPx(100f),
-            0f
-        ).apply {
-            duration = 1000L
-            this.interpolator = interpolator
-        }
-
-        val pointerMove = ObjectAnimator.ofFloat(
-            binding.pointer,
-            View.TRANSLATION_Y,
-            dpToPx(100f),
-            0f
-        ).apply {
-            duration = 1000L
-            this.interpolator = interpolator
-        }
-
-        val dialAlpha = ObjectAnimator.ofFloat(
-            binding.dial,
-            View.ALPHA,//透明度从0-1
-            0f,
-            1f
-        ).apply {
-            duration = 1000L
-        }
-
-        val titleAlpha = ObjectAnimator.ofFloat(
-            binding.title,
-            View.ALPHA,
-            0f,//透明度从0-1
-            1f
-        ).apply {
-            duration = 1000L
-        }
-
-        val pointerAlpha = ObjectAnimator.ofFloat(
-            binding.pointer,
-            View.ALPHA,
-            0f,
-            1f
-        ).apply {
-            duration = 1000L
-        }
-        return AnimatorSet().apply {
-            playTogether(//同时开始
-                dialMove,
-                titleMove,
-                pointerMove,
-                dialAlpha,
-                titleAlpha,
-                pointerAlpha
+        setContent {
+            SplashScreen(
+                onAnimationEnd = {
+                    goNext()
+                }
             )
         }
     }
 
-    //创建指针旋转动画
-    private fun createPointerToYellow(): ObjectAnimator {
-        return ObjectAnimator.ofFloat(
-            binding.pointer,
-            View.ROTATION,//从0-25度旋转
-            0f,
-            25f
-        ).apply {
-            duration = 1000L
 
-            interpolator = PathInterpolator(
-                0.25f,
-                0f,
-                0.1f,
-                0.1f
-            )
-        }
-    }
-    private fun createPointerToGreen(): ObjectAnimator {
-        return ObjectAnimator.ofFloat(
-            binding.pointer,
-            View.ROTATION,
-            25f,//从25到-25旋转
-            -25f
-        ).apply {
-            duration = 1000L
 
-            interpolator = PathInterpolator(
-                0.25f,
-                0f,
-                0.1f,
-                0.1f
-            )
-        }
-    }
+    private fun goNext() {
+        lifecycleScope.launch {
 
-    private fun startSplashAnimation() {
-        val firstStage = AnimatorSet().apply {
-            playTogether(
-                createEnterAnimation(),
-                createPointerToYellow()
-            )
-        }//第一阶段动画
+            val isNewUser = viewModel.isNewUser()
 
-        val secondStage = createPointerToGreen()
-        AnimatorSet().apply {
-            playSequentially(
-                firstStage,
-                secondStage
-            )//第二阶段动画，sequentially是上个结束下个才开始
-            addListener(//动画监听器,监听结束后要干什么
-                object : AnimatorListenerAdapter() {
+            val targetActivity = if (isNewUser) {
+                InputActivity::class.java
+            } else {
+                MainActivity::class.java
+            }
 
-                    override fun onAnimationEnd(animation: Animator) {
-
-                        lifecycleScope.launch {
-//                            delay(1000L)
-                            val isNewUser = viewModel.isNewUser()
-
-                            val targetActivity = if (isNewUser) {
-                                InputActivity::class.java
-                            } else {
-                                MainActivity::class.java
-                            }
-
-                            startActivity(
-                                Intent(
-                                    this@SplashActivity,
-                                    targetActivity
-                                ).apply {
-                                    putExtra("open_page", 1)
-                                }
-                            )
-
-                            finish()
-                        }
-                    }
+            startActivity(
+                Intent(
+                    this@SplashActivity,
+                    targetActivity
+                ).apply {
+                    putExtra("open_page", 1)
                 }
             )
 
-            start()
+            finish()
         }
     }
 }
