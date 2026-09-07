@@ -2,6 +2,8 @@ package com.example.bmi.ui.setting
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.lifecycleScope
@@ -15,34 +17,11 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Locale
 
-class LauSettingActivity : BaseActivity<ActivityLauSettingBinding>() {
-    override fun createBinding(): ActivityLauSettingBinding {
-        return ActivityLauSettingBinding.inflate(layoutInflater)
-    }
+class LauSettingActivity : AppCompatActivity() {
 
     private val viewModel : SplashViewModel by viewModel()
 
-    val languages = listOf(
-        LanguageItem("en", "English"),
-        LanguageItem("pt", "Português"),
-        LanguageItem("ru", "Русский"),
-        LanguageItem("de", "Deutsch"),
-        LanguageItem("zh-TW", "繁體中文"),
-        LanguageItem("zh-CN", "简体中文"),
-        LanguageItem("fr", "Français"),
-        LanguageItem("es", "Español"),
-        LanguageItem("it", "Italiano"),
-        LanguageItem("ko", "한국어"),
-        LanguageItem("ar", "العربية"),
-        LanguageItem("fa", "فارسی"),
-        LanguageItem("id", "Bahasa Indonesia"),
-        LanguageItem("ja", "日本語"),
-        LanguageItem("nl", "Nederlands"),
-        LanguageItem("pl", "Polski"),
-        LanguageItem("th", "ไทย"),
-        LanguageItem("tr", "Türkçe"),
-        LanguageItem("vi", "Tiếng Việt"),
-    )
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,37 +34,67 @@ class LauSettingActivity : BaseActivity<ActivityLauSettingBinding>() {
             currentLocale?.toLanguageTag()
                 ?: Locale.getDefault().toLanguageTag()
 
-        val selectedPosition = languages.indexOfFirst {
-            it.code.equals(currentLanguageCode, ignoreCase = true)
-        }.let {
-            if (it == -1) 0 else it
-        }
-        val adapter = LanguageAdapter(
-            languages = languages,
-            selectedPosition = selectedPosition
-        ) { item ->
-            lifecycleScope.launch{
-                val isNewUser = viewModel.isNewUser()
-                val targetActivity = if (isNewUser) {
-                    InputActivity::class.java
-                } else {
-                    MainActivity::class.java
+        val selectedLanguageCode =
+            languages
+                .firstOrNull { language ->
+                    language.code.equals(
+                        currentLanguageCode,
+                        ignoreCase = true
+                    )
                 }
-                val intent = Intent(this@LauSettingActivity, targetActivity)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
-                            Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                startActivity(intent)
-                overridePendingTransition(0,0)
-            }
+                ?.code
+                ?: "en"
 
-            AppCompatDelegate.setApplicationLocales(
-                LocaleListCompat.forLanguageTags(item.code)
+        setContent {
+
+            LanguageSettingScreen(
+                selectedLanguageCode = selectedLanguageCode,
+
+                onBackClick = {
+                    finish()
+                },
+
+                onLanguageClick = { language ->
+
+                    lifecycleScope.launch {
+
+                        // 判断是不是新用户
+                        val isNewUser = viewModel.isNewUser()
+
+                        // 根据用户状态决定进入哪个页面
+                        val targetActivity =
+                            if (isNewUser) {
+                                InputActivity::class.java
+                            } else {
+                                MainActivity::class.java
+                            }
+
+                        // 修改 App Locale
+                        AppCompatDelegate.setApplicationLocales(
+                            LocaleListCompat.forLanguageTags(
+                                language.code
+                            )
+                        )
+
+                        // 清掉当前 Activity 栈
+                        val intent = Intent(
+                            this@LauSettingActivity,
+                            targetActivity
+                        ).apply {
+                            addFlags(
+                                Intent.FLAG_ACTIVITY_NEW_TASK or
+                                        Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            )
+                        }
+
+                        startActivity(intent)
+
+                        // 不播放 Activity 切换动画
+                        overridePendingTransition(0, 0)
+                    }
+                }
             )
         }
-        binding.languageRecyclerView.adapter = adapter
-        binding.languageRecyclerView.layoutManager = LinearLayoutManager(this)
-        binding.back.setOnClickListener {
-            finish()
-        }
+
     }
 }

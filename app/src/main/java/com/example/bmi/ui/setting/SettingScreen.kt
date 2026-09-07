@@ -365,7 +365,7 @@ fun GoogleFitItem(
     Row(modifier = Modifier
         .fillMaxWidth()
         .height(60.dp)
-        .padding(top = 10.dp, start = 15.dp),
+        .padding(top = 10.dp, start = 15.dp, end = 15.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -398,7 +398,10 @@ fun GoogleFitItem(
             letterSpacing = (-0.01).em
         )
 
-        Spacer(modifier = Modifier.width(50.dp))
+        Spacer(
+            modifier = Modifier.weight(1f)
+        )
+
 
         Switch(
             checked = checked,

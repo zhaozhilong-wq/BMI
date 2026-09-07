@@ -10,11 +10,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
@@ -32,30 +35,37 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.example.bmi.R
 
-@Preview
-@Composable
-fun PreviewLanguageSettingScreen() {
-    LanguageSettingScreen()
-}
+//@Preview
+//@Composable
+//fun PreviewLanguageSettingScreen() {
+//    LanguageSettingScreen()
+//}
 
 
 @Composable
-fun LanguageSettingScreen()
+fun LanguageSettingScreen(
+    selectedLanguageCode: String,
+    onBackClick: () -> Unit,
+    onLanguageClick: (LanguageItem) -> Unit
+)
 {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFEAEAEE))
+            .statusBarsPadding()
+            .navigationBarsPadding()
     ) {
-        Header()
+        Header(onBackClick = onBackClick)
 
-        LanguageItems()
+        LanguageItems(selectedLanguageCode = selectedLanguageCode,
+            onLanguageClick = onLanguageClick)
     }
 
 }
 
 @Composable
-fun Header()
+fun Header(onBackClick: () -> Unit)
 {
     Row(
         modifier = Modifier
@@ -68,6 +78,9 @@ fun Header()
             contentDescription = "Back",
             modifier = Modifier
                 .size(24.dp)
+                .clickable{
+                    onBackClick()
+                }
         )
 
         Spacer(modifier = Modifier.width(10.dp))
@@ -83,7 +96,8 @@ fun Header()
 }
 
 @Composable
-fun LanguageItems()
+fun LanguageItems(selectedLanguageCode: String,
+                  onLanguageClick: (LanguageItem) -> Unit)
 {
     Box(
         modifier = Modifier
@@ -104,12 +118,17 @@ fun LanguageItems()
             contentPadding = PaddingValues(0.dp)
         ) {
 
-            items(languages) { language ->
+            itemsIndexed(languages) { index,language ->
 
                 Item(
                     name = language.name,
-                    selected = true,
+                    selected = language.code.equals(
+                        selectedLanguageCode,
+                        ignoreCase = true
+                    ),
+                    isLast = index == languages.lastIndex,
                     onClick = {
+                        onLanguageClick(language)
                     }
                 )
             }
@@ -121,12 +140,16 @@ fun LanguageItems()
 fun Item(
     name: String,
     selected: Boolean,
+    isLast: Boolean,
     onClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(49.5.dp)
+            .clickable{
+                onClick()
+            }
 
     ) {
 
@@ -148,22 +171,24 @@ fun Item(
                 painter = painterResource(R.drawable.check),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(24.dp)
+                    .size(36.dp)
                     .align(Alignment.CenterEnd)
                     .padding(end = 15.dp)
             )
         }
 
-        HorizontalDivider(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(
-                    start = 15.dp,
-                    end = 15.dp
-                ),
-            thickness = 1.dp,
-            color = Color(0xFFD4D4D5)
-        )
+        if (!isLast) {
+            HorizontalDivider(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(
+                        start = 15.dp,
+                        end = 15.dp
+                    ),
+                thickness = 1.dp,
+                color = Color(0xFFD4D4D5)
+            )
+        }
     }
 }
 val languages = listOf(
