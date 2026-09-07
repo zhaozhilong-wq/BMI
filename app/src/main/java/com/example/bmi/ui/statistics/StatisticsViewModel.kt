@@ -507,82 +507,7 @@ class StatisticsViewModel( private val repository: BmiRepository
         return currentSunday
     }
 
-    fun getTotalWeekCount(): Int {
 
-        val startSunday =
-            getStartSunday()
-
-        val today =
-            Calendar.getInstance()
-        val currentSunday =
-            today.clone() as Calendar
-        val dayOfWeek =
-            currentSunday.get(
-                Calendar.DAY_OF_WEEK
-            )
-
-        currentSunday.add(
-            Calendar.DAY_OF_YEAR,
-            -(dayOfWeek - Calendar.SUNDAY)
-        )
-        return (
-                (
-                        currentSunday.timeInMillis -
-                                startSunday.timeInMillis
-                        ) /
-                        (7L * 24L * 60L * 60L * 1000L)
-                ).toInt()
-    }
-
-    fun getTotalMonthCount(): Int {
-
-        val startCalendar =
-            Calendar.getInstance().apply {
-
-                set(
-                    2021,
-                    Calendar.OCTOBER,
-                    1,
-                    0,
-                    0,
-                    0
-                )
-
-                set(Calendar.MILLISECOND, 0)
-            }
-
-        val today =
-            Calendar.getInstance()
-
-        val endCalendar =
-            today.clone() as Calendar
-
-        endCalendar.set(
-            Calendar.DAY_OF_MONTH,
-            1
-        )
-
-        endCalendar.add(
-            Calendar.MONTH,
-            1
-        )//设置为下个月的第一天
-
-        var count = 0
-
-        while (
-            startCalendar.before(endCalendar)
-        ) {
-
-            count++
-
-            startCalendar.add(
-                Calendar.MONTH,
-                1
-            )
-        }
-
-        return count - 1//减去最后一个月的预留空间
-    }
 
     private fun buildMonthlyData(
         records: List<BmiRecord>,
@@ -784,29 +709,5 @@ class StatisticsViewModel( private val repository: BmiRepository
         return markers
     }
 
-    fun getBmiColor(bmi: Float): Int {
-        return when {
-            bmi < 16.0f -> R.color.vsu_cycle
-
-            bmi < 17.0f ->
-                R.color.su_cycle
-
-            bmi < 18.5f -> R.color.underweight_cycle
-
-            bmi < 25.0f -> R.color.normal_cycle
-
-            bmi < 30.0f ->
-                R.color.overweight_cycle
-
-            bmi < 35.0f ->
-                R.color.obesity1_cycle
-
-            bmi < 40.0f ->
-                R.color.obesity2_cycle
-
-            else ->
-                R.color.obesity3_cycle
-        }
-    }
 
 }
