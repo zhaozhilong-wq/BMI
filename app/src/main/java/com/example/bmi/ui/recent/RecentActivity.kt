@@ -2,7 +2,11 @@ package com.example.bmi.ui.recent
 
 import android.app.Activity
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,7 +19,7 @@ import com.example.bmi.ui.result.ResultMode
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class RecentActivity : BaseActivity<ActivityRecentBinding>() {
+class RecentActivity : AppCompatActivity() {
 
     private val viewModel : RecentViewModel by viewModel()
 
@@ -25,39 +29,24 @@ class RecentActivity : BaseActivity<ActivityRecentBinding>() {
     }
 
 
-    override fun createBinding(): ActivityRecentBinding {
-        return ActivityRecentBinding.inflate(layoutInflater)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val adapter = RecentlistAdapter()
-        binding.recentRecyclerView.adapter = adapter
-        val space =
-            (15 * resources.displayMetrics.density).toInt()
 
-        binding.recentRecyclerView.addItemDecoration(
-            ItemSpaceDecoration(space)
-        )
-        adapter.setOnItemClick { record ->
-            resultLauncher.launch(
-                ResultActivity.newIntent(
-                    this,
-                    ResultMode.HISTORY,
-                    record.id
-                )
+        setContent {
+            val recordLists by viewModel.records.collectAsStateWithLifecycle()
+            RecentScreen(
+                onBackClick = { finish() },
+                onItemClick = { id ->
+                    resultLauncher.launch(
+                        ResultActivity.newIntent(
+                            this,
+                            ResultMode.HISTORY,
+                            id
+                        )
+                    )
+                },
+                recordLists = recordLists
             )
-        }
-        binding.recentRecyclerView.layoutManager = LinearLayoutManager(this)
-        lifecycleScope.launch {
-            repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
-                viewModel.records.collect { records ->
-                    adapter.submitList(records)
-                }
-            }
-        }
-        binding.backButton.setOnClickListener {
-            finish()
         }
 
     }
@@ -78,7 +67,7 @@ class RecentActivity : BaseActivity<ActivityRecentBinding>() {
                 if (deleteSuccess && !isFinishing && !isDestroyed) {
                     CustomPopup.show(
                         this,
-                        binding.root,
+                        window.decorView,
                         getString(R.string.delete_successfully),
                         R.drawable.success_icon
                     )

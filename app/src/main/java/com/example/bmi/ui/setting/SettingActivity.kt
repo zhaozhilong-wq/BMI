@@ -3,21 +3,14 @@ package com.example.bmi.ui.setting
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.example.bmi.R
 import com.example.bmi.data.entity.BmiRecord
-import com.example.bmi.databinding.ActivitySettingBinding
-import com.example.bmi.ui.BaseActivity
 import com.example.bmi.ui.CustomPopup
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Calendar
 
