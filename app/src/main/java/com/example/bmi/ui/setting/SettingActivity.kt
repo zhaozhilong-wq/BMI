@@ -4,8 +4,12 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.bmi.R
@@ -17,80 +21,72 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Calendar
 
-class SettingActivity : BaseActivity<ActivitySettingBinding>() {
+class SettingActivity : AppCompatActivity() {
 
     private val viewModel : SettingViewModel by viewModel()
 
 
-    override fun createBinding(): ActivitySettingBinding {
-        return ActivitySettingBinding.inflate(layoutInflater)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding.back.setOnClickListener { finish() }
+        setContent {
+            val isLogin by viewModel.isLogin.collectAsStateWithLifecycle()
+            val isChecked by viewModel.isChecked.collectAsStateWithLifecycle()
 
-        binding.toggleButton.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.updateChecked(isChecked)
-        }
+            SettingScreen(
+                isLogin = isLogin,
+                isChecked = isChecked,
 
-        binding.personalContainer.setOnClickListener {
-            LogDialog().show(
-                supportFragmentManager,
-                "LogDialog"
-            )
-        }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.isLogin.collect { isLogin ->
-                    if (isLogin) {
-                        binding.userImg.visibility = View.VISIBLE
-                        binding.policy.visibility = View.GONE
-                        binding.divide3.visibility = View.GONE
-                        binding.name.text = "Cassie"
-                        binding.email.text = "cassiexiao@gmail.com"
-                    }else {
-                        binding.userImg.visibility = View.GONE
-                        binding.policy.visibility = View.VISIBLE
-                        binding.divide3.visibility = View.VISIBLE
-                        binding.name.text = "Backup & Restore"
-                        binding.email.text = "Synchronize your data"
-                    }
+                onBackClick = {
+                    finish()
+                },
+
+                onPersonalClick = {
+                    LogDialog().show(
+                        supportFragmentManager,
+                        "LogDialog"
+                    )
+                },
+
+                onSyncClick = {
+                    SyncDialog().show(
+                        supportFragmentManager,
+                        "SyncDialog"
+                    )
+                },
+
+                onLanguageClick = {
+                    startActivity(
+                        Intent(
+                            this@SettingActivity,
+                            LauSettingActivity::class.java
+                        )
+                    )
+                },
+
+                onFeedbackClick = {
+                    resultLauncher.launch(
+                        Intent(
+                            this@SettingActivity,
+                            FeedbackActivity::class.java
+                        )
+                    )
+                },
+
+                onAdsClick = {
+                    viewModel.insertDebugData(
+                        generateDebugRecords()
+                    )
+                },
+
+                onCheckedChange = { checked ->
+                    viewModel.updateChecked(checked)
                 }
-            }
-        }
-        binding.synButton.setOnClickListener {
-            SyncDialog().show(
-                supportFragmentManager,
-                "SyncDialog"
             )
         }
-        binding.language.setOnClickListener {
-            val intent = Intent(this, LauSettingActivity::class.java)
-            startActivity(intent)
-        }
-        binding.feedback.setOnClickListener {
-            resultLauncher.launch(
-                Intent(this, FeedbackActivity::class.java)
-            )
-        }
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED)
-            {
-                viewModel.isChecked.collect { isChecked ->
-                    binding.toggleButton.isChecked = isChecked
-                }
-            }
-        }
-
-        binding.ads.setOnClickListener {
-            viewModel.insertDebugData(generateDebugRecords())
-        }
-
-
     }
+
 
     override fun onStop() {
         CustomPopup.dismiss()
@@ -113,7 +109,7 @@ class SettingActivity : BaseActivity<ActivitySettingBinding>() {
                 if (saveSuccess && !isFinishing && !isDestroyed) {
                     CustomPopup.show(
                         this,
-                        binding.root,
+                        window.decorView,
                         getString(R.string.toast_feedback_text),
                         R.drawable.success_icon
                     )

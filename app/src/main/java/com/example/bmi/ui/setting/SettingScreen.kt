@@ -3,6 +3,7 @@ package com.example.bmi.ui.setting
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,32 +41,59 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.bmi.R
 
-@Preview
-@Composable
-fun SettingScreenPreview() {
-    SettingScreen()
-}
+//@Preview
+//@Composable
+//fun SettingScreenPreview() {
+//    SettingScreen()
+//}
 
 
 
 @Composable
-fun SettingScreen() {
+fun SettingScreen(
+    isLogin: Boolean,
+    isChecked: Boolean,
+
+    onBackClick: () -> Unit,
+    onPersonalClick: () -> Unit,
+    onSyncClick: () -> Unit,
+    onLanguageClick: () -> Unit,
+    onFeedbackClick: () -> Unit,
+    onAdsClick: () -> Unit,
+    onCheckedChange: (Boolean) -> Unit
+) {
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFEAEAEE))
             .statusBarsPadding()
     ) {
-        SettingTopBar()
+        SettingTopBar(
+            onBack = onBackClick
+        )
 
-        SettingContent()
+        SettingContent(
+            isLogin = isLogin,
+            isChecked = isChecked,
+            onPersonalClick = onPersonalClick,
+            onSyncClick = onSyncClick,
+            onLanguageClick = onLanguageClick,
+            onFeedbackClick = onFeedbackClick,
+            onAdsClick = onAdsClick,
+            onCheckedChange = onCheckedChange
+        )
     }
 }
 
 @Composable
-fun SettingTopBar()
+fun SettingTopBar(
+    onBack: () -> Unit
+)
 {
     Box(
         modifier = Modifier
@@ -79,6 +107,9 @@ fun SettingTopBar()
                 .width(24.dp)
                 .height(24.dp)
                 .offset(x = 15.dp , y = 18.5.dp)
+                .clickable {
+                    onBack()
+                }
         )
         Text(
             text = stringResource(R.string.mine),
@@ -95,23 +126,48 @@ fun SettingTopBar()
 }
 
 @Composable
-fun SettingContent()
+fun SettingContent(
+    isLogin: Boolean,
+    isChecked: Boolean,
+    onPersonalClick: () -> Unit,
+    onSyncClick: () -> Unit,
+    onLanguageClick: () -> Unit,
+    onFeedbackClick: () -> Unit,
+    onAdsClick: () -> Unit,
+    onCheckedChange: (Boolean) -> Unit
+)
 {
     Column(modifier = Modifier
         .fillMaxSize()
         .verticalScroll(rememberScrollState()))
     {
-        PersonalCard()
+        PersonalCard(
+            isLogin = isLogin,
+            onPersonalClick = onPersonalClick,
+            onSyncClick = onSyncClick
+        )
 
-        SettingContainer1()
+        SettingContainer1(
+            isChecked = isChecked,
+            onLanguageClick = onLanguageClick,
+            onCheckedChange = onCheckedChange
+        )
 
-        SettingContainer2()
+        SettingContainer2(
+            isLogin = isLogin,
+            onAdsClick = onAdsClick,
+            onFeedbackClick = onFeedbackClick
+        )
 
     }
 }
 
 @Composable
-fun PersonalCard()
+fun PersonalCard(
+    isLogin: Boolean,
+    onPersonalClick: () -> Unit,
+    onSyncClick: () -> Unit
+)
 {
     Box(
         modifier = Modifier
@@ -120,62 +176,89 @@ fun PersonalCard()
             .height(80.dp)
             .clip(RoundedCornerShape(15.dp))
             .background(Color(0xFFFFFFFF))
+            .clickable {
+                onPersonalClick()
+            }
     ) {
-        Image(
-            painter = painterResource(R.drawable.img_user),
-            contentDescription = null,
-            modifier = Modifier
-                .size(65.dp)
-                .offset(
-                    x = 10.dp,
-                    y = 4.dp
-                )
-                .clip(CircleShape)
-        )
-
         Row(
             modifier = Modifier
-                .offset(
-                    x = 90.dp,
-                    y = 19.dp
-                ),
+                .fillMaxWidth()
+                .padding(top = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = stringResource(R.string.set_backup),
-                fontSize = 16.sp,
-                color = Color.Black,
-                fontFamily = FontFamily(
-                    Font(R.font.montserrat_extrabold)
-                ),
-                letterSpacing = (-0.01).em,
-            )
 
-            Spacer(modifier = Modifier.width(4.5.dp))
+            if (isLogin) {
+                Spacer(
+                    modifier = Modifier.width(10.dp)
+                )
+                Image(
+                    painter = painterResource(R.drawable.img_user),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(65.dp)
+                        .clip(CircleShape)
+                )
 
-            Image(
-                painter = painterResource(R.drawable.google),
-                contentDescription = null,
-                Modifier
-                    .size(22.dp)
+            }
+            Spacer(
+                modifier = Modifier.width(15.dp)
             )
+            Column{
+                if (isLogin)
+                    Spacer(
+                        modifier = Modifier.height(1.dp)
+                    ) else
+                        Spacer(
+                            modifier = Modifier.height(16.5.dp)
+                        )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Text(
+                        text = if (isLogin) {
+                            "Cassie"
+                        } else {
+                            stringResource(R.string.set_backup)
+                        },
+                        fontSize = 16.sp,
+                        color = Color.Black,
+                        fontFamily = FontFamily(
+                            Font(R.font.montserrat_extrabold)
+                        ),
+                        letterSpacing = (-0.01).em,
+                    )
+                    Spacer(modifier = Modifier.width(4.5.dp))
+
+                    Image(
+                        painter = painterResource(R.drawable.google),
+                        contentDescription = null,
+                        Modifier
+                            .size(22.dp)
+                    )
+
+                }
+
+                Text(
+                    text = if (isLogin) {
+                        "cassiexiao@gmail.com"
+                    } else {
+                        "Synchronize your data"
+                    },
+                    fontSize = 16.sp,
+                    color = Color(0xFF444444),
+                    fontFamily = FontFamily(
+                        Font(R.font.montserrat_regular)
+                    ),
+                    letterSpacing = (-0.01).em,
+                    modifier = Modifier
+                )
+                }
         }
 
 
-        Text(
-            text = "Synchronize your data",
-            fontSize = 14.sp,
-            color = Color(0xFF444444),
-            fontFamily = FontFamily(
-                Font(R.font.montserrat_regular)
-            ),
-            letterSpacing = (-0.01).em,
-            modifier = Modifier
-                .offset(
-                    x = 90.dp,
-                    y = 44.5.dp
-                )
-        )
+
+
 
         Image(
             painter = painterResource(R.drawable.ic_autorenew_black_24px),
@@ -187,12 +270,19 @@ fun PersonalCard()
                     x = (-15).dp,
                     y = 28.dp
                 )
+                .clickable {
+                    onSyncClick()
+                }
         )
     }
 }
 
 @Composable
-fun SettingContainer1()
+fun SettingContainer1(
+    isChecked: Boolean,
+    onLanguageClick: () -> Unit,
+    onCheckedChange: (Boolean) -> Unit
+)
 {
     Column(
         modifier = Modifier
@@ -202,21 +292,27 @@ fun SettingContainer1()
             .clip(RoundedCornerShape(12.dp))
             .background(Color(0xFFFFFFFF))
     ) {
-        LanguageItem()
+        LanguageItem(onClick = onLanguageClick)
 
         Divider()
 
-        GoogleFitItem()
+        GoogleFitItem(
+            checked = isChecked,
+            onCheckedChange = onCheckedChange
+        )
     }
 }
 
 @Composable
-fun LanguageItem()
+fun LanguageItem(onClick: () -> Unit)
 {
     Row(modifier = Modifier
         .fillMaxWidth()
         .height(60.dp)
-        .padding(top = 10.dp, start = 15.dp),
+        .padding(top = 10.dp, start = 15.dp)
+        .clickable{
+            onClick()
+    },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -261,10 +357,11 @@ fun Divider()
 }
 
 @Composable
-fun GoogleFitItem(){
-    var checked by remember {
-        mutableStateOf(false)
-    }
+fun GoogleFitItem(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+){
+
     Row(modifier = Modifier
         .fillMaxWidth()
         .height(60.dp)
@@ -301,13 +398,11 @@ fun GoogleFitItem(){
             letterSpacing = (-0.01).em
         )
 
-        Spacer(modifier = Modifier.width(30.dp))
+        Spacer(modifier = Modifier.width(50.dp))
 
         Switch(
             checked = checked,
-            onCheckedChange = {
-                checked = it
-            },
+            onCheckedChange = onCheckedChange,
             modifier = Modifier.scale(0.8f)
         )
 
@@ -315,7 +410,11 @@ fun GoogleFitItem(){
 }
 
 @Composable
-fun SettingContainer2()
+fun SettingContainer2(
+    isLogin: Boolean,
+    onAdsClick: () -> Unit,
+    onFeedbackClick: () -> Unit
+)
 {
     Column(
         modifier = Modifier
@@ -325,7 +424,7 @@ fun SettingContainer2()
             .clip(RoundedCornerShape(12.dp))
             .background(Color(0xFFFFFFFF))
     ) {
-        AdsItem()
+        AdsItem(onClick = onAdsClick)
 
         Divider()
 
@@ -333,22 +432,28 @@ fun SettingContainer2()
 
         Divider()
 
-        FeedbackItem()
+        FeedbackItem(onClick = onFeedbackClick)
 
-        Divider()
+        if (!isLogin) {
+            Divider()
 
-        PolicyItem()
+            PolicyItem()
+        }
     }
 }
 
 @Composable
-fun AdsItem()
+fun AdsItem(onClick: () -> Unit)
 {
     Row(modifier = Modifier
         .fillMaxWidth()
         .height(60.dp)
-        .padding(top = 3.5.dp, start = 15.dp),
+        .padding(top = 3.5.dp, start = 15.dp)
+        .clickable{
+            onClick()
+        },
         verticalAlignment = Alignment.CenterVertically
+
     ) {
         Box(
             modifier = Modifier
@@ -418,12 +523,15 @@ fun RateUsItem()
 }
 
 @Composable
-fun FeedbackItem()
+fun FeedbackItem(onClick: () -> Unit)
 {
     Row(modifier = Modifier
         .fillMaxWidth()
         .height(60.dp)
-        .padding(start = 15.dp),
+        .padding(start = 15.dp)
+        .clickable{
+            onClick()
+        },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
