@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -106,6 +107,7 @@ fun InputScreen(
             .fillMaxSize()
             .background(Color(0xFFEAEAEE))
             .statusBarsPadding()
+            .navigationBarsPadding()
             .clickable(
                 indication = null,
                 interactionSource = remember {
@@ -351,7 +353,9 @@ fun UnitSelector(
             .fillMaxWidth()
             .height(36.dp)
             .clip(RoundedCornerShape(18.dp))
-            .background(Color.White)
+            .background(
+                Color(0x80FFFFFF)
+            )
     ) {
 
         UnitItem(
@@ -383,10 +387,6 @@ fun UnitItem(
     Box(
         modifier = modifier
             .fillMaxHeight()
-            .clip(RoundedCornerShape(18.dp))
-            .alpha(
-                if (selected) 1f else 0.2f
-            )
             .clickable(
                 indication = null,
                 interactionSource = remember {
@@ -397,13 +397,27 @@ fun UnitItem(
         contentAlignment = Alignment.Center
     ) {
 
+        if (selected) {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(
+                        RoundedCornerShape(18.dp)
+                    )
+                    .background(
+                        Color.White
+                    )
+            )
+        }
+
         Text(
             text = text,
             fontSize = 16.sp,
             fontFamily = FontFamily(
                 Font(R.font.montserrat_extrabold)
             ),
-            color = Color.Black
+            color = Color.Black.copy(alpha = if (selected) 1f else 0.2f)
         )
     }
 }

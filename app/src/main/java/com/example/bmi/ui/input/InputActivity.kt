@@ -1,59 +1,83 @@
 package com.example.bmi.ui.input
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
 import android.widget.EditText
+import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.getValue
 import androidx.core.graphics.Insets
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.bmi.R
 import com.example.bmi.databinding.ActivityInputBinding
 import com.example.bmi.ui.BaseActivity
 import com.example.bmi.ui.CustomPopup
+import com.example.bmi.ui.result.ResultActivity
+import com.example.bmi.ui.setting.SettingActivity
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.getValue
 
-class InputActivity : BaseActivity<ActivityInputBinding>(){
+class InputActivity : AppCompatActivity(){
 
-    override fun createBinding(): ActivityInputBinding {
-        return ActivityInputBinding.inflate(layoutInflater)
-    }
-    override fun getInsets(insets: WindowInsetsCompat): Insets {
-        val systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-        return Insets.of(
-            systemBarInsets.left,
-            0,
-            systemBarInsets.right,
-            systemBarInsets.bottom
-        )
-    }
-
-    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {//使得点击输入框外，就失去焦点
-        if (ev.action == MotionEvent.ACTION_DOWN) {
-            val currentFocus = currentFocus
-            if (currentFocus is EditText) {
-                val location = IntArray(2)
-                currentFocus.getLocationOnScreen(location)
-                val left = location[0]
-                val top = location[1]
-                val right = left + currentFocus.width
-                val bottom = top + currentFocus.height
-                val x = ev.rawX
-                val y = ev.rawY
-                // 点击的位置不在当前 EditText 内
-                if (x < left || x > right || y < top || y > bottom) {
-                    currentFocus.clearFocus()
-                }
-            }
-        }
-
-
-        return super.dispatchTouchEvent(ev)
-    }
+    private val viewModel : InputViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction().apply {
-                replace(R.id.fragment_container, InputFragment())
-                commit()
+        setContent {
+            MaterialTheme {
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+                InputScreen(
+                    uiState = uiState,
+
+                    onWeightChanged = viewModel::onWeightChanged,
+                    onWeightFocusChanged = viewModel::onWeightFocusChanged,
+                    onWeightUnitSelected = viewModel::selectWeightUnit,
+
+                    onHeightCmChanged = viewModel::onHeightCmChanged,
+                    onHeightFtChanged = viewModel::onHeightFtChanged,
+                    onHeightInChanged = viewModel::onHeightInChanged,
+
+                    onHeightCmFocusChanged =
+                        viewModel::onHeightCmFocusChanged,
+
+                    onHeightFtFocusChanged =
+                        viewModel::onHeightFtFocusChanged,
+
+                    onHeightInFocusChanged =
+                        viewModel::onHeightInFocusChanged,
+
+                    onHeightUnitSelected =
+                        viewModel::selectHeightUnit,
+
+                    onDateSelected = viewModel::selectDate,
+
+
+                    onTimeSelected = viewModel::selectTimeSlot,
+
+                    onAgeSelected = viewModel::selectAge,
+
+                    onGenderSelected = viewModel::selectGender,
+
+                    onCalculateClick =
+                        viewModel::calculateAndSave,
+
+                    onUserClick = {
+                        val intent = Intent(this, SettingActivity::class.java)
+                        startActivity(intent)
+                    }
+                )
             }
         }
 
@@ -63,16 +87,75 @@ class InputActivity : BaseActivity<ActivityInputBinding>(){
         )
 
         if (showDeleteToast && !isFinishing && !isDestroyed) {
-            binding.root.post {
+            window.decorView.post {
                 CustomPopup.show(
                     this,
-                    binding.root,
+                    window.decorView,
                     getString(R.string.delete_successfully),
                     R.drawable.success_icon
                 )
             }
             intent.removeExtra("show_delete_toast")
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(
+                Lifecycle.State.STARTED
+            ) {
+                launch {
+                    viewModel.resultReady.collect { (mode, recordId) ->
+                        resultLauncher.launch(
+                            ResultActivity.newIntent(
+                                this@InputActivity,
+                                mode,
+                                recordId
+                            )
+                        )
+                    }
+                }
+
+                launch {
+                    viewModel.toastEvent.collect { (resId, range) ->
+
+                        CustomPopup.show(
+                            this@InputActivity,
+                            window.decorView,
+                            getString(resId, range),
+                            R.drawable.warning_icon
+                        )
+                    }
+                }
+            }
+        }
     }
+
+    private val resultLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+
+
+            if (result.resultCode == Activity.RESULT_OK) {
+
+                val deleteSuccess =
+                    result.data?.getBooleanExtra(
+                        "delete_success",
+                        false
+                    ) ?: false
+
+                if (!deleteSuccess && !isFinishing && !isDestroyed) {
+                    return@registerForActivityResult
+                }
+
+                if (deleteSuccess ) {
+                    CustomPopup.show(
+                        this@InputActivity,
+                        window.decorView,
+                        getString(R.string.delete_successfully),
+                        R.drawable.success_icon
+                    )
+                }
+            }
+        }
 
 }

@@ -153,7 +153,7 @@ fun StatisticsPeriodSelector(
             )
             .height(40.dp)
             .clip(RoundedCornerShape(18.dp))
-            .background(Color.White)
+            .background(Color(0x80FFFFFF))
     ) {
 
         PeriodItem(
@@ -195,10 +195,6 @@ fun PeriodItem(
     Box(
         modifier = modifier
             .fillMaxHeight()
-            .clip(RoundedCornerShape(18.dp))
-            .alpha(
-                if (selected) 1f else 0.2f
-            )
             .clickable(
                 indication = null,
                 interactionSource = remember {
@@ -208,13 +204,26 @@ fun PeriodItem(
             ),
         contentAlignment = Alignment.Center
     ) {
+        if (selected) {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(
+                        RoundedCornerShape(18.dp)
+                    )
+                    .background(
+                        Color.White
+                    )
+            )
+        }
         Text(
             text = text,
             fontSize = 16.sp,
             fontFamily = FontFamily(
                 Font(R.font.montserrat_extrabold)
             ),
-            color = Color.Black,
+            color = Color.Black.copy(alpha = if (selected) 1f else 0.2f),
             letterSpacing = (-0.01).em
         )
     }
