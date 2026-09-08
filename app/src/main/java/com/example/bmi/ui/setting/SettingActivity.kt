@@ -35,19 +35,6 @@ class SettingActivity : AppCompatActivity() {
                     finish()
                 },
 
-                onPersonalClick = {
-                    LogDialog().show(
-                        supportFragmentManager,
-                        "LogDialog"
-                    )
-                },
-
-                onSyncClick = {
-                    SyncDialog().show(
-                        supportFragmentManager,
-                        "SyncDialog"
-                    )
-                },
 
                 onLanguageClick = {
                     startActivity(
@@ -75,7 +62,21 @@ class SettingActivity : AppCompatActivity() {
 
                 onCheckedChange = { checked ->
                     viewModel.updateChecked(checked)
-                }
+                },
+                onSyncDone = {
+                    CustomPopup.show(
+                        this,
+                        window.decorView,
+                        getString(R.string.sync_success_toast),
+                        R.drawable.success_icon
+                    )
+                },
+                onLoginClick = {
+                    viewModel.login()
+                },
+                onLogoutClick = {
+                    viewModel.logout()
+                },
             )
         }
     }

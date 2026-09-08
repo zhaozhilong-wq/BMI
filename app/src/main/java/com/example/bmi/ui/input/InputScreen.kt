@@ -804,7 +804,7 @@ private fun AgeItem(
     ) {
         Text(
             text = age.toString(),
-            fontSize = 30.sp,
+            fontSize = 32.sp,
             fontFamily = FontFamily(
                 Font(R.font.montserrat_extrabold)
             ),

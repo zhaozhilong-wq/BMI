@@ -37,6 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -58,13 +59,22 @@ fun SettingScreen(
     isChecked: Boolean,
 
     onBackClick: () -> Unit,
-    onPersonalClick: () -> Unit,
-    onSyncClick: () -> Unit,
     onLanguageClick: () -> Unit,
     onFeedbackClick: () -> Unit,
     onAdsClick: () -> Unit,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
+    onSyncDone: () -> Unit,
+    onLoginClick: () -> Unit,
+    onLogoutClick: () -> Unit
 ) {
+
+    var showSyncDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var showLogSheet by remember {
+        mutableStateOf(false)
+    }
 
 
     Column(
@@ -80,12 +90,51 @@ fun SettingScreen(
         SettingContent(
             isLogin = isLogin,
             isChecked = isChecked,
-            onPersonalClick = onPersonalClick,
-            onSyncClick = onSyncClick,
+            onPersonalClick = {
+                showLogSheet = true
+            },
+            onSyncClick = {
+                showSyncDialog = true
+            },
             onLanguageClick = onLanguageClick,
             onFeedbackClick = onFeedbackClick,
             onAdsClick = onAdsClick,
             onCheckedChange = onCheckedChange
+        )
+
+    }
+
+    if (showSyncDialog) {
+        SyncDialog(
+            onDismiss = {
+                showSyncDialog = false
+            },
+            onDoneClick = {
+                showSyncDialog = false
+
+                // 同步成功后的处理
+                onSyncDone()
+            }
+        )
+    }
+
+    if (showLogSheet) {
+        LogBottomSheet(
+            isLogin = isLogin,
+
+            onDismiss = {
+                showLogSheet = false
+            },
+
+            onLoginClick = {
+                showLogSheet = false
+                onLoginClick()
+            },
+
+            onLogoutClick = {
+                showLogSheet = false
+                onLogoutClick()
+            }
         )
     }
 }
@@ -157,6 +206,17 @@ fun SettingContent(
             isLogin = isLogin,
             onAdsClick = onAdsClick,
             onFeedbackClick = onFeedbackClick
+        )
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 15.dp),
+            text = "version 1.0.0",
+            fontSize = 14.sp,
+            color = Color(0xFF000000),
+            fontFamily = FontFamily(Font(R.font.montserrat_regular)),
+            letterSpacing = (-0.01).em,
+            textAlign = TextAlign.Center
         )
 
     }
@@ -245,7 +305,7 @@ fun PersonalCard(
                     } else {
                         "Synchronize your data"
                     },
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     color = Color(0xFF444444),
                     fontFamily = FontFamily(
                         Font(R.font.montserrat_regular)

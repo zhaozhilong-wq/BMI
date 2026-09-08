@@ -31,28 +31,6 @@ import org.koin.androidx.viewmodel.ext.android.activityViewModel
  */
 class InputFragment : Fragment() {
 
-    private val months = listOf(
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "June",
-        "July",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec"
-    )
-    private val times = listOf(
-        R.string.morning,
-        R.string.afternoon,
-        R.string.evening,
-        R.string.night
-    )
-    private val ages = (2..99).toList()
-
     private val viewModel : InputViewModel by activityViewModel()
 
 
