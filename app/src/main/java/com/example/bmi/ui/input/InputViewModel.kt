@@ -11,6 +11,7 @@ import com.example.bmi.data.repository.BmiRepository
 import com.example.bmi.ui.result.ResultMode
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import kotlin.math.roundToInt
@@ -18,6 +19,8 @@ import kotlin.math.roundToInt
 class InputViewModel (
     private val repository: BmiRepository
 ) : ViewModel() {
+
+
     private val calendar = Calendar.getInstance()
 
     private val _uiState = MutableStateFlow(InputUiState(
@@ -28,6 +31,7 @@ class InputViewModel (
     ))
 
     val uiState = _uiState.asStateFlow()
+
 
     private val _toastEvent = MutableSharedFlow<Pair<Int, String>>()
     val toastEvent = _toastEvent.asSharedFlow()//用来监听事件
@@ -312,16 +316,12 @@ class InputViewModel (
     }
 
     fun selectHeightUnit(isCm: Boolean) {
-
         val currentState = _uiState.value
 
         if (currentState.isHeightCm == isCm) {
             return
         }
 
-        // =========================
-        // 用户从来没有编辑过
-        // =========================
         if (!currentState.heightChanged) {
 
             if (isCm) {
@@ -348,9 +348,6 @@ class InputViewModel (
             return
         }
 
-        // =========================
-        // 用户已经编辑过
-        // =========================
 
         if (isCm) {
 
@@ -414,8 +411,7 @@ class InputViewModel (
             currentState.copy(
                 heightCm = value,
                 heightCmText =
-                    formatHeight(value),
-                heightChanged = true
+                    formatHeight(value)
             )
     }
 
@@ -504,7 +500,6 @@ class InputViewModel (
             heightFtText = validFeet.toString(),
             heightInText = validInches.toString(),
             heightCm = heightCm,
-            heightChanged = true
         )
     }
 

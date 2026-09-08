@@ -3,6 +3,7 @@ package com.example.bmi.ui.input
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,12 +35,15 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -52,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.example.bmi.R
+import kotlinx.coroutines.launch
 
 @Preview
 @Composable
@@ -84,11 +89,20 @@ fun InputScreen(
     onCalculateClick: () -> Unit,
     onUserClick: () -> Unit
 ) {
+    val focusManager = LocalFocusManager.current
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFEAEAEE))
             .statusBarsPadding()
+            .clickable(
+                indication = null,
+                interactionSource = remember {
+                    MutableInteractionSource()
+                }
+            ) {
+                focusManager.clearFocus()
+            }
     ) {
 
         Column(
@@ -239,6 +253,7 @@ fun WeightSection(
             value = uiState.weightText,
             onValueChange = onWeightChanged,
             onFocusChanged = onWeightFocusChanged,
+            maxLength = 6,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(68.dp)
@@ -371,6 +386,7 @@ fun HeightSection(
                 value = uiState.heightCmText,
                 onValueChange = onHeightCmChanged,
                 onFocusChanged = onHeightCmFocusChanged,
+                maxLength = 5,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(68.dp)
@@ -428,11 +444,16 @@ private fun InputTextField(
     value: String,
     onValueChange: (String) -> Unit,
     onFocusChanged: (Boolean) -> Unit,
+    maxLength: Int,
     modifier: Modifier = Modifier
 ) {
     TextField(
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = { text ->
+            if (text.length <= maxLength) {
+                onValueChange(text)
+            }
+        },
         modifier = modifier
             .clip(RoundedCornerShape(15.dp))
             .onFocusChanged {
@@ -479,6 +500,7 @@ private fun HeightInputWithUnit(
             value = value,
             onValueChange = onValueChange,
             onFocusChanged = onFocusChanged,
+            maxLength = if (unit == "'") 2 else 1,
             modifier = Modifier.fillMaxSize()
         )
 
@@ -657,6 +679,12 @@ private fun AgePicker(
 
     val itemWidth = 70.dp
 
+    val flingBehavior = rememberSnapFlingBehavior(
+        lazyListState = listState
+    )
+
+    val scope = rememberCoroutineScope()
+
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxWidth()
@@ -673,6 +701,7 @@ private fun AgePicker(
 
         LazyRow(
             state = listState,
+            flingBehavior = flingBehavior,
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(
                 start = sidePadding,
@@ -691,6 +720,13 @@ private fun AgePicker(
                     selected = age == selectedAge,
                     onClick = {
                         onAgeSelected(age)
+
+                        // 点击后滑到中间
+                        scope.launch {
+                            listState.animateScrollToItem(
+                                index = age - 2
+                            )
+                        }
                     }
                 )
             }
@@ -709,6 +745,41 @@ private fun AgePicker(
         listState.scrollToItem(
             index = 25 - 2
         )
+    }
+
+    // 滑动结束后确定当前选中年龄
+    LaunchedEffect(listState) {
+
+        snapshotFlow {
+            listState.isScrollInProgress
+        }.collect { isScrolling ->
+
+            if (!isScrolling) {
+
+                val layoutInfo = listState.layoutInfo
+
+                val center =
+                    (layoutInfo.viewportStartOffset +
+                            layoutInfo.viewportEndOffset) / 2
+
+                val centerItem =
+                    layoutInfo.visibleItemsInfo.minByOrNull { item ->
+
+                        kotlin.math.abs(
+                            (item.offset + item.size / 2) - center
+                        )
+                    }
+
+                centerItem?.let { item ->
+
+                    val age = ages[item.index]
+
+                    if (age != selectedAge) {
+                        onAgeSelected(age)
+                    }
+                }
+            }
+        }
     }
 }
 

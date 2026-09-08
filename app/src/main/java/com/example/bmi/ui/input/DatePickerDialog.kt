@@ -3,6 +3,7 @@ package com.example.bmi.ui.input
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -172,7 +173,7 @@ class DatePickerDialog: DialogFragment() {
         yearAdapter = setupRecyclerView(
             binding.year,
             years,
-            currentYear - 1900,
+            selectedYear - 1900,
         ) { position ->
 
             selectedYear =
