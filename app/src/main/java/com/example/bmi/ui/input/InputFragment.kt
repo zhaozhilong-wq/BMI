@@ -33,38 +33,6 @@ class InputFragment : Fragment() {
 
     private val viewModel : InputViewModel by activityViewModel()
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        parentFragmentManager.setFragmentResultListener(
-            DatePickerDialog.REQUEST_KEY,
-            this
-        ) { _, bundle ->
-
-            val year = bundle.getInt(DatePickerDialog.KEY_YEAR)
-            val month = bundle.getInt(DatePickerDialog.KEY_MONTH)
-            val day = bundle.getInt(DatePickerDialog.KEY_DAY)
-
-            viewModel.selectDate(
-                year = year,
-                month = month,
-                day = day
-            )
-        }
-
-        parentFragmentManager.setFragmentResultListener(
-            TimePickerDialog.REQUEST_KEY,
-            this
-        ) { _, bundle ->
-
-            val timeSlot = bundle.getInt(
-                TimePickerDialog.KEY_TIME_SLOT
-            )
-
-            viewModel.selectTimeSlot(timeSlot)
-        }
-    }
-
     override fun onStop() {
         CustomPopup.dismiss()
         super.onStop()
@@ -108,26 +76,10 @@ class InputFragment : Fragment() {
                     onHeightUnitSelected =
                         viewModel::selectHeightUnit,
 
-                    onDateClick = {
-                        DatePickerDialog.newInstance(
-                            year = uiState.year,
-                            month = uiState.month,
-                            day = uiState.day
-                        ).show(
-                            parentFragmentManager,
-                            "DatePickerDialog"
-                        )
-                    },
+                    onDateSelected = viewModel::selectDate,
 
-                    onTimeClick = {
 
-                        TimePickerDialog.newInstance(
-                            selectedTime = uiState.timeSlot
-                        ).show(
-                            parentFragmentManager,
-                            "TimePickerDialog"
-                        )
-                    },
+                    onTimeSelected = viewModel::selectTimeSlot,
 
                     onAgeSelected = viewModel::selectAge,
 

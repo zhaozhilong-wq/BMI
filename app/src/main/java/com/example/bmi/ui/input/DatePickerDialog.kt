@@ -1,288 +1,170 @@
 package com.example.bmi.ui.input
 
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.os.Bundle
-import android.util.Log
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
-import androidx.fragment.app.DialogFragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSnapHelper
-import androidx.recyclerview.widget.RecyclerView
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.snapping.SnapPosition
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import com.example.bmi.R
-import com.example.bmi.databinding.DialogDatePickerBinding
-import java.util.Calendar
-
-class DatePickerDialog: DialogFragment() {
-
-    private lateinit var monthAdapter: PickerAdapter
-    private lateinit var dayAdapter: PickerAdapter
-    private lateinit var yearAdapter: PickerAdapter
+import kotlinx.coroutines.launch
 
 
-    private var _binding: DialogDatePickerBinding? = null
-    private val binding get() = _binding!!
-
-    private val calendar = Calendar.getInstance()
-
-    private val currentYear = calendar.get(Calendar.YEAR)
-
-    private var selectedYear: Int = currentYear
-
-    // 当前月份
-    // Calendar.MONTH：January = 0，December = 11
-    val currentMonth =
-        Calendar.getInstance().get(Calendar.MONTH)
-
-    // 当前日期
-    val currentDay =
-        Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
-
-    private var selectedMonth: Int = currentMonth
-
-    private var selectedDay: Int = currentDay
-
-    // 月份
-    val months = listOf(
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "June",
-        "July",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec"
+private val MontserratExtraBold =
+    FontFamily(
+        Font(R.font.montserrat_extrabold)
     )
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerBottomSheet(
+    year: Int,
+    month: Int,
+    day: Int,
 
-    override fun onCreate(savedInstanceState: Bundle?) {//处理Fragment重建后的状态恢复
-        super.onCreate(savedInstanceState)
-        selectedYear =
-            savedInstanceState?.getInt(KEY_YEAR)
-                ?: arguments?.getInt(KEY_YEAR)
-                        ?: currentYear
-        selectedMonth =
-            savedInstanceState?.getInt(KEY_MONTH)
-                ?: arguments?.getInt(KEY_MONTH)
-                        ?: currentMonth
-        selectedDay =
-            savedInstanceState?.getInt(KEY_DAY)
-                ?: arguments?.getInt(KEY_DAY)
-                        ?: currentDay
-    }
+    onDismiss: () -> Unit,
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    onDone: (
+        year: Int,
+        month: Int,
+        day: Int
+    ) -> Unit
+) {
 
-        _binding = DialogDatePickerBinding.inflate(
-            inflater,
-            container,
-            false
+    val sheetState =
+        rememberModalBottomSheetState(
+            skipPartiallyExpanded = true
         )
 
-        return binding.root
-    }
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
 
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
+        shape = RoundedCornerShape(
+            topStart = 24.dp,
+            topEnd = 24.dp,
+            bottomStart = 0.dp,
+            bottomEnd = 0.dp
+        ),
+
+        containerColor = Color(0xFFEAEAEE),
+
+        dragHandle = null
     ) {
-        super.onViewCreated(
-            view,
-            savedInstanceState
+
+        DatePickerContent(
+            year = year,
+            month = month,
+            day = day,
+
+            onCancel = onDismiss,
+
+            onDone = onDone
         )
-        setupDatePicker()
-        binding.cancel.setOnClickListener {
-            dismiss()
-        }
-        binding.done.setOnClickListener {
-            parentFragmentManager.setFragmentResult(
-                REQUEST_KEY,//向监听这个请求的Fragment发送结果
-                Bundle().apply {
-                    putInt(KEY_YEAR, selectedYear)
-                    putInt(KEY_MONTH, selectedMonth)
-                    putInt(KEY_DAY, selectedDay)
-                }
-            )
-            dismiss()
-        }
+    }
+}
+
+@Composable
+private fun DatePickerContent(
+    year: Int,
+    month: Int,
+    day: Int,
+
+    onCancel: () -> Unit,
+
+    onDone: (
+        Int,
+        Int,
+        Int
+    ) -> Unit
+) {
+
+    val calendar = remember {
+        java.util.Calendar.getInstance()
     }
 
-    override fun onStart() {
-        super.onStart()
+    val currentYear =
+        calendar.get(java.util.Calendar.YEAR)
 
-        dialog?.window?.apply {
+    val currentMonth =
+        calendar.get(java.util.Calendar.MONTH)
 
-            setGravity(Gravity.BOTTOM)
+    val currentDay =
+        calendar.get(java.util.Calendar.DAY_OF_MONTH)
 
-            setBackgroundDrawable(
-                ColorDrawable(Color.TRANSPARENT)
-            )
-
-            setLayout(
-                WindowManager.LayoutParams.MATCH_PARENT,
-                dpToPx(380f)
-            )
-        }
+    var selectedYear by remember {
+        mutableIntStateOf(year)
     }
 
-    private fun dpToPx(dp: Float): Int {
-        return (dp * resources.displayMetrics.density).toInt()
-    }
-    private fun setupDatePicker() {
-
-
-        // 月份
-        monthAdapter = setupRecyclerView(
-            binding.month,
-            getAvailableMonths(),
-            selectedMonth,
-        ) { position ->
-
-            selectedMonth = position
-
-            updateDay()
-        }
-
-        // 日期
-        dayAdapter = setupRecyclerView(
-            binding.day,
-            getAvailableDays(),
-            selectedDay - 1,
-        ) { position ->
-
-            selectedDay = position + 1
-        }
-
-        // 年份
-        val years =
-            (1900..currentYear)
-                .map { it.toString() }
-
-        yearAdapter = setupRecyclerView(
-            binding.year,
-            years,
-            selectedYear - 1900,
-        ) { position ->
-
-            selectedYear =
-                1900 + position
-
-            updateMonthAndDay()
-        }
+    var selectedMonth by remember {
+        mutableIntStateOf(month)
     }
 
-    private fun setupRecyclerView(
-        recyclerView: RecyclerView,
-        data: List<String>,
-        initialPosition: Int,
-        onItemSelected: (Int) -> Unit
-    ): PickerAdapter {
+    var selectedDay by remember {
+        mutableIntStateOf(day)
+    }
 
-        val layoutManager = LinearLayoutManager(
-            context,
-            RecyclerView.VERTICAL,
-            false
+    val months = remember {
+        listOf(
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "June",
+            "July",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
         )
-
-        recyclerView.layoutManager = layoutManager
-
-
-        lateinit var adapter: PickerAdapter
-
-        adapter = PickerAdapter(data,
-            itemLayoutId = R.layout.item_date_picker,
-            textViewId = R.id.tvDate) { position ->
-
-            recyclerView.smoothScrollToPosition(position)
-
-        }
-
-
-
-        recyclerView.adapter = adapter
-
-        adapter.setSelectedPosition(initialPosition)
-
-        recyclerView.setPadding(
-            0,
-            dpToPx(101f),
-            0,
-            dpToPx(101f)
-        )
-
-        val snapHelper = LinearSnapHelper()//实现滑动后自动吸附的辅助类
-        snapHelper.attachToRecyclerView(recyclerView)
-
-
-        recyclerView.addOnScrollListener(
-            object : RecyclerView.OnScrollListener() {
-
-                override fun onScrollStateChanged(
-                    recyclerView: RecyclerView,
-                    newState: Int
-                ) {
-
-                    super.onScrollStateChanged(
-                        recyclerView,
-                        newState
-                    )
-
-                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {//判断是否停止滚动，找到到前中间的item吸附并选中
-
-                        val snapView =
-                            snapHelper.findSnapView(
-                                layoutManager
-                            ) ?: return
-
-                        val position =
-                            layoutManager.getPosition(
-                                snapView
-                            )
-
-                        adapter.setSelectedPosition(position)
-
-                        onItemSelected(position)
-                    }
-                }
-            }
-        )
-
-        recyclerView.post {
-
-            layoutManager.scrollToPosition(initialPosition)
-
-            adapter.setSelectedPosition(
-                initialPosition
-            )
-
-            onItemSelected(
-                initialPosition
-            )
-        }
-
-        return adapter
     }
 
-
-
-
-    private fun getAvailableMonths(): List<String> {
+    fun getAvailableMonths(): List<String> {
 
         val maxMonth =
             if (selectedYear == currentYear) {
-                calendar.get(Calendar.MONTH)
+                currentMonth
             } else {
                 11
             }
@@ -290,31 +172,32 @@ class DatePickerDialog: DialogFragment() {
         return months.take(maxMonth + 1)
     }
 
-    private fun getAvailableDays(): List<String> {
+
+    fun getAvailableDays(): List<String> {
 
         val maxDay: Int
 
-        if (selectedYear == currentYear &&
-            selectedMonth == calendar.get(Calendar.MONTH)
+        if (
+            selectedYear == currentYear &&
+            selectedMonth == currentMonth
         ) {
 
-            maxDay =
-                calendar.get(Calendar.DAY_OF_MONTH)
+            maxDay = currentDay
 
         } else {
 
             val tempCalendar =
-                Calendar.getInstance()
+                java.util.Calendar.getInstance()
 
             tempCalendar.set(
                 selectedYear,
                 selectedMonth + 1,
                 0
-            )//设置为下个月第0天会得到当前月的最后一天
+            )
 
             maxDay =
                 tempCalendar.get(
-                    Calendar.DAY_OF_MONTH
+                    java.util.Calendar.DAY_OF_MONTH
                 )
         }
 
@@ -323,116 +206,466 @@ class DatePickerDialog: DialogFragment() {
         }
     }
 
-    private fun updateMonthAndDay() {
 
-        val availableMonths =
-            getAvailableMonths()
+    val availableMonths =
+        getAvailableMonths()
 
-        // 记录原来的月份
-        val oldSelectedMonth = selectedMonth
-        if (selectedMonth > availableMonths.lastIndex) {
-            selectedMonth =
-                availableMonths.lastIndex
-        }
-
-        // 更新月份列表
-        monthAdapter.updateData(
-            availableMonths
-        )
-
-        if (selectedMonth != oldSelectedMonth) {
+    val availableDays =
+        getAvailableDays()
 
 
-            binding.month.post {
-                binding.month.smoothScrollToPosition(selectedMonth)
-            }
-        }
+    if (selectedMonth > availableMonths.lastIndex) {
 
-        // 更新日期
-        updateDay()
+        selectedMonth =
+            availableMonths.lastIndex
     }
 
-    private fun updateDay() {
 
-        val availableDays =
-            getAvailableDays()
+    if (selectedDay > availableDays.size) {
 
-        // 记录原来的日期
-        val oldSelectedDay = selectedDay
+        selectedDay =
+            availableDays.size
+    }
 
-        // 只有原来的日期不存在了，才修正日期
-        if (selectedDay > availableDays.size) {
-            selectedDay = availableDays.size
+
+    val years =
+        remember(currentYear) {
+            (1900..currentYear).toList()
         }
 
-        // 更新日期列表
-        dayAdapter.updateData(
-            availableDays
+    val monthState =
+        rememberLazyListState()
+
+    val dayState =
+        rememberLazyListState()
+
+    val yearState =
+        rememberLazyListState()
+
+    LaunchedEffect(Unit) {
+
+        monthState.scrollToItem(
+            selectedMonth
         )
 
-        dayAdapter.setSelectedPosition(
+        dayState.scrollToItem(
             selectedDay - 1
         )
 
+        yearState.scrollToItem(
+            selectedYear - 1900
+        )
+    }
 
-        if (selectedDay == oldSelectedDay) {
-            return
+
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(380.dp)
+            .clip(
+                RoundedCornerShape(
+                    topStart = 24.dp,
+                    topEnd = 24.dp
+                )
+            )
+            .background(
+                Color(0xFFFFFFFF)
+            )
+    ) {
+
+        Text(
+            text =
+                stringResource(
+                    R.string.date
+                ),
+
+            fontSize = 20.sp,
+
+            color = Color.Black,
+
+            fontFamily =
+                MontserratExtraBold,
+
+            letterSpacing =
+                (-0.01).em,
+
+            modifier =
+                Modifier.padding(
+                    start = 20.dp,
+                    top = 20.dp
+                )
+        )
+
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    top = 25.dp
+                )
+        ) {
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(252.dp),
+
+                horizontalArrangement =
+                    Arrangement.Center
+            ) {
+
+                DatePickerColumn(
+                    items = availableMonths,
+
+                    selectedIndex = selectedMonth,
+
+                    state = monthState,
+
+                    onItemSelected = { index ->
+
+                        selectedMonth = index
+
+
+                    }
+                )
+
+                Spacer(
+                    modifier =
+                        Modifier.width(50.dp)
+                )
+
+                /*
+                 * Day
+                 */
+                DatePickerColumn(
+                    items = availableDays,
+
+                    selectedIndex = selectedDay - 1,
+
+                    state = dayState,
+
+                    onItemSelected = { index ->
+
+                        selectedDay = index + 1
+
+                    }
+                )
+
+                Spacer(
+                    modifier =
+                        Modifier.width(30.dp)
+                )
+
+                DatePickerColumn(
+                    items = years.map {
+                        it.toString()
+                    },
+
+                    selectedIndex = selectedYear - 1900,
+
+                    state = yearState,
+
+                    onItemSelected = { index ->
+
+                        selectedYear = years[index]
+
+                    }
+                )
+            }
         }
 
-        binding.day.post {
+        /*
+         * 剩余空间
+         */
+        Spacer(
+            modifier =
+                Modifier.weight(1f)
+        )
 
-            binding.day.smoothScrollToPosition(
-                selectedDay - 1
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    start = 20.dp,
+                    end = 20.dp,
+                    bottom = 15.dp
+                )
+                .height(50.dp)
+        ) {
+
+            /*
+             * Cancel
+             */
+            DateButton(
+                text =
+                    stringResource(
+                        R.string.cancel
+                    ),
+
+                backgroundColor =
+                    Color(0xFFF1F1F1),
+
+                textColor =
+                    Color.Black,
+
+                modifier =
+                    Modifier.weight(1f),
+
+                onClick =
+                    onCancel
             )
 
+            Spacer(
+                modifier =
+                    Modifier.width(15.dp)
+            )
+
+            DateButton(
+                text =
+                    stringResource(
+                        R.string.done
+                    ),
+
+                backgroundColor =
+                    Color(0xFF3659CF),
+
+                textColor =
+                    Color.White,
+
+                modifier =
+                    Modifier.weight(1f),
+
+                onClick = {
+
+                    onDone(
+                        selectedYear,
+                        selectedMonth,
+                        selectedDay
+                    )
+                }
+            )
         }
     }
+}
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+@Composable
+private fun DatePickerColumn(
+    items: List<String>,
+    selectedIndex: Int,
+    state: LazyListState,
+    onItemSelected: (Int) -> Unit
+) {
 
-    companion object {
+    val itemHeight = 36.dp
 
-        const val REQUEST_KEY =
-            "date_picker_result"
+    val flingBehavior =
+        rememberSnapFlingBehavior(
+            lazyListState = state,
+            snapPosition = SnapPosition.Center
+        )
 
-        const val KEY_YEAR =
-            "year"
+    val scope = rememberCoroutineScope()
 
-        const val KEY_MONTH =
-            "month"
+    BoxWithConstraints(
+        modifier = Modifier
+            .width(40.dp)
+            .height(252.dp)
+    ) {
 
-        const val KEY_DAY =
-            "day"
+        val sidePadding =
+            (maxHeight - itemHeight) / 2
 
-        fun newInstance(
-            year: Int,
-            month: Int,
-            day: Int
-        ): DatePickerDialog {
+        LazyColumn(
+            state = state,
 
-            return DatePickerDialog().apply {
-                arguments = Bundle().apply {
-                    putInt(
-                        KEY_YEAR,
-                        year
-                    )
-                    putInt(
-                        KEY_MONTH,
-                        month
-                    )
-                    putInt(
-                        KEY_DAY,
-                        day
+            flingBehavior =
+                flingBehavior,
+
+            modifier =
+                Modifier.fillMaxSize(),
+
+            contentPadding =
+                PaddingValues(
+                    top = sidePadding,
+                    bottom = sidePadding
+                ),
+
+            horizontalAlignment =
+                Alignment.CenterHorizontally
+        ) {
+
+            itemsIndexed(
+                items = items,
+
+                key = { index, _ ->
+                    index
+                }
+            ) { index, item ->
+
+                Box(
+                    modifier = Modifier
+                        .width(40.dp)
+                        .height(itemHeight)
+                        .clickable {
+
+                            scope.launch {
+
+                                state.animateScrollToItem(
+                                    index = index
+                                )
+                            }
+                        },
+
+                    contentAlignment =
+                        Alignment.Center
+                ) {
+
+                    Text(
+                        text = item,
+
+                        modifier =
+                            Modifier.fillMaxWidth(),
+
+                        textAlign =
+                            TextAlign.Center,
+
+                        fontSize = 14.sp,
+
+                        color =
+                            Color.Black.copy(
+                                alpha =
+                                    if (
+                                        index ==
+                                        selectedIndex
+                                    ) {
+                                        1f
+                                    } else {
+                                        0.3f
+                                    }
+                            ),
+
+                        fontFamily =
+                            MontserratExtraBold,
+
+                        letterSpacing =
+                            (-0.01).em
                     )
                 }
             }
         }
+
+        // 上 PickLine
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(
+                    y = sidePadding
+                )
+                .width(40.dp)
+                .height(1.dp)
+                .background(
+                    Color(0x803659CF)
+                )
+        )
+
+        // 下 PickLine
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(
+                    y = sidePadding + itemHeight
+                )
+                .width(40.dp)
+                .height(1.dp)
+                .background(
+                    Color(0x803659CF)
+                )
+        )
     }
 
+    //滑动结束
+    LaunchedEffect(state, items) {
 
+        snapshotFlow {
+            state.isScrollInProgress
+        }.collect { isScrolling ->
+
+            if (!isScrolling) {
+
+                val layoutInfo =
+                    state.layoutInfo
+
+                val center =
+                    (
+                            layoutInfo.viewportStartOffset +
+                                    layoutInfo.viewportEndOffset
+                            ) / 2
+
+                val centerItem =
+                    layoutInfo.visibleItemsInfo
+                        .minByOrNull { item ->
+
+                            kotlin.math.abs(
+                                (item.offset + item.size / 2) -
+                                        center
+                            )
+                        }
+
+                centerItem?.let { item ->
+
+                    if (item.index in items.indices) {
+
+                        onItemSelected(
+                            item.index
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
 
+@Composable
+private fun DateButton(
+    text: String,
+    backgroundColor: Color,
+    textColor: Color,
 
+    modifier: Modifier = Modifier,
+
+    onClick: () -> Unit
+) {
+
+    Box(
+        modifier = modifier
+            .height(50.dp)
+            .clip(
+                RoundedCornerShape(25.dp)
+            )
+            .background(
+                backgroundColor
+            )
+            .clickable {
+                onClick()
+            },
+
+        contentAlignment =
+            Alignment.Center
+    ) {
+
+        Text(
+            text = text,
+
+            fontSize = 18.sp,
+
+            color = textColor,
+
+            fontFamily =
+                MontserratExtraBold,
+
+            letterSpacing =
+                (-0.01).em
+        )
+    }
+}

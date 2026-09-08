@@ -34,8 +34,11 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,7 +65,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun InputScreenPreview() {
 //传入空值看效果
-    InputScreen(InputUiState(), onWeightChanged = {}, onWeightFocusChanged = {}, onWeightUnitSelected = {}, onHeightCmChanged = {}, onHeightFtChanged = {}, onHeightInChanged = {}, onHeightCmFocusChanged = {}, onHeightFtFocusChanged = {}, onHeightInFocusChanged = {}, onHeightUnitSelected = {}, onDateClick = {}, onTimeClick = {}, onAgeSelected = {}, onGenderSelected = {}, onCalculateClick = {}, onUserClick = {})
+    InputScreen(InputUiState(), onWeightChanged = {}, onWeightFocusChanged = {}, onWeightUnitSelected = {}, onHeightCmChanged = {}, onHeightFtChanged = {}, onHeightInChanged = {}, onHeightCmFocusChanged = {}, onHeightFtFocusChanged = {}, onHeightInFocusChanged = {}, onHeightUnitSelected = {}, onDateSelected = { _, _, _ -> }, onTimeSelected = {  }, onAgeSelected = {}, onGenderSelected = {}, onCalculateClick = {}, onUserClick = {})
 }
 
 
@@ -82,14 +85,22 @@ fun InputScreen(
     onHeightInFocusChanged: (Boolean) -> Unit,
     onHeightUnitSelected: (Boolean) -> Unit,
 
-    onDateClick: () -> Unit,
-    onTimeClick: () -> Unit,
+    onDateSelected: (Int, Int, Int) -> Unit,
+    onTimeSelected: (Int) -> Unit,
     onAgeSelected: (Int) -> Unit,
     onGenderSelected: (Boolean) -> Unit,
     onCalculateClick: () -> Unit,
     onUserClick: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
+
+    var showDatePicker by remember {
+        mutableStateOf(false)
+    }
+
+    var showTimePicker by remember {
+        mutableStateOf(false)
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -153,8 +164,12 @@ fun InputScreen(
 
                 DateTimeSection(
                     uiState = uiState,
-                    onDateClick = onDateClick,
-                    onTimeClick = onTimeClick
+                    onDateClick = {
+                        showDatePicker = true
+                    },
+                    onTimeClick = {
+                        showTimePicker = true
+                    }
                 )
 
                 AgeSection(
@@ -178,6 +193,49 @@ fun InputScreen(
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
         )
+
+        if (showDatePicker) {
+
+            DatePickerBottomSheet(
+                year = uiState.year,
+                month = uiState.month,
+                day = uiState.day,
+
+                onDismiss = {
+                    showDatePicker = false
+                },
+
+                onDone = { year, month, day ->
+
+                    showDatePicker = false
+
+                    onDateSelected(
+                        year,
+                        month,
+                        day
+                    )
+                }
+            )
+        }
+
+        if (showTimePicker) {
+
+            TimePickerBottomSheet(
+                timeSlot = uiState.timeSlot,
+
+                onDismiss = {
+                    showTimePicker = false
+                },
+
+                onDone = { timeSlot ->
+
+                    showTimePicker = false
+
+                    onTimeSelected(timeSlot)
+                }
+            )
+        }
+
     }
 }
 

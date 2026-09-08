@@ -1,270 +1,455 @@
 package com.example.bmi.ui.input
 
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.os.Bundle
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
-import androidx.fragment.app.DialogFragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSnapHelper
-import androidx.recyclerview.widget.RecyclerView
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.snapping.SnapPosition
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import com.example.bmi.R
-import com.example.bmi.databinding.DialogTimePickerBinding
+import kotlinx.coroutines.launch
 
-class TimePickerDialog: DialogFragment() {
-
-    private var _binding: DialogTimePickerBinding? = null
-    private val binding get() = _binding!!
-
-    private lateinit var timeAdapter: PickerAdapter
-
-    private val times by lazy {
-        listOf(
-        getString(R.string.morning),
-        getString(R.string.afternoon),
-        getString(R.string.evening),
-        getString(R.string.night)
+private val MontserratExtraBold =
+    FontFamily(
+        Font(R.font.montserrat_extrabold)
     )
-    }
 
-    private var selectedTime = 0
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimePickerBottomSheet(
+    timeSlot: Int,
 
-        selectedTime = arguments?.getInt(
-            ARG_SELECTED_TIME,
-            getCurrentTimeSlot()
-        ) ?: getCurrentTimeSlot()
-    }
+    onDismiss: () -> Unit,
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    onDone: (Int) -> Unit
+) {
 
-        _binding = DialogTimePickerBinding.inflate(
-            inflater,
-            container,
-            false
+    val sheetState =
+        rememberModalBottomSheetState(
+            skipPartiallyExpanded = true
         )
 
-        return binding.root
-    }
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+        sheetState = sheetState,
 
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
+        shape = RoundedCornerShape(
+            topStart = 24.dp,
+            topEnd = 24.dp,
+            bottomStart = 0.dp,
+            bottomEnd = 0.dp
+        ),
+
+        containerColor = Color(0xFFEAEAEE),
+
+        dragHandle = null
     ) {
 
-        setupTimePicker()
+        TimePickerContent(
+            timeSlot = timeSlot,
 
-        binding.cancel.setOnClickListener {
-            dismiss()
-        }
+            onCancel = onDismiss,
 
-        binding.done.setOnClickListener {
+            onDone = onDone
+        )
+    }
+}
 
-            parentFragmentManager.setFragmentResult(
-                REQUEST_KEY,
-                Bundle().apply {
-                    putInt(
-                        KEY_TIME_SLOT,
-                        selectedTime
-                    )
+
+@Composable
+private fun TimePickerContent(
+    timeSlot: Int,
+
+    onCancel: () -> Unit,
+
+    onDone: (Int) -> Unit
+) {
+
+    var selectedTime by remember {
+        mutableIntStateOf(timeSlot)
+    }
+
+    val times = listOf(
+        stringResource(R.string.morning),
+        stringResource(R.string.afternoon),
+        stringResource(R.string.evening),
+        stringResource(R.string.night)
+    )
+
+    val timeState =
+        rememberLazyListState()
+
+    val scope =
+        rememberCoroutineScope()
+
+    /*
+     * 初始化到当前选中的时间
+     */
+    LaunchedEffect(Unit) {
+
+        timeState.scrollToItem(
+            selectedTime
+        )
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(380.dp)
+            .clip(
+                RoundedCornerShape(
+                    topStart = 24.dp,
+                    topEnd = 24.dp
+                )
+            )
+            .background(Color.White)
+    ) {
+
+        Text(
+            text = stringResource(R.string.log_weight_time),
+
+            fontSize = 20.sp,
+
+            color = Color.Black,
+
+            fontFamily = MontserratExtraBold,
+
+            letterSpacing = (-0.01).em,
+
+            modifier = Modifier.padding(
+                start = 20.dp,
+                top = 20.dp
+            )
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 25.dp)
+        ) {
+
+            TimePickerColumn(
+                items = times,
+
+                selectedIndex = selectedTime,
+
+                state = timeState,
+
+                onItemSelected = { index ->
+
+                    selectedTime = index
+
                 }
             )
-
-            dismiss()
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        dialog?.window?.apply {
-
-            setGravity(Gravity.BOTTOM)
-
-            setBackgroundDrawable(
-                ColorDrawable(Color.TRANSPARENT)
-            )
-
-            setLayout(
-                WindowManager.LayoutParams.MATCH_PARENT,
-                dpToPx(380f)
-            )
-        }
-    }
-
-    private fun dpToPx(dp: Float): Int {
-        return (dp * resources.displayMetrics.density).toInt()
-    }
-
-    private fun setupTimePicker() {
-
-        timeAdapter = setupRecyclerView(
-            binding.time,
-            times,
-            selectedTime
-        ) { position ->
-
-            selectedTime = position
-        }
-    }
-
-    private fun setupRecyclerView(
-        recyclerView: RecyclerView,
-        data: List<String>,
-        initialPosition: Int,
-        onItemSelected: (Int) -> Unit
-    ): PickerAdapter {
-
-        val layoutManager =
-            LinearLayoutManager(
-                context,
-                RecyclerView.VERTICAL,
-                false
-            )
-
-        recyclerView.layoutManager =
-            layoutManager
-
-        var adapter = PickerAdapter(
-            data,
-            itemLayoutId = R.layout.item_time_picker,
-            textViewId = R.id.tvTime
-        ) { position ->
-
-            // 点击后平滑滚动
-            recyclerView.smoothScrollToPosition(
-                position
-            )
         }
 
-        recyclerView.adapter = adapter
-
-        adapter.setSelectedPosition(
-            initialPosition
+        Spacer(
+            modifier = Modifier.weight(1f)
         )
 
-        // 和日期选择器保持一致
-        recyclerView.setPadding(
-            0,
-            dpToPx(101f),
-            0,
-            dpToPx(101f)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    start = 20.dp,
+                    end = 20.dp,
+                    bottom = 15.dp
+                )
+                .height(50.dp)
+        ) {
+
+            TimeButton(
+                text = stringResource(R.string.cancel),
+
+                backgroundColor = Color(0xFFF1F1F1),
+
+                textColor = Color.Black,
+
+                modifier = Modifier.weight(1f),
+
+                onClick = onCancel
+            )
+
+            Spacer(
+                modifier = Modifier.width(15.dp)
+            )
+
+            TimeButton(
+                text = stringResource(R.string.done),
+
+                backgroundColor = Color(0xFF3659CF),
+
+                textColor = Color.White,
+
+                modifier = Modifier.weight(1f),
+
+                onClick = {
+
+                    onDone(selectedTime)
+
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun TimePickerColumn(
+    items: List<String>,
+    selectedIndex: Int,
+    state: LazyListState,
+    onItemSelected: (Int) -> Unit
+) {
+
+    val itemHeight = 36.dp
+
+    val flingBehavior =
+        rememberSnapFlingBehavior(
+            lazyListState = state,
+            snapPosition = SnapPosition.Center
         )
+    val scope =
+        rememberCoroutineScope()
 
-        val snapHelper =
-            LinearSnapHelper()
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(252.dp)
+    ) {
 
-        snapHelper.attachToRecyclerView(
-            recyclerView
-        )
+        val sidePadding =
+            (maxHeight - itemHeight) / 2
 
+        LazyColumn(
+            state = state,
 
-        recyclerView.addOnScrollListener(
-            object : RecyclerView.OnScrollListener() {
+            flingBehavior = flingBehavior,
 
-                override fun onScrollStateChanged(
-                    recyclerView: RecyclerView,
-                    newState: Int
+            modifier = Modifier.fillMaxSize(),
+
+            contentPadding = PaddingValues(
+                top = sidePadding,
+                bottom = sidePadding
+            ),
+
+            horizontalAlignment =
+                Alignment.CenterHorizontally
+        ) {
+
+            itemsIndexed(
+                items = items,
+
+                key = { index, _ ->
+                    index
+                }
+            ) { index, item ->
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(itemHeight)
+                        .clickable {
+
+                            scope.launch {
+                                state.animateScrollToItem(
+                                    index
+                                )
+                            }
+                        },
+
+                    contentAlignment =
+                        Alignment.Center
                 ) {
 
-                    super.onScrollStateChanged(
-                        recyclerView,
-                        newState
+                    Text(
+                        text = item,
+
+                        modifier =
+                            Modifier.fillMaxWidth(),
+
+                        textAlign =
+                            TextAlign.Center,
+
+                        fontSize = 14.sp,
+
+                        color =
+                            Color.Black.copy(
+                                alpha =
+                                    if (
+                                        index ==
+                                        selectedIndex
+                                    ) {
+                                        1f
+                                    } else {
+                                        0.3f
+                                    }
+                            ),
+
+                        fontFamily =
+                            MontserratExtraBold,
+
+                        letterSpacing =
+                            (-0.01).em
                     )
+                }
+            }
+        }
 
-                    if (
-                        newState ==
-                        RecyclerView.SCROLL_STATE_IDLE
-                    ) {
+        /*
+         * 上 PickLine
+         */
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(
+                    y = sidePadding
+                )
+                .width(80.dp)
+                .height(1.dp)
+                .background(
+                    Color(0x803659CF)
+                )
+        )
 
-                        val snapView =
-                            snapHelper.findSnapView(
-                                layoutManager
-                            ) ?: return
+        /*
+         * 下 PickLine
+         */
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(
+                    y = sidePadding + itemHeight
+                )
+                .width(80.dp)
+                .height(1.dp)
+                .background(
+                    Color(0x803659CF)
+                )
+        )
+    }
 
-                        val position =
-                            layoutManager.getPosition(
-                                snapView
+    /*
+     * 滑动结束：
+     *
+     * 找真正处于中间的 item
+     */
+    LaunchedEffect(state) {
+
+        snapshotFlow {
+            state.isScrollInProgress
+        }.collect { isScrolling ->
+
+            if (!isScrolling) {
+
+                val layoutInfo =
+                    state.layoutInfo
+
+                val center =
+                    (
+                            layoutInfo.viewportStartOffset +
+                                    layoutInfo.viewportEndOffset
+                            ) / 2
+
+                val centerItem =
+                    layoutInfo.visibleItemsInfo
+                        .minByOrNull { item ->
+
+                            kotlin.math.abs(
+                                (item.offset + item.size / 2) -
+                                        center
                             )
+                        }
 
-                        adapter.setSelectedPosition(
-                            position
+                centerItem?.let { item ->
+
+                    if (item.index in items.indices) {
+
+                        onItemSelected(
+                            item.index
                         )
-
-                        onItemSelected(position)
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun TimeButton(
+    text: String,
+    backgroundColor: Color,
+    textColor: Color,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+
+    Box(
+        modifier = modifier
+            .height(50.dp)
+            .clip(
+                RoundedCornerShape(25.dp)
+            )
+            .background(backgroundColor)
+            .clickable {
+                onClick()
+            },
+
+        contentAlignment = Alignment.Center
+    ) {
+
+        Text(
+            text = text,
+
+            fontSize = 18.sp,
+
+            color = textColor,
+
+            fontFamily =
+                MontserratExtraBold,
+
+            letterSpacing =
+                (-0.01).em
         )
-
-        // 初始化到 Morning
-
-        adapter.setSelectedPosition(initialPosition)
-
-        recyclerView.post {
-
-            layoutManager.scrollToPosition(initialPosition)
-
-            adapter.setSelectedPosition(initialPosition)
-            onItemSelected(initialPosition)
-        }
-
-        return adapter
     }
-
-    private fun getCurrentTimeSlot(): Int {
-
-        val hour = java.util.Calendar.getInstance()
-            .get(java.util.Calendar.HOUR_OF_DAY)
-
-        return when (hour) {
-            in 6..11 -> 0       // Morning
-            in 12..17 -> 1      // Afternoon
-            in 18..21 -> 2      // Evening
-            else -> 3           // Night
-        }
-    }
-
-    companion object {
-
-        const val REQUEST_KEY =
-            "TimePickerDialogResult"
-
-        const val KEY_TIME_SLOT =
-            "time_slot"
-
-        private const val ARG_SELECTED_TIME =
-            "selected_time"
-
-        fun newInstance(
-            selectedTime: Int
-        ): TimePickerDialog {
-
-            return TimePickerDialog().apply {
-
-                arguments = Bundle().apply {
-                    putInt(
-                        ARG_SELECTED_TIME,
-                        selectedTime
-                    )
-                }
-            }
-        }
-    }
-
 }
