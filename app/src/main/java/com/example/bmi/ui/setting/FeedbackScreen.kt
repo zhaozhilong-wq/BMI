@@ -124,8 +124,8 @@ fun InputArea(onSaveClick: () -> Unit)
             placeholder = { Text(text = stringResource(R.string.feedback_or_suggestion),
                 fontSize = 16.sp,
                 fontFamily = FontFamily(Font(R.font.montserrat_regular)),
-                color = Color.Black,
-                letterSpacing = (-0.01).em) },
+                color = Color.Black.copy(alpha = 0.5f),
+                letterSpacing = (-0.01).em)},
             textStyle = androidx.compose.ui.text.TextStyle(
                 fontSize = 16.sp,
                 fontFamily = FontFamily(Font(R.font.montserrat_regular)),
