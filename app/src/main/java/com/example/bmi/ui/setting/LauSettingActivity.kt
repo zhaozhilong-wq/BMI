@@ -16,9 +16,6 @@ import java.util.Locale
 
 class LauSettingActivity : AppCompatActivity() {
 
-    private val viewModel : SplashViewModel by viewModel()
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,43 +49,12 @@ class LauSettingActivity : AppCompatActivity() {
                 },
 
                 onLanguageClick = { language ->
-
-                    lifecycleScope.launch {
-
-                        // 判断是不是新用户
-                        val isNewUser = viewModel.isNewUser()
-
-                        // 根据用户状态决定进入哪个页面
-                        val targetActivity =
-                            if (isNewUser) {
-                                InputActivity::class.java
-                            } else {
-                                MainActivity::class.java
-                            }
-
-                        // 修改 App Locale
-                        AppCompatDelegate.setApplicationLocales(
-                            LocaleListCompat.forLanguageTags(
-                                language.code
-                            )
+                    // 修改 App Locale
+                    AppCompatDelegate.setApplicationLocales(
+                        LocaleListCompat.forLanguageTags(
+                            language.code
                         )
-
-                        // 清掉当前 Activity 栈
-                        val intent = Intent(
-                            this@LauSettingActivity,
-                            targetActivity
-                        ).apply {
-                            addFlags(
-                                Intent.FLAG_ACTIVITY_NEW_TASK or
-                                        Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            )
-                        }
-
-                        startActivity(intent)
-
-                        // 不播放 Activity 切换动画
-                        overridePendingTransition(0, 0)
-                    }
+                    )
                 }
             )
         }

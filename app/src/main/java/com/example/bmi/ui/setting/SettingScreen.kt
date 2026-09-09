@@ -55,17 +55,8 @@ import com.example.bmi.R
 
 @Composable
 fun SettingScreen(
-    isLogin: Boolean,
-    isChecked: Boolean,
-
-    onBackClick: () -> Unit,
-    onLanguageClick: () -> Unit,
-    onFeedbackClick: () -> Unit,
-    onAdsClick: () -> Unit,
-    onCheckedChange: (Boolean) -> Unit,
-    onSyncDone: () -> Unit,
-    onLoginClick: () -> Unit,
-    onLogoutClick: () -> Unit
+    uiState: SettingUiState,
+    onIntent: (SettingIntent) -> Unit
 ) {
 
     var showSyncDialog by remember {
@@ -84,22 +75,32 @@ fun SettingScreen(
             .statusBarsPadding()
     ) {
         SettingTopBar(
-            onBack = onBackClick
+            onBack = {
+                onIntent(SettingIntent.BackClick)
+            }
         )
 
         SettingContent(
-            isLogin = isLogin,
-            isChecked = isChecked,
+            isLogin = uiState.isLogin,
+            isChecked = uiState.isChecked,
             onPersonalClick = {
                 showLogSheet = true
             },
             onSyncClick = {
                 showSyncDialog = true
             },
-            onLanguageClick = onLanguageClick,
-            onFeedbackClick = onFeedbackClick,
-            onAdsClick = onAdsClick,
-            onCheckedChange = onCheckedChange
+            onLanguageClick = {
+                onIntent(SettingIntent.LanguageClick)
+            },
+            onFeedbackClick = {
+                onIntent(SettingIntent.FeedbackClick)
+            },
+            onAdsClick = {
+                onIntent(SettingIntent.AdsClick)
+            },
+            onCheckedChange = {
+                onIntent(SettingIntent.CheckedChange(it))
+            }
         )
 
     }
@@ -113,14 +114,14 @@ fun SettingScreen(
                 showSyncDialog = false
 
                 // 同步成功后的处理
-                onSyncDone()
+                onIntent(SettingIntent.SyncDone)
             }
         )
     }
 
     if (showLogSheet) {
         LogBottomSheet(
-            isLogin = isLogin,
+            isLogin = uiState.isLogin,
 
             onDismiss = {
                 showLogSheet = false
@@ -128,12 +129,12 @@ fun SettingScreen(
 
             onLoginClick = {
                 showLogSheet = false
-                onLoginClick()
+                onIntent(SettingIntent.LoginClick)
             },
 
             onLogoutClick = {
                 showLogSheet = false
-                onLogoutClick()
+                onIntent(SettingIntent.LogoutClick)
             }
         )
     }

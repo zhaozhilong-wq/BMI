@@ -107,7 +107,7 @@ fun InputScreen(
             .fillMaxSize()
             .background(Color(0xFFEAEAEE))
             .statusBarsPadding()
-            .navigationBarsPadding()
+
             .clickable(
                 indication = null,
                 interactionSource = remember {
@@ -522,8 +522,10 @@ private fun InputTextField(
     TextField(
         value = value,
         onValueChange = { text ->
-            if (text.length <= maxLength) {
-                onValueChange(text)
+            if (text.matches(Regex("^\\d*\\.?\\d*$"))) {
+                if (text.length <= maxLength) {
+                    onValueChange(text)
+                }
             }
         },
         modifier = modifier

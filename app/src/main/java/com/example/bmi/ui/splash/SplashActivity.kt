@@ -10,7 +10,9 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.bmi.ui.input.InputActivity
 import com.example.bmi.ui.main.MainActivity
 import kotlinx.coroutines.launch
@@ -33,10 +35,14 @@ class SplashActivity : AppCompatActivity() {
                 Color.TRANSPARENT
             )
         )
+        observeEffect()
+
         setContent {
             SplashScreen(
                 onAnimationEnd = {
-                    goNext()
+                    viewModel.onIntent(
+                        SplashIntent.AnimationEnd
+                    )
                 }
             )
         }
@@ -44,27 +50,47 @@ class SplashActivity : AppCompatActivity() {
 
 
 
-    private fun goNext() {
+    private fun observeEffect() {
+
         lifecycleScope.launch {
 
-            val isNewUser = viewModel.isNewUser()
+            repeatOnLifecycle(
+                Lifecycle.State.STARTED
+            ) {
 
-            val targetActivity = if (isNewUser) {
-                InputActivity::class.java
-            } else {
-                MainActivity::class.java
-            }
+                viewModel.effect.collect { effect ->
 
-            startActivity(
-                Intent(
-                    this@SplashActivity,
-                    targetActivity
-                ).apply {
-                    putExtra("open_page", 1)
+                    when (effect) {
+
+                        SplashEffect.OpenInput -> {
+                            startActivity(
+                                Intent(
+                                    this@SplashActivity,
+                                    InputActivity::class.java
+                                )
+                            )
+
+                            finish()
+                        }
+
+                        SplashEffect.OpenMain -> {
+                            startActivity(
+                                Intent(
+                                    this@SplashActivity,
+                                    MainActivity::class.java
+                                ).apply {
+                                    putExtra(
+                                        "open_page",
+                                        1
+                                    )
+                                }
+                            )
+
+                            finish()
+                        }
+                    }
                 }
-            )
-
-            finish()
+            }
         }
     }
 }
