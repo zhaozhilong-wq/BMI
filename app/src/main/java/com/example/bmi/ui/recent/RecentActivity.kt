@@ -7,10 +7,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.bmi.R
 import com.example.bmi.ui.CustomPopup
 import com.example.bmi.ui.result.ResultActivity
 import com.example.bmi.ui.result.ResultMode
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class RecentActivity : AppCompatActivity() {
@@ -26,20 +29,13 @@ class RecentActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        observeEffect()
+
         setContent {
-            val recordLists by viewModel.records.collectAsStateWithLifecycle()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             RecentScreen(
-                onBackClick = { finish() },
-                onItemClick = { id ->
-                    resultLauncher.launch(
-                        ResultActivity.newIntent(
-                            this,
-                            ResultMode.HISTORY,
-                            id
-                        )
-                    )
-                },
-                recordLists = recordLists
+                uiState = uiState,
+                onIntent = viewModel::onIntent
             )
         }
 
@@ -68,4 +64,37 @@ class RecentActivity : AppCompatActivity() {
                 }
             }
         }
+
+    private fun observeEffect() {
+
+        lifecycleScope.launch {
+
+            repeatOnLifecycle(
+                androidx.lifecycle.Lifecycle.State.STARTED
+            ) {
+
+                viewModel.effect.collect { effect ->
+
+                    when (effect) {
+
+                        RecentEffect.NavigateBack -> {
+                            finish()
+                        }
+
+                        is RecentEffect.OpenHistory -> {
+
+                            resultLauncher.launch(
+                                ResultActivity.newIntent(
+                                    this@RecentActivity,
+                                    ResultMode.HISTORY,
+                                    effect.recordId
+                                )
+                            )
+                        }
+
+                    }
+                }
+            }
+        }
+    }
 }

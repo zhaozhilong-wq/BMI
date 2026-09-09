@@ -55,9 +55,8 @@ import com.example.bmi.ui.result.category.BmiClassifier
 
 @Composable
 fun RecentScreen(
-    onBackClick: () -> Unit,
-    onItemClick: (id: Long) -> Unit,
-    recordLists : List<BmiRecord>
+    uiState: RecentUiState,
+    onIntent: (RecentIntent) -> Unit
 )
 {
     Column(
@@ -67,8 +66,8 @@ fun RecentScreen(
             .statusBarsPadding()
             .navigationBarsPadding()
     ) {
-        HeaderRecent(onBackClick = onBackClick)
-        BMIRecordList(onItemClick = onItemClick, recordLists = recordLists)
+        HeaderRecent(onBackClick = { onIntent(RecentIntent.BackClick) })
+        BMIRecordList(onItemClick = { onIntent(RecentIntent.RecordClick(it)) }, recordLists = uiState.records)
     }
 }
 
