@@ -5,102 +5,150 @@ import androidx.lifecycle.viewModelScope
 import com.example.bmi.R
 import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.data.repository.BmiRepository
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Locale
 
+data class StatisticsUiState(
+    val currentInterval: ChartInterval = ChartInterval.DAY,
+
+    val dailyBmi: List<ChartPoint> = emptyList(),
+    val dailyWeight: List<ChartPoint> = emptyList(),
+
+    val weeklyBmi: List<ChartPoint> = emptyList(),
+    val weeklyWeight: List<ChartPoint> = emptyList(),
+
+    val monthlyBmi: List<ChartPoint> = emptyList(),
+    val monthlyWeight: List<ChartPoint> = emptyList(),
+
+    val timeMarkers: List<TimeMarker> = emptyList()
+)
+
+sealed interface StatisticsIntent {
+
+    data class IntervalClick(
+        val interval: ChartInterval
+    ) : StatisticsIntent
+
+    data object UpdateClick : StatisticsIntent
+}
+
+sealed interface StatisticsEffect {
+
+    data object NavigateToInput : StatisticsEffect
+}
+
 class StatisticsViewModel( private val repository: BmiRepository
 ) : ViewModel() {
-    private val _dailyBmi =
-        MutableStateFlow<List<ChartPoint>>(emptyList())
+    private val _uiState =
+        MutableStateFlow(
+            StatisticsUiState()
+        )
 
-    val dailyBmi =
-        _dailyBmi.asStateFlow()
+    val uiState =
+        _uiState.asStateFlow()
 
-    private val _dailyWeight =
-        MutableStateFlow<List<ChartPoint>>(emptyList())
+    private val _effect =
+        MutableSharedFlow<StatisticsEffect>()
 
-    val dailyWeight =
-        _dailyWeight.asStateFlow()
-
-    private val _weeklyBmi =
-        MutableStateFlow<List<ChartPoint>>(emptyList())
-
-    val weeklyBmi =
-        _weeklyBmi.asStateFlow()
-
-    private val _weeklyWeight =
-        MutableStateFlow<List<ChartPoint>>(emptyList())
-
-    val weeklyWeight =
-        _weeklyWeight.asStateFlow()
-
-    private val _monthlyBmi =
-        MutableStateFlow<List<ChartPoint>>(emptyList())
-
-    val monthlyBmi =
-        _monthlyBmi.asStateFlow()
-
-    private val _monthlyWeight =
-        MutableStateFlow<List<ChartPoint>>(emptyList())
-
-    val monthlyWeight =
-        _monthlyWeight.asStateFlow()
-
-    private val _timeMarkers =
-        MutableStateFlow<List<TimeMarker>>(emptyList())
-
-    val timeMarkers =
-        _timeMarkers.asStateFlow()
-
-    private var currentInterval = ChartInterval.DAY
-
-
-    fun setInterval(interval: ChartInterval) {
-
-        currentInterval = interval
-
-        _timeMarkers.value =
-            buildTimeMarkers(currentInterval)
-    }
-
-
+    val effect =
+        _effect.asSharedFlow()
 
 
     init {
         viewModelScope.launch {
-            repository.getAllRecords().collect { records ->
-                _dailyBmi.value =
-                    buildDailyData(records) { it.bmi.toFloat() }
-                _dailyWeight.value =
-                    buildDailyData(records) { it.weightKg.toFloat() }
 
-                _weeklyBmi.value =
-                    buildWeeklyData(records) {
-                        it.bmi.toFloat()
+            repository.getAllRecords()
+                .collect { records ->
+
+                    _uiState.update { state ->
+
+                        state.copy(
+                            dailyBmi =
+                                buildDailyData(records) {
+                                    it.bmi.toFloat()
+                                },
+
+                            dailyWeight =
+                                buildDailyData(records) {
+                                    it.weightKg.toFloat()
+                                },
+
+                            weeklyBmi =
+                                buildWeeklyData(records) {
+                                    it.bmi.toFloat()
+                                },
+
+                            weeklyWeight =
+                                buildWeeklyData(records) {
+                                    it.weightKg.toFloat()
+                                },
+
+                            monthlyBmi =
+                                buildMonthlyData(records) {
+                                    it.bmi.toFloat()
+                                },
+
+                            monthlyWeight =
+                                buildMonthlyData(records) {
+                                    it.weightKg.toFloat()
+                                },
+
+                            timeMarkers =
+                                buildTimeMarkers(
+                                    state.currentInterval
+                                )
+                        )
                     }
+                }
+        }
+    }
 
-                _weeklyWeight.value =
-                    buildWeeklyData(records) {
-                        it.weightKg.toFloat()
-                    }
 
-                _monthlyBmi.value =
-                    buildMonthlyData(records) {
-                        it.bmi.toFloat()
-                    }
+    fun onIntent(
+        intent: StatisticsIntent
+    ) {
 
-                _monthlyWeight.value =
-                    buildMonthlyData(records) {
-                        it.weightKg.toFloat()
-                    }
+        when (intent) {
 
-                _timeMarkers.value = buildTimeMarkers(currentInterval)
+            is StatisticsIntent.IntervalClick -> {
+
+                _uiState.update { state ->
+
+                    state.copy(
+                        currentInterval = intent.interval,
+                        timeMarkers =
+                            buildTimeMarkers(
+                                intent.interval
+                            )
+                    )
+                }
+            }
+
+
+            StatisticsIntent.UpdateClick -> {
+
+                sendEffect(
+                    StatisticsEffect.NavigateToInput
+                )
             }
         }
     }
+
+
+    private fun sendEffect(
+        effect: StatisticsEffect
+    ) {
+        viewModelScope.launch {
+            _effect.emit(effect)
+        }
+    }
+
 
     private fun buildDailyData(
         records: List<BmiRecord>,

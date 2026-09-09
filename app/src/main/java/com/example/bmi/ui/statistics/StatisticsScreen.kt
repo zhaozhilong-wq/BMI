@@ -40,25 +40,17 @@ import com.example.bmi.R
 import com.example.bmi.ui.ChartType
 import com.example.bmi.ui.StatisticsChartView
 
-@Preview
-@Composable
-fun StatisticsPreview()
-{
-    StatisticsScreen(onUpdateClick = {}, currentInterval = ChartInterval.DAY, onIntervalClick = {}, dailyBmi = emptyList(), dailyWeight = emptyList(), weeklyBmi = emptyList(), weeklyWeight = emptyList(), monthlyBmi = emptyList(), monthlyWeight = emptyList(), timeMarkers = emptyList())
-}
+//@Preview
+//@Composable
+//fun StatisticsPreview()
+//{
+//    StatisticsScreen(onUpdateClick = {}, currentInterval = ChartInterval.DAY, onIntervalClick = {}, dailyBmi = emptyList(), dailyWeight = emptyList(), weeklyBmi = emptyList(), weeklyWeight = emptyList(), monthlyBmi = emptyList(), monthlyWeight = emptyList(), timeMarkers = emptyList())
+//}
 
 
 @Composable
-fun StatisticsScreen(onUpdateClick: () -> Unit,
-                     currentInterval: ChartInterval,
-                     dailyBmi: List<ChartPoint>,
-                     dailyWeight: List<ChartPoint>,
-                     weeklyBmi: List<ChartPoint>,
-                     weeklyWeight: List<ChartPoint>,
-                     monthlyBmi: List<ChartPoint>,
-                     monthlyWeight: List<ChartPoint>,
-                     timeMarkers: List<TimeMarker>,
-                     onIntervalClick: (ChartInterval) -> Unit)
+fun StatisticsScreen(uiState: StatisticsUiState,
+                     onIntent: (StatisticsIntent) -> Unit)
 {
     Box(modifier = Modifier
         .fillMaxSize()
@@ -70,16 +62,8 @@ fun StatisticsScreen(onUpdateClick: () -> Unit,
             StatisticsTopBar()
 
             StatisticsContent(
-                currentInterval = currentInterval,
-                onIntervalClick = onIntervalClick,
-                dailyBmi = dailyBmi,
-                dailyWeight = dailyWeight,
-                weeklyBmi = weeklyBmi,
-                weeklyWeight = weeklyWeight,
-                monthlyBmi = monthlyBmi,
-                monthlyWeight = monthlyWeight,
-                timeMarkers = timeMarkers,
-                onUpdateClick = onUpdateClick)
+                uiState = uiState,
+                onIntent = onIntent)
         }
     }
 }
@@ -101,16 +85,10 @@ fun StatisticsTopBar()
 }
 
 @Composable
-fun StatisticsContent(currentInterval: ChartInterval,
-                      onIntervalClick: (ChartInterval) -> Unit,
-                      dailyBmi: List<ChartPoint>,
-                      dailyWeight: List<ChartPoint>,
-                      weeklyBmi: List<ChartPoint>,
-                      weeklyWeight: List<ChartPoint>,
-                      monthlyBmi: List<ChartPoint>,
-                      monthlyWeight: List<ChartPoint>,
-                      timeMarkers: List<TimeMarker>,
-                      onUpdateClick: () -> Unit) {
+fun StatisticsContent(
+    uiState: StatisticsUiState,
+    onIntent: (StatisticsIntent) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -118,23 +96,35 @@ fun StatisticsContent(currentInterval: ChartInterval,
             .verticalScroll(rememberScrollState())
     ) {
 
-        StatisticsPeriodSelector(currentInterval = currentInterval, onIntervalClick = onIntervalClick)
+        StatisticsPeriodSelector(currentInterval = uiState.currentInterval, onIntervalClick = { interval ->
+            onIntent(
+                StatisticsIntent.IntervalClick(interval)
+            )
+        })
 
-        BmiTitle(onUpdateClick = onUpdateClick)
+        BmiTitle(onUpdateClick = {
+            onIntent(
+                StatisticsIntent.UpdateClick
+            )
+        })
 
-        BmiChart(currentInterval = currentInterval,
-            dailyBmi = dailyBmi,
-            weeklyBmi = weeklyBmi,
-            timeMarkers = timeMarkers,
-            monthlyBmi = monthlyBmi)
+        BmiChart(currentInterval = uiState.currentInterval,
+            dailyBmi = uiState.dailyBmi,
+            weeklyBmi = uiState.weeklyBmi,
+            timeMarkers = uiState.timeMarkers,
+            monthlyBmi = uiState.monthlyBmi)
 
-        WeightTitle(onUpdateClick = onUpdateClick)
+        WeightTitle(onUpdateClick = {
+            onIntent(
+                StatisticsIntent.UpdateClick
+            )
+        })
 
-        WeightChart(currentInterval = currentInterval,
-            dailyWeight = dailyWeight,
-            weeklyWeight = weeklyWeight,
-            timeMarkers = timeMarkers,
-            monthlyWeight = monthlyWeight)
+        WeightChart(currentInterval = uiState.currentInterval,
+            dailyWeight = uiState.dailyWeight,
+            weeklyWeight = uiState.weeklyWeight,
+            timeMarkers = uiState.timeMarkers,
+            monthlyWeight = uiState.monthlyWeight)
     }
 }
 

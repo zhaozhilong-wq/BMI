@@ -115,9 +115,6 @@ class SettingViewModel(
                         generateDebugRecords()
                     )
 
-                    _effect.emit(
-                        SettingEffect.SyncSuccess
-                    )
                 }
             }
 
