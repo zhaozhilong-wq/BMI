@@ -11,7 +11,6 @@ import com.example.bmi.data.repository.BmiRepository
 import com.example.bmi.ui.result.ResultMode
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import kotlin.math.roundToInt

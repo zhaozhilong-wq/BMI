@@ -61,57 +61,55 @@ class BmiDialDialog: DialogFragment() {
             viewLifecycleOwner.repeatOnLifecycle(
                 Lifecycle.State.STARTED
             ) {
-                viewModel.record.collect { record ->
+                viewModel.uiState.collect { state ->
 
-                    if (record == null) return@collect
+                    if (state.record == null) return@collect
 
-                    if (record.id != recordId) return@collect
+                    if (state.record.id != recordId) return@collect
 
-                    setupContent(record)
+                    setupContent(state)
                 }
             }
         }
     }
 
-    private fun setupContent(record: BmiRecord) {
+    private fun setupContent(state: ResultUiState) {
 
-        viewModel.getDialConfig(record)?.let {
-            binding.bmiDialView.setConfig(
-                it
-            )
-        }
+        state.dialConfig?.let { binding.bmiDialView.setConfig(it) }
 
-        setupCategories(record)
+        state.record?.let { setupCategories(it) }
 
         binding.gotButton.setOnClickListener {
             dismiss()
         }
 
-        if (record.isChild) {
+        state.record?.let {
+            if (it.isChild) {
 
-            binding.title.text =
-                getString(R.string.bmi_teenager_tip)
+                binding.title.text =
+                    getString(R.string.bmi_teenager_tip)
 
-            val gender = if (record.gender == "Male") {
-                getString(R.string.gender_boy)
+                val gender = if (it.gender == "Male") {
+                    getString(R.string.gender_boy)
+                } else {
+                    getString(R.string.gender_girl)
+                }
+
+                binding.subTitle.text = getString(
+                    R.string.bmi_teenager_info_tip,
+                    it.age.toString(),
+                    gender
+                )
+
+                binding.subTitle.visibility = View.VISIBLE
+
             } else {
-                getString(R.string.gender_girl)
+
+                binding.title.text =
+                    getString(R.string.bmi_adult_tip)
+
+                binding.subTitle.visibility = View.GONE
             }
-
-            binding.subTitle.text = getString(
-                R.string.bmi_teenager_info_tip,
-                record.age.toString(),
-                gender
-            )
-
-            binding.subTitle.visibility = View.VISIBLE
-
-        } else {
-
-            binding.title.text =
-                getString(R.string.bmi_adult_tip)
-
-            binding.subTitle.visibility = View.GONE
         }
     }
 

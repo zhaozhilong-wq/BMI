@@ -2,7 +2,6 @@ package com.example.bmi.ui.statistics
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bmi.R
 import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.data.repository.BmiRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
