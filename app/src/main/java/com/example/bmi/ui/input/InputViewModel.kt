@@ -16,6 +16,92 @@ import kotlinx.coroutines.launch
 import java.util.Calendar
 import kotlin.math.roundToInt
 
+sealed interface InputIntent {
+
+    // Weight
+    data class WeightChanged(
+        val text: String
+    ) : InputIntent
+
+    data class WeightFocusChanged(
+        val hasFocus: Boolean
+    ) : InputIntent
+
+    data class WeightUnitSelected(
+        val isKg: Boolean
+    ) : InputIntent
+
+    // Height
+    data class HeightCmChanged(
+        val text: String
+    ) : InputIntent
+
+    data class HeightFtChanged(
+        val text: String
+    ) : InputIntent
+
+    data class HeightInChanged(
+        val text: String
+    ) : InputIntent
+
+    data class HeightCmFocusChanged(
+        val hasFocus: Boolean
+    ) : InputIntent
+
+    data class HeightFtFocusChanged(
+        val hasFocus: Boolean
+    ) : InputIntent
+
+    data class HeightInFocusChanged(
+        val hasFocus: Boolean
+    ) : InputIntent
+
+    data class HeightUnitSelected(
+        val isCm: Boolean
+    ) : InputIntent
+
+    // Date / Time
+    data class DateSelected(
+        val year: Int,
+        val month: Int,
+        val day: Int
+    ) : InputIntent
+
+    data class TimeSelected(
+        val timeSlot: Int
+    ) : InputIntent
+
+    // Age / Gender
+    data class AgeSelected(
+        val age: Int
+    ) : InputIntent
+
+    data class GenderSelected(
+        val isMale: Boolean
+    ) : InputIntent
+
+    // Calculate
+    data object CalculateClicked : InputIntent
+
+    // User / Setting
+    data object UserClicked : InputIntent
+}
+
+sealed interface InputEffect {
+
+    data class ShowToast(
+        val resId: Int,
+        val range: String
+    ) : InputEffect
+
+    data class NavigateToResult(
+        val mode: ResultMode,
+        val recordId: Long
+    ) : InputEffect
+
+    data object NavigateToSetting : InputEffect
+}
+
 class InputViewModel (
     private val repository: BmiRepository
 ) : ViewModel() {
@@ -33,11 +119,84 @@ class InputViewModel (
     val uiState = _uiState.asStateFlow()
 
 
-    private val _toastEvent = MutableSharedFlow<Pair<Int, String>>()
-    val toastEvent = _toastEvent.asSharedFlow()//用来监听事件
+    private val _effect = MutableSharedFlow<InputEffect>()
+    val effect = _effect.asSharedFlow()
 
-    private val _resultReady = MutableSharedFlow<Pair<ResultMode, Long>>()
-    val resultReady = _resultReady.asSharedFlow()
+    fun onIntent(intent: InputIntent) {
+
+        when (intent) {
+            is InputIntent.WeightChanged -> {
+                onWeightChanged(intent.text)
+            }
+
+            is InputIntent.WeightFocusChanged -> {
+                onWeightFocusChanged(intent.hasFocus)
+            }
+
+            is InputIntent.WeightUnitSelected -> {
+                selectWeightUnit(intent.isKg)
+            }
+
+            is InputIntent.HeightCmChanged -> {
+                onHeightCmChanged(intent.text)
+            }
+
+            is InputIntent.HeightFtChanged -> {
+                onHeightFtChanged(intent.text)
+            }
+
+            is InputIntent.HeightInChanged -> {
+                onHeightInChanged(intent.text)
+            }
+
+            is InputIntent.HeightCmFocusChanged -> {
+                onHeightCmFocusChanged(intent.hasFocus)
+            }
+
+            is InputIntent.HeightFtFocusChanged -> {
+                onHeightFtFocusChanged(intent.hasFocus)
+            }
+
+            is InputIntent.HeightInFocusChanged -> {
+                onHeightInFocusChanged(intent.hasFocus)
+            }
+
+            is InputIntent.HeightUnitSelected -> {
+                selectHeightUnit(intent.isCm)
+            }
+
+            is InputIntent.DateSelected -> {
+                selectDate(
+                    year = intent.year,
+                    month = intent.month,
+                    day = intent.day
+                )
+            }
+
+            is InputIntent.TimeSelected -> {
+                selectTimeSlot(intent.timeSlot)
+            }
+
+            is InputIntent.AgeSelected -> {
+                selectAge(intent.age)
+            }
+
+            is InputIntent.GenderSelected -> {
+                selectGender(intent.isMale)
+            }
+
+            InputIntent.CalculateClicked -> {
+                calculateAndSave()
+            }
+
+            InputIntent.UserClicked -> {
+                viewModelScope.launch {
+                    _effect.emit(InputEffect.NavigateToSetting)
+                }
+            }
+        }
+    }
+
 
     fun onWeightChanged(text: String) {
 
@@ -604,8 +763,11 @@ class InputViewModel (
         }
 
         viewModelScope.launch {
-            _toastEvent.emit(
-                R.string.input_valid_weight_toast to range
+            _effect.emit(
+                InputEffect.ShowToast(
+                    resId = R.string.input_valid_weight_toast,
+                    range = range
+                )
             )
         }
     }
@@ -619,8 +781,11 @@ class InputViewModel (
         }
 
         viewModelScope.launch {
-            _toastEvent.emit(
-                R.string.input_valid_height_toast to range
+            _effect.emit(
+                InputEffect.ShowToast(
+                    resId = R.string.input_valid_height_toast,
+                    range = range
+                )
             )
         }
     }
@@ -686,7 +851,12 @@ class InputViewModel (
                 ResultMode.NORMAL
             }
 
-            _resultReady.emit(mode to recordId)
+            _effect.emit(
+                InputEffect.NavigateToResult(
+                    mode = mode,
+                    recordId = recordId
+                )
+            )
 
         }
     }

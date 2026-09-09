@@ -40,43 +40,7 @@ class InputActivity : AppCompatActivity(){
 
                 InputScreen(
                     uiState = uiState,
-
-                    onWeightChanged = viewModel::onWeightChanged,
-                    onWeightFocusChanged = viewModel::onWeightFocusChanged,
-                    onWeightUnitSelected = viewModel::selectWeightUnit,
-
-                    onHeightCmChanged = viewModel::onHeightCmChanged,
-                    onHeightFtChanged = viewModel::onHeightFtChanged,
-                    onHeightInChanged = viewModel::onHeightInChanged,
-
-                    onHeightCmFocusChanged =
-                        viewModel::onHeightCmFocusChanged,
-
-                    onHeightFtFocusChanged =
-                        viewModel::onHeightFtFocusChanged,
-
-                    onHeightInFocusChanged =
-                        viewModel::onHeightInFocusChanged,
-
-                    onHeightUnitSelected =
-                        viewModel::selectHeightUnit,
-
-                    onDateSelected = viewModel::selectDate,
-
-
-                    onTimeSelected = viewModel::selectTimeSlot,
-
-                    onAgeSelected = viewModel::selectAge,
-
-                    onGenderSelected = viewModel::selectGender,
-
-                    onCalculateClick =
-                        viewModel::calculateAndSave,
-
-                    onUserClick = {
-                        val intent = Intent(this, SettingActivity::class.java)
-                        startActivity(intent)
-                    }
+                    onIntent = viewModel::onIntent
                 )
             }
         }
@@ -103,26 +67,41 @@ class InputActivity : AppCompatActivity(){
                 Lifecycle.State.STARTED
             ) {
                 launch {
-                    viewModel.resultReady.collect { (mode, recordId) ->
-                        resultLauncher.launch(
-                            ResultActivity.newIntent(
-                                this@InputActivity,
-                                mode,
-                                recordId
-                            )
-                        )
-                    }
-                }
+                    viewModel.effect.collect { effect ->
 
-                launch {
-                    viewModel.toastEvent.collect { (resId, range) ->
+                        when (effect) {
 
-                        CustomPopup.show(
-                            this@InputActivity,
-                            window.decorView,
-                            getString(resId, range),
-                            R.drawable.warning_icon
-                        )
+                            is InputEffect.ShowToast -> {
+                                CustomPopup.show(
+                                    this@InputActivity,
+                                    window.decorView,
+                                    getString(
+                                        effect.resId,
+                                        effect.range
+                                    ),
+                                    R.drawable.warning_icon
+                                )
+                            }
+
+                            is InputEffect.NavigateToResult -> {
+                                resultLauncher.launch(
+                                    ResultActivity.newIntent(
+                                        this@InputActivity,
+                                        effect.mode,
+                                        effect.recordId
+                                    )
+                                )
+                            }
+
+                            InputEffect.NavigateToSetting -> {
+                                startActivity(
+                                    Intent(
+                                        this@InputActivity,
+                                        SettingActivity::class.java
+                                    )
+                                )
+                            }
+                        }
                     }
                 }
             }

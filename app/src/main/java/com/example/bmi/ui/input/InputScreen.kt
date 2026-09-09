@@ -62,36 +62,18 @@ import androidx.compose.ui.unit.sp
 import com.example.bmi.R
 import kotlinx.coroutines.launch
 
-@Preview
-@Composable
-fun InputScreenPreview() {
-//传入空值看效果
-    InputScreen(InputUiState(), onWeightChanged = {}, onWeightFocusChanged = {}, onWeightUnitSelected = {}, onHeightCmChanged = {}, onHeightFtChanged = {}, onHeightInChanged = {}, onHeightCmFocusChanged = {}, onHeightFtFocusChanged = {}, onHeightInFocusChanged = {}, onHeightUnitSelected = {}, onDateSelected = { _, _, _ -> }, onTimeSelected = {  }, onAgeSelected = {}, onGenderSelected = {}, onCalculateClick = {}, onUserClick = {})
-}
+//@Preview
+//@Composable
+//fun InputScreenPreview() {
+////传入空值看效果
+//    InputScreen(InputUiState(), onWeightChanged = {}, onWeightFocusChanged = {}, onWeightUnitSelected = {}, onHeightCmChanged = {}, onHeightFtChanged = {}, onHeightInChanged = {}, onHeightCmFocusChanged = {}, onHeightFtFocusChanged = {}, onHeightInFocusChanged = {}, onHeightUnitSelected = {}, onDateSelected = { _, _, _ -> }, onTimeSelected = {  }, onAgeSelected = {}, onGenderSelected = {}, onCalculateClick = {}, onUserClick = {})
+//}
 
 
 @Composable
 fun InputScreen(
     uiState: InputUiState,
-
-    onWeightChanged: (String) -> Unit,
-    onWeightFocusChanged: (Boolean) -> Unit,
-    onWeightUnitSelected: (Boolean) -> Unit,
-
-    onHeightCmChanged: (String) -> Unit,
-    onHeightFtChanged: (String) -> Unit,
-    onHeightInChanged: (String) -> Unit,
-    onHeightCmFocusChanged: (Boolean) -> Unit,
-    onHeightFtFocusChanged: (Boolean) -> Unit,
-    onHeightInFocusChanged: (Boolean) -> Unit,
-    onHeightUnitSelected: (Boolean) -> Unit,
-
-    onDateSelected: (Int, Int, Int) -> Unit,
-    onTimeSelected: (Int) -> Unit,
-    onAgeSelected: (Int) -> Unit,
-    onGenderSelected: (Boolean) -> Unit,
-    onCalculateClick: () -> Unit,
-    onUserClick: () -> Unit
+    onIntent:(InputIntent)->Unit
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -123,7 +105,9 @@ fun InputScreen(
         ) {
 
             InputTopBar(
-                onUserClick = onUserClick
+                onUserClick = {
+                    onIntent(InputIntent.UserClicked)
+                }
             )
 
             Column(
@@ -145,21 +129,41 @@ fun InputScreen(
 
                     WeightSection(
                         uiState = uiState,
-                        onWeightChanged = onWeightChanged,
-                        onWeightFocusChanged = onWeightFocusChanged,
-                        onWeightUnitSelected = onWeightUnitSelected,
+                        onWeightChanged = {
+                            onIntent(InputIntent.WeightChanged(it))
+                        },
+                        onWeightFocusChanged = {
+                            onIntent(InputIntent.WeightFocusChanged(it))
+                        },
+                        onWeightUnitSelected = {
+                            onIntent(InputIntent.WeightUnitSelected(it))
+                        },
                         modifier = Modifier.weight(1f)
                     )
 
                     HeightSection(
                         uiState = uiState,
-                        onHeightCmChanged = onHeightCmChanged,
-                        onHeightFtChanged = onHeightFtChanged,
-                        onHeightInChanged = onHeightInChanged,
-                        onHeightCmFocusChanged = onHeightCmFocusChanged,
-                        onHeightFtFocusChanged = onHeightFtFocusChanged,
-                        onHeightInFocusChanged = onHeightInFocusChanged,
-                        onHeightUnitSelected = onHeightUnitSelected,
+                        onHeightCmChanged = {
+                            onIntent(InputIntent.HeightCmChanged(it))
+                        },
+                        onHeightFtChanged = {
+                            onIntent(InputIntent.HeightFtChanged(it))
+                        },
+                        onHeightInChanged = {
+                            onIntent(InputIntent.HeightInChanged(it))
+                        },
+                        onHeightCmFocusChanged = {
+                            onIntent(InputIntent.HeightCmFocusChanged(it))
+                        },
+                        onHeightFtFocusChanged = {
+                            onIntent(InputIntent.HeightFtFocusChanged(it))
+                        },
+                        onHeightInFocusChanged = {
+                            onIntent(InputIntent.HeightInFocusChanged(it))
+                        },
+                        onHeightUnitSelected = {
+                            onIntent(InputIntent.HeightUnitSelected(it))
+                        },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -176,12 +180,16 @@ fun InputScreen(
 
                 AgeSection(
                     age = uiState.age,
-                    onAgeSelected = onAgeSelected
+                    onAgeSelected = {
+                        onIntent(InputIntent.AgeSelected(it))
+                    }
                 )
 
                 GenderSection(
                     selectedMale = uiState.isMale,
-                    onGenderSelected = onGenderSelected
+                    onGenderSelected = {
+                        onIntent(InputIntent.GenderSelected(it))
+                    }
                 )
 
 
@@ -190,7 +198,9 @@ fun InputScreen(
         }
 
         CalculateButton(
-            onClick = onCalculateClick,
+            onClick = {
+                onIntent(InputIntent.CalculateClicked)
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
@@ -211,11 +221,7 @@ fun InputScreen(
 
                     showDatePicker = false
 
-                    onDateSelected(
-                        year,
-                        month,
-                        day
-                    )
+                    onIntent(InputIntent.DateSelected(year, month, day))
                 }
             )
         }
@@ -233,7 +239,7 @@ fun InputScreen(
 
                     showTimePicker = false
 
-                    onTimeSelected(timeSlot)
+                    onIntent(InputIntent.TimeSelected(timeSlot))
                 }
             )
         }
