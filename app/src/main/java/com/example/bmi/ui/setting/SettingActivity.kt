@@ -15,6 +15,7 @@ import com.example.bmi.R
 import com.example.bmi.ui.CustomPopup
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.jvm.java
 
 class SettingActivity : AppCompatActivity() {
 
@@ -30,7 +31,12 @@ class SettingActivity : AppCompatActivity() {
 
             SettingScreen(
                 uiState = uiState,
-                onIntent = viewModel::onIntent
+                onIntent = viewModel::onIntent,
+                onBack = {finish()},
+                onFeedback = {
+                    resultLauncher.launch(Intent(this@SettingActivity, FeedbackActivity::class.java))
+                },
+                onLanguage = { startActivity(Intent(this@SettingActivity, LauSettingActivity::class.java)) },
             )
         }
         observeEffect()
@@ -46,28 +52,6 @@ class SettingActivity : AppCompatActivity() {
                 viewModel.effect.collect { effect ->
 
                     when (effect) {
-
-                        SettingEffect.NavigateBack -> {
-                            finish()
-                        }
-
-                        SettingEffect.OpenLanguage -> {
-                            startActivity(
-                                Intent(
-                                    this@SettingActivity,
-                                    LauSettingActivity::class.java
-                                )
-                            )
-                        }
-
-                        SettingEffect.OpenFeedback -> {
-                            resultLauncher.launch(
-                                Intent(
-                                    this@SettingActivity,
-                                    FeedbackActivity::class.java
-                                )
-                            )
-                        }
 
                         SettingEffect.SyncSuccess -> {
                             CustomPopup.show(

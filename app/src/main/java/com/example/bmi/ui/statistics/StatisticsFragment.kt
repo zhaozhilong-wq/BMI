@@ -40,37 +40,15 @@ class StatisticsFragment : Fragment() {
                 StatisticsScreen(
                     uiState,
                     onIntent = viewModel::onIntent,
+                    onUpdate = {
+                        (requireActivity() as MainActivity)
+                            .goToInputPage()
+                    }
                 )
             }
         }
     }
 
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
-    ) {
-        super.onViewCreated(view, savedInstanceState)
-
-        viewLifecycleOwner.lifecycleScope.launch {
-
-            viewLifecycleOwner.repeatOnLifecycle(
-                Lifecycle.State.STARTED
-            ) {
-
-                viewModel.effect.collect { effect ->
-
-                    when (effect) {
-
-                        StatisticsEffect.NavigateToInput -> {
-
-                            (requireActivity() as MainActivity)
-                                .goToInputPage()
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     override fun onStop() {
         CustomPopup.dismiss()

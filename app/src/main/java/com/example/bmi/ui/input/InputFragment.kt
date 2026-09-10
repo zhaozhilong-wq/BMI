@@ -54,7 +54,15 @@ class InputFragment : Fragment() {
 
                 InputScreen(
                     uiState = uiState,
-                    onIntent = viewModel::onIntent
+                    onIntent = viewModel::onIntent,
+                    onUserClick = {
+                        startActivity(
+                            Intent(
+                                requireContext(),
+                                SettingActivity::class.java
+                            )
+                        )
+                    }
                 )
             }
         }
@@ -98,14 +106,6 @@ class InputFragment : Fragment() {
                                 )
                             }
 
-                            InputEffect.NavigateToSetting -> {
-                                startActivity(
-                                    Intent(
-                                        requireContext(),
-                                        SettingActivity::class.java
-                                    )
-                                )
-                            }
                         }
                     }
                 }

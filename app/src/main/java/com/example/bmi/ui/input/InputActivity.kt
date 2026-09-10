@@ -32,7 +32,15 @@ class InputActivity : AppCompatActivity(){
 
                 InputScreen(
                     uiState = uiState,
-                    onIntent = viewModel::onIntent
+                    onIntent = viewModel::onIntent,
+                    onUserClick = {
+                        startActivity(
+                            Intent(
+                                this@InputActivity,
+                                SettingActivity::class.java
+                            )
+                        )
+                    }
                 )
             }
         }
@@ -85,14 +93,6 @@ class InputActivity : AppCompatActivity(){
                                 )
                             }
 
-                            InputEffect.NavigateToSetting -> {
-                                startActivity(
-                                    Intent(
-                                        this@InputActivity,
-                                        SettingActivity::class.java
-                                    )
-                                )
-                            }
                         }
                     }
                 }

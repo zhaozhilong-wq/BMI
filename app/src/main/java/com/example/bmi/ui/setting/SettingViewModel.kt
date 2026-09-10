@@ -19,12 +19,6 @@ data class SettingUiState(
 
 sealed interface SettingIntent {
 
-    data object BackClick : SettingIntent
-
-    data object LanguageClick : SettingIntent
-
-    data object FeedbackClick : SettingIntent
-
     data object AdsClick : SettingIntent
 
 
@@ -42,12 +36,6 @@ sealed interface SettingIntent {
 }
 
 sealed interface SettingEffect {
-
-    data object NavigateBack : SettingEffect
-
-    data object OpenLanguage : SettingEffect
-
-    data object OpenFeedback : SettingEffect
 
     data object SyncSuccess : SettingEffect
 
@@ -77,23 +65,8 @@ class SettingViewModel(
 
         when (intent) {
 
-            SettingIntent.BackClick -> {
-                sendEffect(
-                    SettingEffect.NavigateBack
-                )
-            }
 
-            SettingIntent.LanguageClick -> {
-                sendEffect(
-                    SettingEffect.OpenLanguage
-                )
-            }
 
-            SettingIntent.FeedbackClick -> {
-                sendEffect(
-                    SettingEffect.OpenFeedback
-                )
-            }
 
             SettingIntent.FeedbackResult -> {
                 sendEffect(

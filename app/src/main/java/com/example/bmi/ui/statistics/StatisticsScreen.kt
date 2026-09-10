@@ -48,7 +48,8 @@ import com.example.bmi.ui.StatisticsChartView
 
 @Composable
 fun StatisticsScreen(uiState: StatisticsUiState,
-                     onIntent: (StatisticsIntent) -> Unit)
+                     onIntent: (StatisticsIntent) -> Unit,
+                     onUpdate: () -> Unit)
 {
     Box(modifier = Modifier
         .fillMaxSize()
@@ -61,7 +62,8 @@ fun StatisticsScreen(uiState: StatisticsUiState,
 
             StatisticsContent(
                 uiState = uiState,
-                onIntent = onIntent)
+                onIntent = onIntent,
+                onUpdateClick = onUpdate)
         }
     }
 }
@@ -85,7 +87,8 @@ fun StatisticsTopBar()
 @Composable
 fun StatisticsContent(
     uiState: StatisticsUiState,
-    onIntent: (StatisticsIntent) -> Unit
+    onIntent: (StatisticsIntent) -> Unit,
+    onUpdateClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -100,11 +103,7 @@ fun StatisticsContent(
             )
         })
 
-        BmiTitle(onUpdateClick = {
-            onIntent(
-                StatisticsIntent.UpdateClick
-            )
-        })
+        BmiTitle(onUpdateClick = onUpdateClick)
 
         BmiChart(currentInterval = uiState.currentInterval,
             dailyBmi = uiState.dailyBmi,
@@ -112,11 +111,7 @@ fun StatisticsContent(
             timeMarkers = uiState.timeMarkers,
             monthlyBmi = uiState.monthlyBmi)
 
-        WeightTitle(onUpdateClick = {
-            onIntent(
-                StatisticsIntent.UpdateClick
-            )
-        })
+        WeightTitle(onUpdateClick = onUpdateClick)
 
         WeightChart(currentInterval = uiState.currentInterval,
             dailyWeight = uiState.dailyWeight,

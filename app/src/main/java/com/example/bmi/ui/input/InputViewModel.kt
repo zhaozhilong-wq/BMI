@@ -82,8 +82,6 @@ sealed interface InputIntent {
     // Calculate
     data object CalculateClicked : InputIntent
 
-    // User / Setting
-    data object UserClicked : InputIntent
 }
 
 sealed interface InputEffect {
@@ -97,8 +95,6 @@ sealed interface InputEffect {
         val mode: ResultMode,
         val recordId: Long
     ) : InputEffect
-
-    data object NavigateToSetting : InputEffect
 }
 
 class InputViewModel (
@@ -188,11 +184,6 @@ class InputViewModel (
                 calculateAndSave()
             }
 
-            InputIntent.UserClicked -> {
-                viewModelScope.launch {
-                    _effect.emit(InputEffect.NavigateToSetting)
-                }
-            }
         }
     }
 

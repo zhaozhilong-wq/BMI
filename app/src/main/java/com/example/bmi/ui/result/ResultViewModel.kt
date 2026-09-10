@@ -36,18 +36,12 @@ sealed interface ResultIntent {
         val recordId: Long
     ) : ResultIntent
 
-    data object Back : ResultIntent
-
-    data object Recent : ResultIntent
-
-    data object Help : ResultIntent
 
     data object Save : ResultIntent
 }
 
 sealed interface ResultEffect {
 
-    data object NavigateToRecent : ResultEffect
 
     data object ShowHelp : ResultEffect
 
@@ -90,17 +84,6 @@ class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
                 deleteRecord(intent.recordId)
             }
 
-            ResultIntent.Back -> {
-                // 后面处理
-            }
-
-            ResultIntent.Recent -> {
-                // 后面处理
-            }
-
-            ResultIntent.Help -> {
-                // 后面处理
-            }
 
             ResultIntent.Save -> {
                 // 后面处理

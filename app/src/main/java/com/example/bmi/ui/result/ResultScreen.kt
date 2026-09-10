@@ -73,6 +73,8 @@ fun ResultScreen(
     uiState: ResultUiState,
     mode: ResultMode,
     onIntent: (ResultIntent) -> Unit,
+    onBack: () -> Unit,
+    onRecent: () -> Unit
 )
 {
     Box(modifier = Modifier
@@ -90,9 +92,10 @@ fun ResultScreen(
             ResultTopBar(
                 record = uiState.record,
                 mode = mode,
-                onBack = { onIntent(ResultIntent.Back) },
+                onBack = onBack,
+
                 onDelete = { uiState.record?.let { onIntent(ResultIntent.DeleteRecord(it.id)) } },
-                onRecent = { onIntent(ResultIntent.Recent) },
+                onRecent = onRecent,
                 onDiscard = {  }
             )
 
@@ -103,7 +106,7 @@ fun ResultScreen(
                     mode = mode,
                     category = uiState.category,
                     dialConfig = uiState.dialConfig,
-                    onHelp = { onIntent(ResultIntent.Help) }
+                    onHelp = {  }
                 )
             }
         }

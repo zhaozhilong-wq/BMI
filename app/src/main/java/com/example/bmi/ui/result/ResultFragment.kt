@@ -28,9 +28,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.bmi.ui.recent.RecentActivity
 import com.example.bmi.ui.result.category.BmiStatus
 import com.example.bmi.ui.result.category.BmiStatusResult
 import java.util.Locale
+import kotlin.jvm.java
 
 
 /**
@@ -94,7 +96,11 @@ class ResultFragment : Fragment() {
                 ResultScreen(
                     uiState = uiState,
                     mode = mode,
-                    onIntent = viewModel::onIntent
+                    onIntent = viewModel::onIntent,
+                    onBack = {requireActivity().finish()},
+                    onRecent = {
+                        startActivity(Intent(requireContext(), RecentActivity::class.java))
+                    }
                 )
             }
         }

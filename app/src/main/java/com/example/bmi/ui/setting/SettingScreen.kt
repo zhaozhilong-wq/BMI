@@ -54,7 +54,10 @@ import com.example.bmi.R
 @Composable
 fun SettingScreen(
     uiState: SettingUiState,
-    onIntent: (SettingIntent) -> Unit
+    onIntent: (SettingIntent) -> Unit,
+    onBack: () -> Unit,
+    onFeedback: () -> Unit,
+    onLanguage: () -> Unit
 ) {
 
     var showSyncDialog by remember {
@@ -73,9 +76,8 @@ fun SettingScreen(
             .statusBarsPadding()
     ) {
         SettingTopBar(
-            onBack = {
-                onIntent(SettingIntent.BackClick)
-            }
+            onBack = onBack
+
         )
 
         SettingContent(
@@ -87,12 +89,8 @@ fun SettingScreen(
             onSyncClick = {
                 showSyncDialog = true
             },
-            onLanguageClick = {
-                onIntent(SettingIntent.LanguageClick)
-            },
-            onFeedbackClick = {
-                onIntent(SettingIntent.FeedbackClick)
-            },
+            onLanguageClick = onLanguage,
+            onFeedbackClick = onFeedback,
             onAdsClick = {
                 onIntent(SettingIntent.AdsClick)
             },

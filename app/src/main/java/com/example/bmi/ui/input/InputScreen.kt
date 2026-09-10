@@ -71,7 +71,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun InputScreen(
     uiState: InputUiState,
-    onIntent:(InputIntent)->Unit
+    onIntent:(InputIntent)->Unit,
+    onUserClick: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -103,9 +104,7 @@ fun InputScreen(
         ) {
 
             InputTopBar(
-                onUserClick = {
-                    onIntent(InputIntent.UserClicked)
-                }
+                onUserClick = onUserClick
             )
 
             Column(

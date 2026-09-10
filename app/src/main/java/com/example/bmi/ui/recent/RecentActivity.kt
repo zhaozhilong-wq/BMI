@@ -29,13 +29,22 @@ class RecentActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        observeEffect()
-
         setContent {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             RecentScreen(
                 uiState = uiState,
-                onIntent = viewModel::onIntent
+                onBackClick = {
+                    finish()
+                },
+                onItemClick = { recordId ->
+                    resultLauncher.launch(
+                        ResultActivity.newIntent(
+                            this@RecentActivity,
+                            ResultMode.HISTORY,
+                            recordId
+                        )
+                    )
+                }
             )
         }
 
@@ -64,37 +73,4 @@ class RecentActivity : AppCompatActivity() {
                 }
             }
         }
-
-    private fun observeEffect() {
-
-        lifecycleScope.launch {
-
-            repeatOnLifecycle(
-                androidx.lifecycle.Lifecycle.State.STARTED
-            ) {
-
-                viewModel.effect.collect { effect ->
-
-                    when (effect) {
-
-                        RecentEffect.NavigateBack -> {
-                            finish()
-                        }
-
-                        is RecentEffect.OpenHistory -> {
-
-                            resultLauncher.launch(
-                                ResultActivity.newIntent(
-                                    this@RecentActivity,
-                                    ResultMode.HISTORY,
-                                    effect.recordId
-                                )
-                            )
-                        }
-
-                    }
-                }
-            }
-        }
-    }
 }

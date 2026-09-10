@@ -17,25 +17,6 @@ data class RecentUiState(
     val records: List<BmiRecord> = emptyList()
 )
 
-sealed interface RecentIntent {
-
-    data object BackClick : RecentIntent
-
-    data class RecordClick(
-        val recordId: Long
-    ) : RecentIntent
-
-}
-
-sealed interface RecentEffect {
-
-    data object NavigateBack : RecentEffect
-
-    data class OpenHistory(
-        val recordId: Long
-    ) : RecentEffect
-
-}
 
 class RecentViewModel(private val repository: BmiRepository)
     : ViewModel()
@@ -53,42 +34,5 @@ class RecentViewModel(private val repository: BmiRepository)
                 RecentUiState()
             )
 
-    private val _effect =
-        MutableSharedFlow<RecentEffect>()
-
-    val effect =
-        _effect.asSharedFlow()
-
-
-
-    fun onIntent(intent: RecentIntent) {
-
-        when (intent) {
-
-            RecentIntent.BackClick -> {
-                sendEffect(
-                    RecentEffect.NavigateBack
-                )
-            }
-
-            is RecentIntent.RecordClick -> {
-                sendEffect(
-                    RecentEffect.OpenHistory(
-                        intent.recordId
-                    )
-                )
-            }
-
-        }
-    }
-
-
-    private fun sendEffect(
-        effect: RecentEffect
-    ) {
-        viewModelScope.launch {
-            _effect.emit(effect)
-        }
-    }
 
 }

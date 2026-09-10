@@ -34,13 +34,8 @@ sealed interface StatisticsIntent {
         val interval: ChartInterval
     ) : StatisticsIntent
 
-    data object UpdateClick : StatisticsIntent
 }
 
-sealed interface StatisticsEffect {
-
-    data object NavigateToInput : StatisticsEffect
-}
 
 class StatisticsViewModel( private val repository: BmiRepository
 ) : ViewModel() {
@@ -52,11 +47,6 @@ class StatisticsViewModel( private val repository: BmiRepository
     val uiState =
         _uiState.asStateFlow()
 
-    private val _effect =
-        MutableSharedFlow<StatisticsEffect>()
-
-    val effect =
-        _effect.asSharedFlow()
 
 
     init {
@@ -130,23 +120,10 @@ class StatisticsViewModel( private val repository: BmiRepository
             }
 
 
-            StatisticsIntent.UpdateClick -> {
-
-                sendEffect(
-                    StatisticsEffect.NavigateToInput
-                )
-            }
         }
     }
 
 
-    private fun sendEffect(
-        effect: StatisticsEffect
-    ) {
-        viewModelScope.launch {
-            _effect.emit(effect)
-        }
-    }
 
 
     private fun buildDailyData(
