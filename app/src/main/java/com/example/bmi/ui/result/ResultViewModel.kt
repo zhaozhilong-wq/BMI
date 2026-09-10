@@ -30,8 +30,6 @@ sealed interface ResultEvent : Event {
         val recordId: Long
     ) : ResultEvent
 
-
-    data object Save : ResultEvent
 }
 
 sealed interface ResultEffect : Effect{
@@ -74,10 +72,6 @@ class ResultViewModel(
                 deleteRecord(event.recordId)
             }
 
-
-            ResultEvent.Save -> {
-                // 后面处理
-            }
         }
 
     }

@@ -366,7 +366,10 @@ fun ResultContent(
             .fillMaxWidth()
     ) {
 
-        BmiDialSection(record = record, dialConfig = dialConfig)
+        BmiDialSection(record = record,
+            dialConfig = dialConfig,
+            modifier = Modifier.padding(top = 11.dp)
+        )
 
         Row(
             modifier = Modifier
@@ -661,7 +664,8 @@ private fun AdviceSection(record: BmiRecord?,
 @Composable
 private fun BmiDialSection(
     record: BmiRecord?,
-    dialConfig: BmiDialConfig?
+    dialConfig: BmiDialConfig?,
+    modifier: Modifier
 ) {
 
     val targetBmi =
@@ -678,7 +682,7 @@ private fun BmiDialSection(
     )
 
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
 
         BmiDialViewSection(
