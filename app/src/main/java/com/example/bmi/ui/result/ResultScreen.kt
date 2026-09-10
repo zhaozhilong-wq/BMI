@@ -1,5 +1,6 @@
 package com.example.bmi.ui.result
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,7 +30,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -40,9 +43,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -57,6 +63,8 @@ import com.example.bmi.ui.BmiDialView
 import com.example.bmi.ui.result.category.BmiCategory
 import com.example.bmi.ui.result.category.BmiCategoryItem
 import com.example.bmi.ui.result.category.BmiCategoryViewHelper
+import com.example.bmi.ui.result.category.BmiStatus
+import com.example.bmi.ui.result.category.BmiStatusResult
 import com.example.bmi.ui.result.category.ChildBmiThreshold
 import java.util.Locale
 
@@ -72,31 +80,54 @@ import java.util.Locale
 fun ResultScreen(
     uiState: ResultUiState,
     mode: ResultMode,
-    onIntent: (ResultIntent) -> Unit,
+    dispatch: (ResultEvent) -> Unit,
     onBack: () -> Unit,
-    onRecent: () -> Unit
+    onRecent: () -> Unit,
+    onBackgroundClick: () -> Unit,
+    onSave: () -> Unit,
 )
 {
+    var showDeleteDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var showBmiDialDialog by remember {
+        mutableStateOf(false)
+    }
+
     Box(modifier = Modifier
         .fillMaxSize()
         .background(Color.White)
         .statusBarsPadding()
     )
     {
+
         Column(modifier = Modifier
             .fillMaxSize()
             .verticalScroll(
                 rememberScrollState()
-            ))
+            )
+            .clickable(
+                indication = null,
+                interactionSource = remember {
+                    MutableInteractionSource()
+                },
+                onClick = {
+                    if (mode == ResultMode.LATEST) {
+                        onBackgroundClick()
+                    }
+                }
+            )
+        )
         {
             ResultTopBar(
                 record = uiState.record,
                 mode = mode,
                 onBack = onBack,
 
-                onDelete = { uiState.record?.let { onIntent(ResultIntent.DeleteRecord(it.id)) } },
+                onDelete = { showDeleteDialog = true },
                 onRecent = onRecent,
-                onDiscard = {  }
+                onDiscard = { showDeleteDialog = true }
             )
 
             Column(
@@ -106,7 +137,9 @@ fun ResultScreen(
                     mode = mode,
                     category = uiState.category,
                     dialConfig = uiState.dialConfig,
-                    onHelp = {  }
+                    childThreshold = uiState.childThreshold,
+                    statusResult = uiState.statusResult,
+                    onHelp = { showBmiDialDialog = true }
                 )
             }
         }
@@ -114,10 +147,52 @@ fun ResultScreen(
         if (mode == ResultMode.NEW_USER || mode == ResultMode.NORMAL)
         {
             SaveButton(
-                onClick = {},
+                onClick = onSave,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
             )
+        }
+    }
+    if (showDeleteDialog) {
+        ConfirmDeleteDialog(
+            onCancel = {
+                showDeleteDialog = false
+            },
+            onDelete = {
+                showDeleteDialog = false
+
+                uiState.record?.let {
+                    dispatch(
+                        ResultEvent.DeleteRecord(it.id)
+                    )
+                }
+            }
+        )
+    }
+
+    if (showBmiDialDialog) {
+        BmiDialDialog(
+            uiState = uiState,
+            onDismiss = {
+                showBmiDialDialog = false
+            }
+        )
+    }
+    BackHandler {
+        when (mode) {
+
+            ResultMode.NORMAL,
+            ResultMode.NEW_USER -> {
+                showDeleteDialog = true
+            }
+
+            ResultMode.HISTORY -> {
+                onBack()
+            }
+
+            ResultMode.LATEST -> {
+                onBack()
+            }
         }
     }
 }
@@ -281,6 +356,8 @@ fun ResultContent(
     mode: ResultMode,
     category: BmiCategory?,
     dialConfig: BmiDialConfig?,
+    childThreshold: ChildBmiThreshold?,
+    statusResult: BmiStatusResult?,
     onHelp: () -> Unit
 )
 {
@@ -304,7 +381,7 @@ fun ResultContent(
                 .padding(horizontal = 20.dp)
                 .align(Alignment.CenterHorizontally)
                 .then(
-                    if (mode != ResultMode.LATEST) {
+                    if (mode != ResultMode.LATEST && mode != ResultMode.NEW_USER) {
                         Modifier.clickable(
                             indication = null,
                             interactionSource = remember {
@@ -332,7 +409,7 @@ fun ResultContent(
             )
 
             // LATEST 不显示问号
-            if (mode != ResultMode.LATEST) {
+            if (mode != ResultMode.LATEST && mode != ResultMode.NEW_USER) {
                 Spacer(
                     modifier = Modifier.width(5.dp)
                 )
@@ -367,47 +444,30 @@ fun ResultContent(
         )
 
         if(mode == ResultMode.LATEST || mode == ResultMode.NEW_USER){
-
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = 30.dp,
-                    end = 30.dp,
-                    top = 25.dp
-                )
-                .clip(
-                    RoundedCornerShape(15.dp)
-                )
-                .background(
-                    Color(0xFFF4F4F4)
-                )
-                .padding(17.dp)
-        ) {
-
-            Text(
-                text = "👍 Thumbs Up! You’ve done a great job and now only need to keep your lifestyle healthy to stay in this range.",
-                fontSize = 14.sp,
-                fontFamily = FontFamily(
-                    Font(R.font.montserrat_regular)
-                ),
-                color = Color.Black,
-                letterSpacing = (-0.01).em,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
+            BmiCategoryList(
+                modifier = Modifier.padding(top = 21.5.dp),
+                record = record,
+                selectedCategory = category,
+                childThreshold = childThreshold
             )
         }
 
-        if (mode == ResultMode.HISTORY || mode == ResultMode.NORMAL){ RecommendationSection(mode) }
+        if(mode != ResultMode.LATEST)
+        {
+            AdviceSection(record = record,
+                statusResult = statusResult)
+        }
+
+        if (mode == ResultMode.HISTORY || mode == ResultMode.NORMAL){ RecommendationSection(mode,record) }
     }
 }
 
 @Composable
-private fun BmiDialSection(
+fun BmiDialViewSection(
     record: BmiRecord?,
-    dialConfig: BmiDialConfig?
+    dialConfig: BmiDialConfig?,
+    modifier: Modifier = Modifier,
+    isDialog: Boolean,
 ) {
 
     val targetRotation =
@@ -420,16 +480,6 @@ private fun BmiDialSection(
             -68.6f
         }
 
-    val targetBmi = record?.bmi?.toFloat() ?: 0f
-
-    val animatedBmi by androidx.compose.animation.core.animateFloatAsState(
-        targetValue = targetBmi,
-        animationSpec = androidx.compose.animation.core.tween(
-            durationMillis = 800
-        ),
-        label = "bmi"
-    )
-
     val animatedRotation by androidx.compose.animation.core.animateFloatAsState(
         targetValue = targetRotation,
         animationSpec = androidx.compose.animation.core.tween(
@@ -438,58 +488,211 @@ private fun BmiDialSection(
         label = "pointer"
     )
 
-    Column(
-        modifier = Modifier.fillMaxWidth()
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(183.dp)
     ) {
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(183.dp)
+                .height(172.dp)
+                .padding(
+                    start = 10.dp,
+                    end = 11.dp,
+                    top = 11.dp
+                )
         ) {
 
-            /*
-             * dialContainer
-             */
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(172.dp)
-                    .padding(
-                        start = 10.dp,
-                        end = 11.dp,
-                        top = 11.dp
-                    )
-            ) {
-                AndroidView(
-                    factory = { context ->
-                        BmiDialView(context)
-                    },
-                    update = { view ->
-                        dialConfig?.let {
-                            view.setConfig(it)
-                        }
-                    },
-                    modifier = Modifier.fillMaxSize()
-                )
+            AndroidView(
+                factory = { context ->
+                    BmiDialView(context)
+                },
+                update = { view ->
+                    dialConfig?.let {
+                        view.setConfig(it)
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+            )
 
+            if (!isDialog)
+            {
                 Image(
-                    painter = painterResource(R.drawable.result_pointer),
+                    painter = painterResource(
+                        R.drawable.result_pointer
+                    ),
                     contentDescription = null,
                     modifier = Modifier
                         .size(53.dp, 92.dp)
                         .align(Alignment.BottomCenter)
-                        .offset(x = (-8).dp, y = 5.dp)
+                        .offset(
+                            x = (-8).dp,
+                            y = 5.dp
+                        )
                         .graphicsLayer {
-                            transformOrigin = TransformOrigin(
-                                pivotFractionX = 38.543f / 53f,
-                                pivotFractionY = 77.617f / 92f
-                            )
+
+                            transformOrigin =
+                                TransformOrigin(
+                                    pivotFractionX = 38.543f / 53f,
+                                    pivotFractionY = 77.617f / 92f
+                                )
+
                             rotationZ = animatedRotation
                         }
                 )
             }
-
         }
+    }
+}
+
+@Composable
+private fun AdviceSection(record: BmiRecord?,
+                          statusResult: BmiStatusResult?)
+{
+    if (record == null) {
+        return
+    }
+    val text = when (statusResult?.status) {
+        null -> return
+        BmiStatus.UNDERWEIGHT,
+        BmiStatus.OVERWEIGHT -> {
+
+            val weightRange =
+                getWeightRangeText(statusResult)
+
+            val differenceText =
+                getDifferenceText(statusResult)
+
+            val heightText =
+                if (record.heightUnit == "cm") {
+                    "${record.heightCm.toInt()}cm"
+                } else {
+                    val totalInches =
+                        kotlin.math.round(
+                            record.heightCm / 2.54
+                        ).toInt()
+
+                    val feet = totalInches / 12
+                    val inches = totalInches % 12
+
+                    "${feet}ft ${inches}in"
+                }
+
+            buildAnnotatedString {
+
+                append(
+                    stringResource(
+                        R.string.bmi_result_suggest_start,
+                        heightText
+                    )
+                )
+
+                withStyle(
+                    SpanStyle(
+                        fontFamily = FontFamily(
+                            Font(R.font.montserrat_extrabold)
+                        )
+                    )
+                ) {
+                    append(weightRange)
+                }
+
+                differenceText?.let {
+
+                    append(" ")
+
+                    withStyle(
+                        SpanStyle(
+                            fontFamily = FontFamily(
+                                Font(R.font.montserrat_extrabold)
+                            ),
+                            color = colorResource(
+                                R.color.adviceWeight
+                            )
+                        )
+                    ) {
+                        append(it)
+                    }
+                }
+            }
+        }
+        BmiStatus.NORMAL -> {
+
+            buildAnnotatedString {
+
+                append(
+                    stringResource(
+                        if (record.isChild) {
+                            R.string.bmi_range_normal_child_description
+                        } else {
+                            R.string.bmi_range_normal_adult_description
+                        }
+                    )
+                )
+            }
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                start = 30.dp,
+                end = 30.dp,
+                top = 25.dp
+            )
+            .clip(
+                RoundedCornerShape(15.dp)
+            )
+            .background(
+                Color(0xFFF4F4F4)
+            )
+            .padding(17.dp)
+    ) {
+
+        Text(
+            text = text,
+            fontSize = 14.sp,
+            fontFamily = FontFamily(
+                Font(R.font.montserrat_regular)
+            ),
+            color = Color.Black,
+            letterSpacing = (-0.01).em,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+@Composable
+private fun BmiDialSection(
+    record: BmiRecord?,
+    dialConfig: BmiDialConfig?
+) {
+
+    val targetBmi =
+        record?.bmi?.toFloat() ?: 0f
+
+    val animatedBmi by
+    androidx.compose.animation.core.animateFloatAsState(
+        targetValue = targetBmi,
+        animationSpec =
+            androidx.compose.animation.core.tween(
+                durationMillis = 800
+            ),
+        label = "bmi"
+    )
+
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+
+        BmiDialViewSection(
+            record = record,
+            dialConfig = dialConfig,
+            isDialog = false
+        )
 
         Text(
             text = "Your BMI is...",
@@ -518,9 +721,7 @@ private fun BmiDialSection(
             color = Color.Black,
             letterSpacing = (-0.01).em,
             textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
@@ -528,17 +729,39 @@ private fun BmiDialSection(
 
 
 @Composable
-private fun BmiCategoryItem(
-    type: String,
-    range: String
+fun BmiCategoryRow(
+    item: BmiCategoryItem,
+    selected: Boolean
 ) {
+    val backgroundColor =
+        if (selected) {
+            colorResource(item.backgroundColor)
+        } else {
+            Color.Transparent
+        }
+
+    val circleColor =
+        if (selected) {
+            Color.White
+        } else {
+            colorResource(item.category.colorRes)
+        }
+
+    val textColor =
+        if (selected) {
+            Color.White
+        } else {
+            Color.Black.copy(alpha = 0.7f)
+        }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(27.dp)
             .clip(
                 RoundedCornerShape(13.dp)
-            ),
+            )
+            .background(backgroundColor),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -547,16 +770,22 @@ private fun BmiCategoryItem(
                 .padding(start = 15.dp)
                 .size(10.dp)
                 .clip(CircleShape)
-                .background(Color.Gray)
+                .background(circleColor)
         )
 
         Text(
-            text = type,
+            text = stringResource(item.category.displayName),
             fontSize = 14.sp,
             fontFamily = FontFamily(
-                Font(R.font.montserrat_regular)
+                Font(
+                    if (selected) {
+                        R.font.montserrat_extrabold
+                    } else {
+                        R.font.montserrat_regular
+                    }
+                )
             ),
-            color = Color.Black.copy(alpha = 0.7f),
+            color = textColor,
             letterSpacing = (-0.01).em,
             modifier = Modifier
                 .padding(start = 10.dp)
@@ -564,12 +793,18 @@ private fun BmiCategoryItem(
         )
 
         Text(
-            text = range,
+            text = item.range,
             fontSize = 14.sp,
             fontFamily = FontFamily(
-                Font(R.font.montserrat_regular)
+                Font(
+                    if (selected) {
+                        R.font.montserrat_extrabold
+                    } else {
+                        R.font.montserrat_regular
+                    }
+                )
             ),
-            color = Color.Black.copy(alpha = 0.7f),
+            color = textColor,
             letterSpacing = (-0.01).em,
             modifier = Modifier
                 .padding(end = 13.dp)
@@ -578,7 +813,44 @@ private fun BmiCategoryItem(
 }
 
 @Composable
-private fun RecommendationSection(mode: ResultMode) {
+fun BmiCategoryList(
+    modifier: Modifier,
+    record: BmiRecord?,
+    selectedCategory: BmiCategory?,
+    childThreshold: ChildBmiThreshold?
+) {
+
+    val items = if (
+        record?.isChild == true &&
+        childThreshold != null
+    ) {
+        BmiCategoryViewHelper.createChildCategoryItems(
+            childThreshold
+        )
+    } else {
+        BmiCategoryViewHelper.createAdultCategoryItems()
+    }
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                start = 20.dp,
+                end = 20.dp
+            )
+    ) {
+
+        items.forEach { item ->
+
+            BmiCategoryRow(
+                item = item,
+                selected = item.category == selectedCategory
+            )
+        }
+    }
+}
+
+@Composable
+private fun RecommendationSection(mode: ResultMode, record: BmiRecord?) {
 
     Column(
         modifier = Modifier
@@ -589,7 +861,7 @@ private fun RecommendationSection(mode: ResultMode) {
             )
     ) {
 
-        RecommendationDivider(mode = mode)
+        RecommendationDivider(mode = mode, record = record)
 
         Text(
             text = "Apps you might need",
@@ -753,8 +1025,21 @@ private fun RecommendItem(
 @Composable
 private fun RecommendationDivider(
     mode: ResultMode,
-    text: String = "May 6, 2021 Morning"
+    record: BmiRecord?
 ) {
+
+    val timeText = when (record?.time) {
+        0 -> stringResource(R.string.morning)
+        1 -> stringResource(R.string.afternoon)
+        2 -> stringResource(R.string.evening)
+        3 -> stringResource(R.string.night)
+        else -> ""
+    }
+
+    val dateTimeText = formatRecordDateTime(
+        record = record,
+        timeText = timeText
+    )
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -776,7 +1061,7 @@ private fun RecommendationDivider(
         if (mode == ResultMode.HISTORY)
         {
             Text(
-                text = text,
+                text = dateTimeText,
                 fontSize = 12.sp,
                 fontFamily = FontFamily(
                     Font(R.font.montserrat_extrabold)
@@ -840,6 +1125,19 @@ private fun formatRecordDate(record: BmiRecord): String {
     )
 
     return "${months[record.month]} ${record.day}, ${record.year}"
+}
+
+private fun formatRecordDateTime(
+    record: BmiRecord?,
+    timeText: String
+): String {
+
+    val months = listOf(
+        "Jan", "Feb", "Mar", "Apr", "May", "June",
+        "July", "Aug", "Sep", "Oct", "Nov", "Dec"
+    )
+
+    return "${months[record?.month ?: 0]} ${record?.day ?: 0}, ${record?.year ?: 0} $timeText"
 }
 
 private fun bmiToPointerRotation(
@@ -909,4 +1207,41 @@ private fun formatBmiInputData(
         gender,
         record.age
     )
+}
+
+private fun getWeightRangeText(
+    statusResult: BmiStatusResult
+): String {
+    return "${String.format(
+        Locale.US,
+        "%.1f",
+        statusResult.minHealthyWeight
+    )}kg - ${
+        String.format(
+            Locale.US,
+            "%.1f",
+            statusResult.maxHealthyWeight
+        )
+    }kg"
+}
+
+private fun getDifferenceText(
+    statusResult: BmiStatusResult
+): String? {
+
+    val difference =
+        statusResult.weightDifference
+            ?: return null
+
+    return when (statusResult.status) {
+
+        BmiStatus.UNDERWEIGHT ->
+            "(-${String.format(Locale.US, "%.1f", difference)}kg)"
+
+        BmiStatus.OVERWEIGHT ->
+            "(+${String.format(Locale.US, "%.1f", difference)}kg)"
+
+        BmiStatus.NORMAL ->
+            null
+    }
 }

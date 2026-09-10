@@ -47,62 +47,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                 }
             }
         }
-        //结果页点击任意地方，返回输入页
-        if (
-            ev.action == MotionEvent.ACTION_UP &&
-            binding.viewPager.currentItem == 1
-        ) {
-            val dx = ev.rawX - downX
-            val dy = ev.rawY - downY
-
-            val distance = kotlin.math.sqrt(
-                dx * dx + dy * dy
-            )
-            val touchSlop = ViewConfiguration.get(this).scaledTouchSlop
-            if(distance < touchSlop)
-            {
-
-                // 判断是不是点击了 BottomNavigation
-                val navLocation = IntArray(2)
-                binding.bottomNav.getLocationOnScreen(navLocation)
-
-                val navLeft = navLocation[0]
-                val navTop = navLocation[1]
-                val navRight = navLeft + binding.bottomNav.width
-                val navBottom = navTop + binding.bottomNav.height
-
-                val isInsideBottomNav =
-                    ev.rawX >= navLeft &&
-                            ev.rawX <= navRight &&
-                            ev.rawY >= navTop &&
-                            ev.rawY <= navBottom
-
-                if (isInsideBottomNav) {
-                    return super.dispatchTouchEvent(ev)
-                }
-
-                val recent = binding.root.findViewById<View>(R.id.recent)
-                if (recent != null) {
-                    val location = IntArray(2)
-                    recent.getLocationOnScreen(location)
-                    val left = location[0]
-                    val top = location[1]
-                    val right = left + recent.width
-                    val bottom = top + recent.height
-                    val isInsideRecent =
-                        ev.rawX >= left &&
-                                ev.rawX <= right &&
-                                ev.rawY >= top &&
-                                ev.rawY <= bottom
-                    if (!isInsideRecent) {
-                        goToInputPage()
-                    }
-                } else {
-                    // 找不到 Recent，就直接跳转
-                    goToInputPage()
-                }
-            }
-        }
 
 
         return super.dispatchTouchEvent(ev)

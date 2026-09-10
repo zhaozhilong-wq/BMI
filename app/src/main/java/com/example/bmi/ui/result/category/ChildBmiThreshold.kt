@@ -1,5 +1,9 @@
 package com.example.bmi.ui.result.category
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class ChildBmiThreshold(
     val age: Int,
 
@@ -17,4 +21,4 @@ data class ChildBmiThreshold(
 
     // 表盘最大值
     val dialMax: Float
-)
+): Parcelable

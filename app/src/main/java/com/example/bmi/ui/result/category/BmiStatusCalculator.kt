@@ -1,13 +1,16 @@
 package com.example.bmi.ui.result.category
 
+import android.os.Parcelable
 import com.example.bmi.data.entity.BmiRecord
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class BmiStatusResult(
     val status: BmiStatus,
     val minHealthyWeight: Float,
     val maxHealthyWeight: Float,
     val weightDifference: Float?
-)
+): Parcelable
 
 object BmiStatusCalculator {
 

@@ -1,95 +1,91 @@
 package com.example.bmi.ui.result
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.app.framework.base.Effect
+import android.app.framework.base.Event
+import android.app.framework.base.MVIBaseAndroidVm
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.bmi.R
 import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.data.repository.BmiRepository
 import com.example.bmi.ui.BmiDialConfig
 import com.example.bmi.ui.BmiSection
-import com.example.bmi.ui.result.category.BmiCategory
 import com.example.bmi.ui.result.category.BmiClassifier
 import com.example.bmi.ui.result.category.BmiStatusCalculator
-import com.example.bmi.ui.result.category.BmiStatusResult
 import com.example.bmi.ui.toDialConfig
-import com.example.bmi.ui.result.category.ChildBmiThreshold
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-sealed interface ResultIntent {
+sealed interface ResultEvent : Event {
 
     data class LoadRecord(
         val mode: ResultMode,
         val recordId: Long
-    ) : ResultIntent
+    ) : ResultEvent
 
 
 
     data class DeleteRecord(
         val recordId: Long
-    ) : ResultIntent
+    ) : ResultEvent
 
 
-    data object Save : ResultIntent
+    data object Save : ResultEvent
 }
 
-sealed interface ResultEffect {
+sealed interface ResultEffect : Effect{
 
-
-    data object ShowHelp : ResultEffect
-
-    data object ShowConfirm : ResultEffect
 
     data object DeleteAndGoToInput : ResultEffect
 
     data object DeleteAndFinish : ResultEffect
 }
 
-class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
+class ResultViewModel(
+    private val repository: BmiRepository,
+    application: Application,
+    savedStateHandle: SavedStateHandle
+) : MVIBaseAndroidVm<
+        ResultUiState,
+        ResultEvent,
+        ResultEffect
+        >(
+    application,
+    savedStateHandle
+) {
 
-    private val _uiState = MutableStateFlow(
-        ResultUiState()
-    )
+    override fun getInitState(): ResultUiState {
 
-    val uiState = _uiState.asStateFlow()
+        return ResultUiState()
+    }
+
+    override fun dispatch(event: ResultEvent) {
+        when (event) {
+
+            is ResultEvent.LoadRecord -> {
+                load(
+                    mode = event.mode,
+                    recordId = event.recordId
+                )
+            }
+
+            is ResultEvent.DeleteRecord -> {
+                deleteRecord(event.recordId)
+            }
 
 
-    private val _effect = MutableSharedFlow<ResultEffect>()
-    val effect = _effect.asSharedFlow()
+            ResultEvent.Save -> {
+                // 后面处理
+            }
+        }
+
+    }
 
     private var loadedRecordId: Long? = null
 
     private var latestRecordJob: Job? = null
 
-    fun onIntent(
-        intent: ResultIntent
-    ) {
-        when (intent) {
-
-            is ResultIntent.LoadRecord -> {
-                load(
-                    mode = intent.mode,
-                    recordId = intent.recordId
-                )
-            }
-
-            is ResultIntent.DeleteRecord -> {
-                deleteRecord(intent.recordId)
-            }
-
-
-            ResultIntent.Save -> {
-                // 后面处理
-            }
-        }
-    }
 
 
 
@@ -156,9 +152,7 @@ class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
     private fun updateRecord(record: BmiRecord?) {
 
         if (record == null) {
-            _uiState.update {
-                ResultUiState()
-            }
+            emitState { ResultUiState() }
             return
         }
 
@@ -190,15 +184,13 @@ class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
                 BmiStatusCalculator.calculateAdult(record)
             }
 
-        _uiState.update {
-            it.copy(
-                record = record,
-                category = category,
-                childThreshold = childThreshold,
-                dialConfig = dialConfig,
-                statusResult = statusResult
-            )
-        }
+        emitState { copy(
+            record = record,
+            category = category,
+            childThreshold = childThreshold,
+            dialConfig = dialConfig,
+            statusResult = statusResult
+        ) }
     }
 
 
@@ -216,13 +208,9 @@ class ResultViewModel(private val repository: BmiRepository) : ViewModel() {
             val isEmpty = repository.getCount() == 0
 
             if (isEmpty) {
-                _effect.emit(
-                    ResultEffect.DeleteAndGoToInput
-                )
+                emitEffect(ResultEffect.DeleteAndGoToInput)
             } else {
-                _effect.emit(
-                    ResultEffect.DeleteAndFinish
-                )
+                emitEffect(ResultEffect.DeleteAndFinish)
             }
         }
     }

@@ -57,6 +57,8 @@ val appModule = module {
     }
     viewModel {
         ResultViewModel(
+            application = get(),
+            savedStateHandle = get(),
             repository = get()
         )
     }

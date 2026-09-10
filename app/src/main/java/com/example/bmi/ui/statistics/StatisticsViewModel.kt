@@ -6,16 +6,9 @@ import android.app.framework.base.Event
 import android.app.framework.base.MVIBaseAndroidVm
 import android.app.framework.base.State
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.data.repository.BmiRepository
-import com.example.bmi.ui.splash.SplashEffect
-import com.example.bmi.ui.splash.SplashEvent
-import com.example.bmi.ui.splash.SplashState
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import java.util.Calendar

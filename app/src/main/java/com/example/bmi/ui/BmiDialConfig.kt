@@ -1,20 +1,25 @@
 package com.example.bmi.ui
 
+import android.os.Parcelable
 import com.example.bmi.R
 import com.example.bmi.ui.result.category.ChildBmiThreshold
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class BmiDialConfig(
     val minBmi: Float,
     val maxBmi: Float,
     val sections: List<BmiSection>,
     val ticks: List<Float>
-)
+): Parcelable
 
+@Parcelize
 data class BmiSection(
     val min: Float,
     val max: Float,
     val color: Int
-)
+): Parcelable
+
 fun ChildBmiThreshold.toDialConfig(): BmiDialConfig {
     return BmiDialConfig(
         minBmi = dialMin,

@@ -24,10 +24,12 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import kotlin.math.roundToInt
 import android.app.Activity
+import android.app.framework.base.collectEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.bmi.ui.main.MainActivity
 import com.example.bmi.ui.recent.RecentActivity
 import com.example.bmi.ui.result.category.BmiStatus
 import com.example.bmi.ui.result.category.BmiStatusResult
@@ -75,8 +77,8 @@ class ResultFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        viewModel.onIntent(
-            ResultIntent.LoadRecord(
+        viewModel.dispatch(
+            ResultEvent.LoadRecord(
                 mode = mode,
                 recordId = recordId
             )
@@ -93,59 +95,7 @@ class ResultFragment : Fragment() {
                 val uiState by
                 viewModel.uiState.collectAsStateWithLifecycle()
 
-                ResultScreen(
-                    uiState = uiState,
-                    mode = mode,
-                    onIntent = viewModel::onIntent,
-                    onBack = {requireActivity().finish()},
-                    onRecent = {
-                        startActivity(Intent(requireContext(), RecentActivity::class.java))
-                    }
-                )
-            }
-        }
-    }
-
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
-    ) {
-        super.onViewCreated(view, savedInstanceState)
-
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
-            object : OnBackPressedCallback(true) {
-
-                override fun handleOnBackPressed() {
-
-                    when (mode) {
-
-                        ResultMode.NORMAL,
-                        ResultMode.NEW_USER -> {
-                            showConfirmDialog()
-                        }
-
-                        ResultMode.HISTORY -> {
-                            requireActivity().finish()
-                        }
-
-                        ResultMode.LATEST -> {
-                            isEnabled = false
-                            requireActivity()
-                                .onBackPressedDispatcher
-                                .onBackPressed()
-                            isEnabled = true
-                        }
-                    }
-                }
-            }
-        )
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(
-                Lifecycle.State.STARTED
-            ) {
-                viewModel.effect.collect { effect ->
+                viewModel.collectEffect { effect ->
 
                     when (effect) {
 
@@ -186,36 +136,38 @@ class ResultFragment : Fragment() {
                         else -> {}
                     }
                 }
-            }
-        }
-    }
 
-    private fun showConfirmDialog() {
-        childFragmentManager.setFragmentResultListener(
-            ConfirmDialog.REQUEST_KEY,
-            viewLifecycleOwner
-        ) { _, bundle ->
-            val confirmed =
-                bundle.getBoolean(
-                    ConfirmDialog.RESULT_KEY
+                ResultScreen(
+                    uiState = uiState,
+                    mode = mode,
+                    dispatch = viewModel::dispatch,
+                    onBack = {requireActivity().finish()},
+                    onRecent = {
+                        startActivity(Intent(requireContext(), RecentActivity::class.java))
+                    },
+                    onBackgroundClick = {
+                        (requireActivity() as MainActivity).goToInputPage()
+                    },
+                    onSave = {
+                        startActivity(
+                            Intent(
+                                requireContext(),
+                                MainActivity::class.java
+                            ).apply {
+                                putExtra("open_page", 2)
+                                putExtra("show_saved_toast", true)
+                                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                            }
+                        )
+
+                        requireActivity().finish()
+                    }
                 )
-
-            if (confirmed) {
-                viewModel.deleteRecord(recordId)
             }
         }
-
-        if (
-            childFragmentManager.findFragmentByTag(
-                ConfirmDialog.TAG
-            ) == null
-        ) {
-            ConfirmDialog().show(
-                childFragmentManager,
-                ConfirmDialog.TAG
-            )
-        }
     }
+
+
 
     companion object {
 
@@ -237,123 +189,4 @@ class ResultFragment : Fragment() {
             }
         }
     }
-
-    private fun getWeightRangeText(
-        statusResult: BmiStatusResult
-    ): String {
-        return "${String.format(Locale.US,"%.1f", statusResult.minHealthyWeight)}kg - " +
-                "${String.format(Locale.US,"%.1f", statusResult.maxHealthyWeight)}kg"
-    }
-
-    private fun getDifferenceText(
-        statusResult: BmiStatusResult
-    ): String? {
-
-        val difference =
-            statusResult.weightDifference
-                ?: return null
-
-        return when (statusResult.status) {
-
-            BmiStatus.UNDERWEIGHT ->
-                "(-${String.format(Locale.US,"%.1f", difference)}kg)"
-
-            BmiStatus.OVERWEIGHT ->
-                "(+${String.format(Locale.US,"%.1f", difference)}kg)"
-
-            BmiStatus.NORMAL ->
-                null
-        }
-    }
-
-//    private fun setAdviceText(record: BmiRecord)
-//    {
-//        val statusResult = viewModel.getStatus(record)
-//            ?: return//计算正常体重范围，以及与正常范围的差值
-//        val weightRange =
-//            getWeightRangeText(statusResult)//获取正常体重范围的文本
-//
-//        val differenceText =
-//            getDifferenceText(statusResult)//获取与正常范围的差值文本
-//        val text = when (statusResult.status) {
-//            BmiStatus.UNDERWEIGHT,
-//            BmiStatus.OVERWEIGHT -> {
-//                if(record.heightUnit == "cm"){
-//                    getString(R.string.bmi_result_suggest_start,record.heightCm.toInt().toString() + "cm") +
-//                            "$weightRange $differenceText"
-//                } else {
-//                    val totalInches = (record.heightCm / 2.54).roundToInt()
-//                    val feet = totalInches / 12
-//                    val inches = totalInches % 12
-//                    getString(R.string.bmi_result_suggest_start, feet.toString() + "ft " + inches.toString() + "in") +
-//                            "$weightRange $differenceText"
-//                }
-//            }
-//            BmiStatus.NORMAL -> {
-//                if (!record.isChild)
-//                {
-//                    getString(R.string.bmi_range_normal_adult_description)
-//                }else{
-//                    getString(R.string.bmi_range_normal_child_description)
-//                }
-//            }
-//        }
-//        val spannable = SpannableString(text)
-//
-//        val boldTypeface = ResourcesCompat.getFont(
-//            requireContext(),
-//            R.font.montserrat_extrabold
-//        ) ?: return
-//
-//        // 正常体重范围
-//        val rangeStart = text.indexOf(weightRange)
-//
-//        if (rangeStart != -1) {
-//
-//            val rangeEnd =
-//                rangeStart + weightRange.length
-//
-//            spannable.setSpan(
-//                CustomTypefaceSpan(boldTypeface),
-//                rangeStart,
-//                rangeEnd,
-//                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-//            )
-//        }
-//
-//        // 超重 / 体重不足的差值
-//        if (differenceText != null) {
-//
-//            val differenceStart =
-//                text.indexOf(differenceText)
-//
-//            if (differenceStart != -1) {
-//
-//                val differenceEnd =
-//                    differenceStart + differenceText.length
-//
-//                spannable.setSpan(
-//                    CustomTypefaceSpan(boldTypeface),
-//                    differenceStart,
-//                    differenceEnd,
-//                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-//                )
-//                // 颜色
-//                spannable.setSpan(
-//                    ForegroundColorSpan(
-//                        ContextCompat.getColor(
-//                            requireContext(),
-//                            R.color.adviceWeight
-//                        )
-//                    ),
-//                    differenceStart,
-//                    differenceEnd,
-//                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-//                )
-//            }
-//        }
-//
-//    }
-
-
 }

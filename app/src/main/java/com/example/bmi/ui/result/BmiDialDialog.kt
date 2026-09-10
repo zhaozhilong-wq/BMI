@@ -1,193 +1,195 @@
 package com.example.bmi.ui.result
 
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.os.Bundle
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
-import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.rememberModalBottomSheetState
 import com.example.bmi.R
-import com.example.bmi.data.entity.BmiRecord
-import com.example.bmi.databinding.DialogBmiDialBinding
-import com.example.bmi.ui.result.category.BmiCategoryViewHelper
-import com.example.bmi.ui.result.category.BmiClassifier
-import kotlinx.coroutines.launch
-import org.koin.androidx.viewmodel.ext.android.activityViewModel
-import kotlin.getValue
 
-class BmiDialDialog: DialogFragment() {
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BmiDialDialog(
+    uiState: ResultUiState,
+    onDismiss: () -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+    ModalBottomSheet(
+        sheetState = sheetState,
+        onDismissRequest = onDismiss,
 
-    private var _binding: DialogBmiDialBinding? = null
-    private val binding get() = _binding!!
+        // 原来的 XML 是 24dp 顶部圆角
+        shape = RoundedCornerShape(
+            topStart = 24.dp,
+            topEnd = 24.dp
+        ),
 
-    private val viewModel: ResultViewModel by activityViewModel()
+        // 白色背景
+        containerColor = Color.White,
 
-    private var recordId: Long = -1L
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        recordId = requireArguments().getLong(ARG_RECORD_ID)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-
-        _binding = DialogBmiDialBinding.inflate(
-            inflater,
-            container,
-            false
-        )
-
-        return binding.root
-    }
-
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
+        // 原来的 XML 没有顶部拖拽条
+        dragHandle = null,
     ) {
-        super.onViewCreated(view, savedInstanceState)
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(
-                Lifecycle.State.STARTED
-            ) {
-                viewModel.uiState.collect { state ->
+        val record = uiState.record
 
-                    if (state.record == null) return@collect
-
-                    if (state.record.id != recordId) return@collect
-
-                    setupContent(state)
-                }
-            }
-        }
-    }
-
-    private fun setupContent(state: ResultUiState) {
-
-        state.dialConfig?.let { binding.bmiDialView.setConfig(it) }
-
-        state.record?.let { setupCategories(it) }
-
-        binding.gotButton.setOnClickListener {
-            dismiss()
-        }
-
-        state.record?.let {
-            if (it.isChild) {
-
-                binding.title.text =
-                    getString(R.string.bmi_teenager_tip)
-
-                val gender = if (it.gender == "Male") {
-                    getString(R.string.gender_boy)
-                } else {
-                    getString(R.string.gender_girl)
-                }
-
-                binding.subTitle.text = getString(
-                    R.string.bmi_teenager_info_tip,
-                    it.age.toString(),
-                    gender
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(
+                    rememberScrollState()
                 )
+        ) {
 
-                binding.subTitle.visibility = View.VISIBLE
+            // =========================
+            // 标题
+            // =========================
 
-            } else {
-
-                binding.title.text =
-                    getString(R.string.bmi_adult_tip)
-
-                binding.subTitle.visibility = View.GONE
-            }
-        }
-    }
-
-    private fun setupCategories(record: BmiRecord) {
-
-        val container =
-            binding.bmiCategoryLayout.bmiCategoryContainer
-
-        val selectedCategory =
-            BmiClassifier.classify(record)
-
-        if (record.isChild) {
-
-            val threshold =
-                BmiClassifier.getChildThreshold(record)
-                    ?: return
-
-            val items =
-                BmiCategoryViewHelper.createChildCategoryItems(
-                    threshold
+            Text(
+                text = stringResource(
+                    if (record?.isChild == true) {
+                        R.string.bmi_teenager_tip
+                    } else {
+                        R.string.bmi_adult_tip
+                    }
+                ),
+                fontSize = 20.sp,
+                fontFamily = FontFamily(
+                    Font(R.font.montserrat_extrabold)
+                ),
+                color = Color.Black,
+                letterSpacing = (-0.01).em,
+                modifier = Modifier.padding(
+                    start = 20.dp,
+                    top = 20.dp
                 )
-
-            BmiCategoryViewHelper.setup(
-                container = container,
-                items = items,
-                selectedCategory = selectedCategory,
-                inflater = layoutInflater
             )
 
-        } else {
+            // =========================
+            // 儿童副标题
+            // =========================
 
-            val items =
-                BmiCategoryViewHelper.createAdultCategoryItems()
+            if (record?.isChild == true) {
 
-            BmiCategoryViewHelper.setup(
-                container = container,
-                items = items,
-                selectedCategory = selectedCategory,
-                inflater = layoutInflater
-            )
-        }
-    }
+                val gender =
+                    if (record.gender == "Male") {
+                        stringResource(R.string.gender_boy)
+                    } else {
+                        stringResource(R.string.gender_girl)
+                    }
 
-    override fun onStart() {
-        super.onStart()
-
-        dialog?.window?.apply {
-
-            setGravity(Gravity.BOTTOM)
-
-            setBackgroundDrawable(
-                ColorDrawable(Color.TRANSPARENT)
-            )
-
-            setLayout(
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.WRAP_CONTENT
-            )
-        }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
-    companion object {
-
-        private const val ARG_RECORD_ID = "arg_record_id"
-
-        fun newInstance(recordId: Long): BmiDialDialog {
-            return BmiDialDialog().apply {
-
-                arguments = Bundle().apply {
-                    putLong(ARG_RECORD_ID, recordId)
-                }
+                Text(
+                    text = stringResource(
+                        R.string.bmi_teenager_info_tip,
+                        record.age.toString(),
+                        gender
+                    ),
+                    fontSize = 14.sp,
+                    fontFamily = FontFamily(
+                        Font(R.font.montserrat_regular)
+                    ),
+                    color = Color.Black.copy(alpha = 0.7f),
+                    letterSpacing = (-0.01).em,
+                    modifier = Modifier.padding(
+                        start = 20.dp,
+                        top = 2.5.dp
+                    )
+                )
             }
+
+            // =========================
+            // 表盘
+            // =========================
+
+            BmiDialViewSection(
+                record = record,
+                dialConfig = uiState.dialConfig,
+                isDialog = true,
+                modifier = Modifier.padding(
+                    top = 10.dp,
+                    start = 10.dp,
+                    end = 10.dp
+                )
+            )
+
+            // =========================
+            // BMI 分类列表
+            // =========================
+
+            BmiCategoryList(
+                modifier = Modifier.padding(
+                    top = 25.dp
+                ),
+                record = record,
+                selectedCategory = uiState.category,
+                childThreshold = uiState.childThreshold
+            )
+
+            // =========================
+            // GOT IT
+            // =========================
+
+            Text(
+                text = "GOT IT",
+                fontSize = 20.sp,
+                fontFamily = FontFamily(
+                    Font(R.font.montserrat_extrabold)
+                ),
+                color = Color.White,
+                letterSpacing = (-0.01).em,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = 40.dp,
+                        end = 40.dp,
+                        top = 23.dp,
+                        bottom = 16.dp
+                    )
+                    .height(55.dp)
+                    .clip(
+                        RoundedCornerShape(27.dp)
+                    )
+                    .background(
+                        Color(0xFF3659CF)
+                    )
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember {
+                            MutableInteractionSource()
+                        },
+                        onClick = onDismiss
+                    )
+                    .wrapContentHeight(
+                        Alignment.CenterVertically
+                    )
+            )
         }
     }
-
 }
