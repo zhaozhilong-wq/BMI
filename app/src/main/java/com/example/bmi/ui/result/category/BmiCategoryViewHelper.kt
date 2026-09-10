@@ -1,13 +1,6 @@
 package com.example.bmi.ui.result.category
 
-import android.content.res.ColorStateList
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import com.example.bmi.R
-import com.example.bmi.databinding.ItemBmiTypeBinding
 
 object BmiCategoryViewHelper {
 
@@ -104,72 +97,5 @@ object BmiCategoryViewHelper {
         return String.format("%.1f", value)
     }
 
-    fun setup(
-        container: ViewGroup,
-        items: List<BmiCategoryItem>,
-        selectedCategory: BmiCategory,
-        inflater: LayoutInflater
-    ) {
-        container.removeAllViews()
 
-        items.forEach { item ->
-
-            val itemBinding = ItemBmiTypeBinding.inflate(
-                inflater,
-                container,
-                false
-            )
-
-            itemBinding.typeText.text = inflater.context.getString(item.category.displayName)
-            itemBinding.typeRange.text = item.range
-            itemBinding.typeCycle.background =
-                AppCompatResources.getDrawable(
-                    inflater.context,
-                    R.drawable.bg_type_cycle
-                )
-            // 根据分类设置圆形颜色
-            itemBinding.typeCycle.backgroundTintList =
-                ColorStateList.valueOf(
-                    ContextCompat.getColor(
-                        inflater.context,
-                        item.category.colorRes
-                    )
-                )
-
-            if (item.category == selectedCategory) {
-                itemBinding.root.backgroundTintList = ColorStateList.valueOf(
-                    ContextCompat.getColor(
-                        inflater.context,
-                        item.backgroundColor
-                    )
-                )
-                // 选中状态的圆
-                itemBinding.typeCycle.backgroundTintList =
-                    ColorStateList.valueOf(
-                        ContextCompat.getColor(
-                            inflater.context,
-                            R.color.white
-                        )
-                    )
-                itemBinding.typeText.setTextColor(
-                    itemBinding.typeText.context.getColor(
-                        R.color.white
-                    )
-                )
-                itemBinding.typeText.typeface =
-                    ResourcesCompat.getFont(itemBinding.typeText.context, R.font.montserrat_extrabold)
-                itemBinding.typeText.alpha = 1f
-                itemBinding.typeRange.setTextColor(
-                    itemBinding.typeRange.context.getColor(
-                        R.color.white
-                    )
-                )
-                itemBinding.typeRange.typeface =
-                    ResourcesCompat.getFont(itemBinding.typeRange.context, R.font.montserrat_extrabold)
-                itemBinding.typeRange.alpha = 1f
-            }
-
-            container.addView(itemBinding.root)
-        }
-    }
 }

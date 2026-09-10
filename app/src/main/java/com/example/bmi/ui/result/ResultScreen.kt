@@ -505,15 +505,8 @@ fun BmiDialViewSection(
                 )
         ) {
 
-            AndroidView(
-                factory = { context ->
-                    BmiDialView(context)
-                },
-                update = { view ->
-                    dialConfig?.let {
-                        view.setConfig(it)
-                    }
-                },
+            BmiDialView(
+                config = dialConfig,
                 modifier = Modifier.fillMaxSize()
             )
 
