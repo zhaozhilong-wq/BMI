@@ -1,18 +1,27 @@
 package com.example.bmi.ui.statistics
 
+import android.app.Application
+import android.app.framework.base.Effect
+import android.app.framework.base.Event
+import android.app.framework.base.MVIBaseAndroidVm
+import android.app.framework.base.State
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.data.repository.BmiRepository
-import kotlinx.coroutines.flow.MutableSharedFlow
+import com.example.bmi.ui.splash.SplashEffect
+import com.example.bmi.ui.splash.SplashEvent
+import com.example.bmi.ui.splash.SplashState
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import java.util.Calendar
 import java.util.Locale
 
+@Parcelize
 data class StatisticsUiState(
     val currentInterval: ChartInterval = ChartInterval.DAY,
 
@@ -26,27 +35,57 @@ data class StatisticsUiState(
     val monthlyWeight: List<ChartPoint> = emptyList(),
 
     val timeMarkers: List<TimeMarker> = emptyList()
-)
+): State
 
-sealed interface StatisticsIntent {
+sealed interface StatisticsEvent : Event {
 
     data class IntervalClick(
         val interval: ChartInterval
-    ) : StatisticsIntent
+    ) : StatisticsEvent
+
+}
+
+sealed interface StatisticsEffect : Effect {
+
 
 }
 
 
-class StatisticsViewModel( private val repository: BmiRepository
-) : ViewModel() {
-    private val _uiState =
-        MutableStateFlow(
-            StatisticsUiState()
-        )
+class StatisticsViewModel(
+    private val repository: BmiRepository,
+    application: Application,
+    savedStateHandle: SavedStateHandle
+) : MVIBaseAndroidVm<
+        StatisticsUiState,
+        StatisticsEvent,
+        StatisticsEffect
+        >(
+    application,
+    savedStateHandle
+)  {
 
-    val uiState =
-        _uiState.asStateFlow()
+    override fun getInitState(): StatisticsUiState {
+        return StatisticsUiState()
+    }
 
+    override fun dispatch(event: StatisticsEvent) {
+        when (event) {
+
+            is StatisticsEvent.IntervalClick -> {
+                emitState {
+                    copy(
+                    currentInterval = event.interval,
+                    timeMarkers =
+                        buildTimeMarkers(
+                            event.interval
+                        )
+                    )
+                }
+            }
+
+
+        }
+    }
 
 
     init {
@@ -54,10 +93,8 @@ class StatisticsViewModel( private val repository: BmiRepository
 
             repository.getAllRecords()
                 .collect { records ->
-
-                    _uiState.update { state ->
-
-                        state.copy(
+                    emitState {
+                        copy(
                             dailyBmi =
                                 buildDailyData(records) {
                                     it.bmi.toFloat()
@@ -90,7 +127,7 @@ class StatisticsViewModel( private val repository: BmiRepository
 
                             timeMarkers =
                                 buildTimeMarkers(
-                                    state.currentInterval
+                                    uiState.value.currentInterval
                                 )
                         )
                     }
@@ -99,29 +136,6 @@ class StatisticsViewModel( private val repository: BmiRepository
     }
 
 
-    fun onIntent(
-        intent: StatisticsIntent
-    ) {
-
-        when (intent) {
-
-            is StatisticsIntent.IntervalClick -> {
-
-                _uiState.update { state ->
-
-                    state.copy(
-                        currentInterval = intent.interval,
-                        timeMarkers =
-                            buildTimeMarkers(
-                                intent.interval
-                            )
-                    )
-                }
-            }
-
-
-        }
-    }
 
 
 

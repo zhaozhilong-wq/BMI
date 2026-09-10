@@ -13,7 +13,7 @@ koin = "4.1.1"
 
 room = "2.8.0"
 ksp = "2.2.10-2.0.2"
-kotlin = "2.2.10"
+kotlin = "2.4.10"
 
 gson = "2.13.1"
 glide = "4.16.0"
@@ -55,3 +55,4 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 android-application = { id = "com.android.application", version.ref = "agp" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }

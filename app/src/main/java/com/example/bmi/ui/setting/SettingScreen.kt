@@ -53,8 +53,8 @@ import com.example.bmi.R
 
 @Composable
 fun SettingScreen(
-    uiState: SettingUiState,
-    onIntent: (SettingIntent) -> Unit,
+    uiState: SettingState,
+    dispatch: (SettingEvent) -> Unit,
     onBack: () -> Unit,
     onFeedback: () -> Unit,
     onLanguage: () -> Unit
@@ -92,10 +92,10 @@ fun SettingScreen(
             onLanguageClick = onLanguage,
             onFeedbackClick = onFeedback,
             onAdsClick = {
-                onIntent(SettingIntent.AdsClick)
+                dispatch(SettingEvent.AdsClick)
             },
             onCheckedChange = {
-                onIntent(SettingIntent.CheckedChange(it))
+                dispatch(SettingEvent.CheckedChange(it))
             }
         )
 
@@ -110,7 +110,7 @@ fun SettingScreen(
                 showSyncDialog = false
 
                 // 同步成功后的处理
-                onIntent(SettingIntent.SyncDone)
+                dispatch(SettingEvent.SyncDone)
             }
         )
     }
@@ -125,12 +125,12 @@ fun SettingScreen(
 
             onLoginClick = {
                 showLogSheet = false
-                onIntent(SettingIntent.LoginClick)
+                dispatch(SettingEvent.LoginClick)
             },
 
             onLogoutClick = {
                 showLogSheet = false
-                onIntent(SettingIntent.LogoutClick)
+                dispatch(SettingEvent.LogoutClick)
             }
         )
     }

@@ -71,7 +71,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun InputScreen(
     uiState: InputUiState,
-    onIntent:(InputIntent)->Unit,
+    dispatch:(InputEvent)->Unit,
     onUserClick: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
@@ -127,13 +127,13 @@ fun InputScreen(
                     WeightSection(
                         uiState = uiState,
                         onWeightChanged = {
-                            onIntent(InputIntent.WeightChanged(it))
+                            dispatch(InputEvent.WeightChanged(it))
                         },
                         onWeightFocusChanged = {
-                            onIntent(InputIntent.WeightFocusChanged(it))
+                            dispatch(InputEvent.WeightFocusChanged(it))
                         },
                         onWeightUnitSelected = {
-                            onIntent(InputIntent.WeightUnitSelected(it))
+                            dispatch(InputEvent.WeightUnitSelected(it))
                         },
                         modifier = Modifier.weight(1f)
                     )
@@ -141,25 +141,25 @@ fun InputScreen(
                     HeightSection(
                         uiState = uiState,
                         onHeightCmChanged = {
-                            onIntent(InputIntent.HeightCmChanged(it))
+                            dispatch(InputEvent.HeightCmChanged(it))
                         },
                         onHeightFtChanged = {
-                            onIntent(InputIntent.HeightFtChanged(it))
+                            dispatch(InputEvent.HeightFtChanged(it))
                         },
                         onHeightInChanged = {
-                            onIntent(InputIntent.HeightInChanged(it))
+                            dispatch(InputEvent.HeightInChanged(it))
                         },
                         onHeightCmFocusChanged = {
-                            onIntent(InputIntent.HeightCmFocusChanged(it))
+                            dispatch(InputEvent.HeightCmFocusChanged(it))
                         },
                         onHeightFtFocusChanged = {
-                            onIntent(InputIntent.HeightFtFocusChanged(it))
+                            dispatch(InputEvent.HeightFtFocusChanged(it))
                         },
                         onHeightInFocusChanged = {
-                            onIntent(InputIntent.HeightInFocusChanged(it))
+                            dispatch(InputEvent.HeightInFocusChanged(it))
                         },
                         onHeightUnitSelected = {
-                            onIntent(InputIntent.HeightUnitSelected(it))
+                            dispatch(InputEvent.HeightUnitSelected(it))
                         },
                         modifier = Modifier.weight(1f)
                     )
@@ -178,14 +178,14 @@ fun InputScreen(
                 AgeSection(
                     age = uiState.age,
                     onAgeSelected = {
-                        onIntent(InputIntent.AgeSelected(it))
+                        dispatch(InputEvent.AgeSelected(it))
                     }
                 )
 
                 GenderSection(
                     selectedMale = uiState.isMale,
                     onGenderSelected = {
-                        onIntent(InputIntent.GenderSelected(it))
+                        dispatch(InputEvent.GenderSelected(it))
                     }
                 )
 
@@ -196,7 +196,7 @@ fun InputScreen(
 
         CalculateButton(
             onClick = {
-                onIntent(InputIntent.CalculateClicked)
+                dispatch(InputEvent.CalculateClicked)
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -218,7 +218,7 @@ fun InputScreen(
 
                     showDatePicker = false
 
-                    onIntent(InputIntent.DateSelected(year, month, day))
+                    dispatch(InputEvent.DateSelected(year, month, day))
                 }
             )
         }
@@ -236,7 +236,7 @@ fun InputScreen(
 
                     showTimePicker = false
 
-                    onIntent(InputIntent.TimeSelected(timeSlot))
+                    dispatch(InputEvent.TimeSelected(timeSlot))
                 }
             )
         }

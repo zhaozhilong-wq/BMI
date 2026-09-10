@@ -48,7 +48,7 @@ import com.example.bmi.ui.StatisticsChartView
 
 @Composable
 fun StatisticsScreen(uiState: StatisticsUiState,
-                     onIntent: (StatisticsIntent) -> Unit,
+                     dispatch: (StatisticsEvent) -> Unit,
                      onUpdate: () -> Unit)
 {
     Box(modifier = Modifier
@@ -62,7 +62,7 @@ fun StatisticsScreen(uiState: StatisticsUiState,
 
             StatisticsContent(
                 uiState = uiState,
-                onIntent = onIntent,
+                dispatch = dispatch,
                 onUpdateClick = onUpdate)
         }
     }
@@ -87,7 +87,7 @@ fun StatisticsTopBar()
 @Composable
 fun StatisticsContent(
     uiState: StatisticsUiState,
-    onIntent: (StatisticsIntent) -> Unit,
+    dispatch: (StatisticsEvent) -> Unit,
     onUpdateClick: () -> Unit
 ) {
     Column(
@@ -98,8 +98,8 @@ fun StatisticsContent(
     ) {
 
         StatisticsPeriodSelector(currentInterval = uiState.currentInterval, onIntervalClick = { interval ->
-            onIntent(
-                StatisticsIntent.IntervalClick(interval)
+            dispatch(
+                StatisticsEvent.IntervalClick(interval)
             )
         })
 

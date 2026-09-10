@@ -1,6 +1,7 @@
 package com.example.bmi.ui.input
 
 import android.app.Activity
+import android.app.framework.base.collectEffect
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -30,9 +31,36 @@ class InputActivity : AppCompatActivity(){
             MaterialTheme {
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+                viewModel.collectEffect { effect ->
+
+                    when (effect) {
+
+                        is InputEffect.ShowToast -> {
+                            CustomPopup.show(
+                                this@InputActivity,
+                                window.decorView,
+                                getString(
+                                    effect.resId,
+                                    effect.range
+                                ),
+                                R.drawable.warning_icon
+                            )
+                        }
+
+                        is InputEffect.NavigateToResult -> {
+                            resultLauncher.launch(
+                                ResultActivity.newIntent(
+                                    this@InputActivity,
+                                    effect.mode,
+                                    effect.recordId
+                                )
+                            )
+                        }
+
+                    }}
                 InputScreen(
                     uiState = uiState,
-                    onIntent = viewModel::onIntent,
+                    dispatch = viewModel::dispatch,
                     onUserClick = {
                         startActivity(
                             Intent(
@@ -62,42 +90,6 @@ class InputActivity : AppCompatActivity(){
             intent.removeExtra("show_delete_toast")
         }
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(
-                Lifecycle.State.STARTED
-            ) {
-                launch {
-                    viewModel.effect.collect { effect ->
-
-                        when (effect) {
-
-                            is InputEffect.ShowToast -> {
-                                CustomPopup.show(
-                                    this@InputActivity,
-                                    window.decorView,
-                                    getString(
-                                        effect.resId,
-                                        effect.range
-                                    ),
-                                    R.drawable.warning_icon
-                                )
-                            }
-
-                            is InputEffect.NavigateToResult -> {
-                                resultLauncher.launch(
-                                    ResultActivity.newIntent(
-                                        this@InputActivity,
-                                        effect.mode,
-                                        effect.recordId
-                                    )
-                                )
-                            }
-
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private val resultLauncher =

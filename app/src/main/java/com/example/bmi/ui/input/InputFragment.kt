@@ -1,6 +1,7 @@
 package com.example.bmi.ui.input
 
 import android.app.Activity
+import android.app.framework.base.collectEffect
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -52,9 +53,36 @@ class InputFragment : Fragment() {
 
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+                viewModel.collectEffect {effect ->
+
+                    when (effect) {
+
+                        is InputEffect.ShowToast -> {
+                            CustomPopup.show(
+                                requireContext(),
+                                requireActivity().window.decorView,
+                                getString(
+                                    effect.resId,
+                                    effect.range
+                                ),
+                                R.drawable.warning_icon
+                            )
+                        }
+
+                        is InputEffect.NavigateToResult -> {
+                            resultLauncher.launch(
+                                ResultActivity.newIntent(
+                                    requireContext(),
+                                    effect.mode,
+                                    effect.recordId
+                                )
+                            )
+                        }
+
+                    } }
                 InputScreen(
                     uiState = uiState,
-                    onIntent = viewModel::onIntent,
+                    dispatch = viewModel::dispatch,
                     onUserClick = {
                         startActivity(
                             Intent(
@@ -69,49 +97,6 @@ class InputFragment : Fragment() {
 
     }
 
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
-    ) {
-        super.onViewCreated(view, savedInstanceState)
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(
-                Lifecycle.State.STARTED
-            ) {
-                launch {
-                    viewModel.effect.collect { effect ->
-
-                        when (effect) {
-
-                            is InputEffect.ShowToast -> {
-                                CustomPopup.show(
-                                    requireContext(),
-                                    requireActivity().window.decorView,
-                                    getString(
-                                        effect.resId,
-                                        effect.range
-                                    ),
-                                    R.drawable.warning_icon
-                                )
-                            }
-
-                            is InputEffect.NavigateToResult -> {
-                                resultLauncher.launch(
-                                    ResultActivity.newIntent(
-                                        requireContext(),
-                                        effect.mode,
-                                        effect.recordId
-                                    )
-                                )
-                            }
-
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     private val resultLauncher =
         registerForActivityResult(

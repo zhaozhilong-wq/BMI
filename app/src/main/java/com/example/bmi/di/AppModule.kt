@@ -43,11 +43,15 @@ val appModule = module {
     }
     viewModel {
         InputViewModel(
-            repository = get()
+            repository = get(),
+            application = get(),
+            savedStateHandle = get()
         )
     }
     viewModel {
         SplashViewModel(
+            application = get(),
+            savedStateHandle = get(),
             repository = get()
         )
     }
@@ -58,17 +62,23 @@ val appModule = module {
     }
     viewModel {
         RecentViewModel(
-            repository = get()
+            repository = get(),
+            application = get(),
+            savedStateHandle = get()
         )
     }
     viewModel {
         StatisticsViewModel(
-            repository = get()
+            repository = get(),
+            application = get(),
+            savedStateHandle = get()
         )
     }
 
     viewModel {
         SettingViewModel(
+            application = get(),
+            savedStateHandle = get(),
             repository = get()
         )
     }

@@ -1,6 +1,11 @@
 package com.example.bmi.ui.input
 
+import android.app.Application
+import android.app.framework.base.Effect
+import android.app.framework.base.Event
+import android.app.framework.base.MVIBaseAndroidVm
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bmi.R
@@ -9,82 +14,85 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import com.example.bmi.data.repository.BmiRepository
 import com.example.bmi.ui.result.ResultMode
+import com.example.bmi.ui.splash.SplashEffect
+import com.example.bmi.ui.splash.SplashEvent
+import com.example.bmi.ui.splash.SplashState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import kotlin.math.roundToInt
 
-sealed interface InputIntent {
+sealed interface InputEvent : Event {
 
     // Weight
     data class WeightChanged(
         val text: String
-    ) : InputIntent
+    ) : InputEvent
 
     data class WeightFocusChanged(
         val hasFocus: Boolean
-    ) : InputIntent
+    ) : InputEvent
 
     data class WeightUnitSelected(
         val isKg: Boolean
-    ) : InputIntent
+    ) : InputEvent
 
     // Height
     data class HeightCmChanged(
         val text: String
-    ) : InputIntent
+    ) : InputEvent
 
     data class HeightFtChanged(
         val text: String
-    ) : InputIntent
+    ) : InputEvent
 
     data class HeightInChanged(
         val text: String
-    ) : InputIntent
+    ) : InputEvent
 
     data class HeightCmFocusChanged(
         val hasFocus: Boolean
-    ) : InputIntent
+    ) : InputEvent
 
     data class HeightFtFocusChanged(
         val hasFocus: Boolean
-    ) : InputIntent
+    ) : InputEvent
 
     data class HeightInFocusChanged(
         val hasFocus: Boolean
-    ) : InputIntent
+    ) : InputEvent
 
     data class HeightUnitSelected(
         val isCm: Boolean
-    ) : InputIntent
+    ) : InputEvent
 
     // Date / Time
     data class DateSelected(
         val year: Int,
         val month: Int,
         val day: Int
-    ) : InputIntent
+    ) : InputEvent
 
     data class TimeSelected(
         val timeSlot: Int
-    ) : InputIntent
+    ) : InputEvent
 
     // Age / Gender
     data class AgeSelected(
         val age: Int
-    ) : InputIntent
+    ) : InputEvent
 
     data class GenderSelected(
         val isMale: Boolean
-    ) : InputIntent
+    ) : InputEvent
 
     // Calculate
-    data object CalculateClicked : InputIntent
+    data object CalculateClicked : InputEvent
 
 }
 
-sealed interface InputEffect {
+sealed interface InputEffect : Effect {
 
     data class ShowToast(
         val resId: Int,
@@ -98,89 +106,95 @@ sealed interface InputEffect {
 }
 
 class InputViewModel (
-    private val repository: BmiRepository
-) : ViewModel() {
+    private val repository: BmiRepository,
+    application: Application,
+    savedStateHandle: SavedStateHandle
+) : MVIBaseAndroidVm<
+        InputUiState,
+        InputEvent,
+        InputEffect
+        >(
+    application,
+    savedStateHandle
+)  {
 
 
-    private val calendar = Calendar.getInstance()
 
-    private val _uiState = MutableStateFlow(InputUiState(
-        year = calendar.get(Calendar.YEAR),
-        month = calendar.get(Calendar.MONTH),
-        day = calendar.get(Calendar.DAY_OF_MONTH),
-        timeSlot = getCurrentTimeSlotIndex()
-    ))
+    override fun getInitState(): InputUiState {
+        val calendar = Calendar.getInstance()
+        return InputUiState(
+            year = calendar.get(Calendar.YEAR),
+            month = calendar.get(Calendar.MONTH),
+            day = calendar.get(Calendar.DAY_OF_MONTH),
+            timeSlot = getCurrentTimeSlotIndex()
+        )
+    }
 
-    val uiState = _uiState.asStateFlow()
 
+    override fun dispatch(event: InputEvent) {
 
-    private val _effect = MutableSharedFlow<InputEffect>()
-    val effect = _effect.asSharedFlow()
-
-    fun onIntent(intent: InputIntent) {
-
-        when (intent) {
-            is InputIntent.WeightChanged -> {
-                onWeightChanged(intent.text)
+        when (event) {
+            is InputEvent.WeightChanged -> {
+                onWeightChanged(event.text)
             }
 
-            is InputIntent.WeightFocusChanged -> {
-                onWeightFocusChanged(intent.hasFocus)
+            is InputEvent.WeightFocusChanged -> {
+                onWeightFocusChanged(event.hasFocus)
             }
 
-            is InputIntent.WeightUnitSelected -> {
-                selectWeightUnit(intent.isKg)
+            is InputEvent.WeightUnitSelected -> {
+                selectWeightUnit(event.isKg)
             }
 
-            is InputIntent.HeightCmChanged -> {
-                onHeightCmChanged(intent.text)
+            is InputEvent.HeightCmChanged -> {
+                onHeightCmChanged(event.text)
             }
 
-            is InputIntent.HeightFtChanged -> {
-                onHeightFtChanged(intent.text)
+            is InputEvent.HeightFtChanged -> {
+                onHeightFtChanged(event.text)
             }
 
-            is InputIntent.HeightInChanged -> {
-                onHeightInChanged(intent.text)
+            is InputEvent.HeightInChanged -> {
+                onHeightInChanged(event.text)
             }
 
-            is InputIntent.HeightCmFocusChanged -> {
-                onHeightCmFocusChanged(intent.hasFocus)
+            is InputEvent.HeightCmFocusChanged -> {
+                onHeightCmFocusChanged(event.hasFocus)
             }
 
-            is InputIntent.HeightFtFocusChanged -> {
-                onHeightFtFocusChanged(intent.hasFocus)
+            is InputEvent.HeightFtFocusChanged -> {
+                onHeightFtFocusChanged(event.hasFocus)
             }
 
-            is InputIntent.HeightInFocusChanged -> {
-                onHeightInFocusChanged(intent.hasFocus)
+            is InputEvent.HeightInFocusChanged -> {
+                onHeightInFocusChanged(event.hasFocus)
             }
 
-            is InputIntent.HeightUnitSelected -> {
-                selectHeightUnit(intent.isCm)
+            is InputEvent.HeightUnitSelected -> {
+                selectHeightUnit(event.isCm)
             }
 
-            is InputIntent.DateSelected -> {
+            is InputEvent.DateSelected -> {
                 selectDate(
-                    year = intent.year,
-                    month = intent.month,
-                    day = intent.day
+                    year = event.year,
+                    month = event.month,
+                    day = event.day
                 )
             }
 
-            is InputIntent.TimeSelected -> {
-                selectTimeSlot(intent.timeSlot)
+            is InputEvent.TimeSelected -> {
+                selectTimeSlot(event.timeSlot)
             }
 
-            is InputIntent.AgeSelected -> {
-                selectAge(intent.age)
+            is InputEvent.AgeSelected -> {
+                selectAge(event.age)
             }
 
-            is InputIntent.GenderSelected -> {
-                selectGender(intent.isMale)
+            is InputEvent.GenderSelected -> {
+                selectGender(event.isMale)
             }
 
-            InputIntent.CalculateClicked -> {
+            InputEvent.CalculateClicked -> {
                 calculateAndSave()
             }
 
@@ -191,33 +205,37 @@ class InputViewModel (
     fun onWeightChanged(text: String) {
 
         if (text.isEmpty()) {
-            _uiState.value = _uiState.value.copy(
-                weightText = "",
-                weightChanged = true
-            )
+            emitState {
+                copy(
+                    weightText = "",
+                    weightChanged = true
+                )
+            }
             return
         }
 
         val value = text.toDoubleOrNull() ?: return
 
-        val weightKg = if (_uiState.value.isWeightKg) {
+        val weightKg = if (uiState.value.isWeightKg) {
             value
         } else {
             lbToKg(value)
         }
 
-        _uiState.value = _uiState.value.copy(
-            weightKg = weightKg,
-            weightText = text,
-            weightChanged = true
-        )
+        emitState {
+            copy(
+                weightKg = weightKg,
+                weightText = text,
+                weightChanged = true
+            )
+        }
 
         Log.d("InputViewModel", "weightKg=$weightKg")
     }
 
     fun selectWeightUnit(isKg: Boolean) {
 
-        val currentState = _uiState.value
+        val currentState = uiState.value
 
         if (currentState.isWeightKg == isKg) {
             return
@@ -238,11 +256,13 @@ class InputViewModel (
                 lbToKg(140.0)
             }
 
-            _uiState.value = currentState.copy(
+            emitState {
+                copy(
                 isWeightKg = isKg,
                 weightKg = defaultWeightKg,
                 weightText = defaultText
             )
+                }
             Log.d("InputViewModel", "after select weightKg=$defaultWeightKg")
             return
         }
@@ -263,18 +283,20 @@ class InputViewModel (
             formatWeight(lb)
         }
 
-        _uiState.value = currentState.copy(
-            isWeightKg = isKg,
-            weightKg = weightKg,
-            weightText = newWeightText
-        )
+        emitState {
+            copy(
+                isWeightKg = isKg,
+                weightKg = weightKg,
+                weightText = newWeightText
+            )
+        }
         Log.d("InputViewModel", "after select weightKg=$weightKg")
 
     }
 
     private fun resetWeightToDefault() {
 
-        val currentState = _uiState.value
+        val currentState = uiState.value
 
         val weightKg: Double
         val weightText: String
@@ -287,10 +309,10 @@ class InputViewModel (
             weightText = "140.00"
         }
 
-        _uiState.value = currentState.copy(
+        emitState { copy(
             weightKg = weightKg,
             weightText = weightText
-        )
+        ) }
     }
 
     private fun lbToKg(lb: Double): Double {
@@ -307,7 +329,7 @@ class InputViewModel (
             return
         }
 
-        val currentState = _uiState.value
+        val currentState = uiState.value
         val text = currentState.weightText
 
         if (text.isEmpty()) {
@@ -333,11 +355,11 @@ class InputViewModel (
             } else {
                 lbToKg(validValue)
             }
-            _uiState.value = currentState.copy(
+            emitState { copy(
                 weightKg = weightKg,
                 weightText = formatWeight(validValue),
                 weightChanged = true
-            )
+            ) }
 
             showInvalidWeightToast()
             return
@@ -349,10 +371,10 @@ class InputViewModel (
             lbToKg(validValue)
         }
 
-        _uiState.value = currentState.copy(
+        emitState { copy(
             weightKg = weightKg,
             weightText = formatWeight(validValue)
-        )
+        ) }
     }
 
     private fun formatWeight(value: Double): String {
@@ -360,7 +382,7 @@ class InputViewModel (
     }
     private fun validateWeight(value: Double): Double {
 
-        return if (_uiState.value.isWeightKg) {
+        return if (uiState.value.isWeightKg) {
             value.coerceIn(1.0, 250.0)
         } else {
             value.coerceIn(2.0, 551.0)
@@ -371,17 +393,17 @@ class InputViewModel (
     fun onHeightCmChanged(text: String) {
 
         if (text.isEmpty()) {
-            _uiState.value = _uiState.value.copy(
+            emitState { copy(
                 heightCmText = ""
-            )
+            ) }
             return
         }
         val value = text.toDoubleOrNull() ?: return
-        _uiState.value = _uiState.value.copy(
+        emitState { copy(
             heightCm = value,
             heightCmText = text,
             heightChanged = true
-        )
+        ) }
         Log.d(
             "InputViewModel",
             "heightCm=$value"
@@ -392,10 +414,10 @@ class InputViewModel (
 
         if (text.isEmpty()) {
 
-            _uiState.value = _uiState.value.copy(
-                heightFtText = "",
-                heightChanged = true
-            )
+           emitState { copy(
+               heightFtText = "",
+               heightChanged = true
+           ) }
 
             return
         }
@@ -403,15 +425,15 @@ class InputViewModel (
         val feet = text.toIntOrNull()
             ?: return
 
-        val currentState = _uiState.value
+        val currentState = uiState.value
 
         val inches = currentState.heightInText
             .toIntOrNull()
 
-        _uiState.value = currentState.copy(
+        emitState { copy(
             heightFtText = text,
             heightChanged = true
-        )
+        ) }
 
         if (inches != null) {
 
@@ -420,9 +442,9 @@ class InputViewModel (
                 inches
             )
 
-            _uiState.value = _uiState.value.copy(
+            emitState { copy(
                 heightCm = heightCm
-            )
+            ) }
         }
     }
 
@@ -430,10 +452,10 @@ class InputViewModel (
 
         if (text.isEmpty()) {
 
-            _uiState.value = _uiState.value.copy(
+            emitState { copy(
                 heightInText = "",
                 heightChanged = true
-            )
+            ) }
 
             return
         }
@@ -441,15 +463,15 @@ class InputViewModel (
         val inches = text.toIntOrNull()
             ?: return
 
-        val currentState = _uiState.value
+        val currentState = uiState.value
 
         val feet = currentState.heightFtText
             .toIntOrNull()
 
-        _uiState.value = currentState.copy(
+        emitState { copy(
             heightInText = text,
             heightChanged = true
-        )
+        ) }
 
         if (feet != null) {
 
@@ -458,14 +480,14 @@ class InputViewModel (
                 inches
             )
 
-            _uiState.value = _uiState.value.copy(
+            emitState { copy(
                 heightCm = heightCm
-            )
+            ) }
         }
     }
 
     fun selectHeightUnit(isCm: Boolean) {
-        val currentState = _uiState.value
+        val currentState = uiState.value
 
         if (currentState.isHeightCm == isCm) {
             return
@@ -476,22 +498,22 @@ class InputViewModel (
             if (isCm) {
 
                 // FT/IN -> CM
-                _uiState.value = currentState.copy(
+                emitState { copy(
                     isHeightCm = true,
                     heightCm = 170.0,
                     heightCmText = "170.0"
-                )
+                ) }
 
             } else {
 
                 // CM -> FT/IN
-                _uiState.value = currentState.copy(
+                emitState { copy(
                     isHeightCm = false,
                     heightCm = 170.18,
                     heightFtText = "5",
                     heightInText = "7"
-                )
-                Log.d("HEIGHT_TEST", "切换FTIN后 heightCm=${_uiState.value.heightCm}")
+                ) }
+                Log.d("HEIGHT_TEST", "切换FTIN后 heightCm=${uiState.value.heightCm}")
             }
 
             return
@@ -503,10 +525,10 @@ class InputViewModel (
             // FT/IN -> CM
             val heightCm = currentState.heightCm
 
-            _uiState.value = currentState.copy(
+            emitState { copy(
                 isHeightCm = true,
                 heightCmText = formatHeight(heightCm)
-            )
+            )}
 
         } else {
 
@@ -514,11 +536,13 @@ class InputViewModel (
             val (feet, inches) =
                 cmToFtIn(currentState.heightCm)
 
-            _uiState.value = currentState.copy(
-                isHeightCm = false,
-                heightFtText = feet.toString(),
-                heightInText = inches.toString()
-            )
+            emitState {
+                copy(
+                    isHeightCm = false,
+                    heightFtText = feet.toString(),
+                    heightInText = inches.toString()
+                )
+            }
         }
     }
     private fun formatHeight(value: Double): String {
@@ -530,7 +554,7 @@ class InputViewModel (
         if (hasFocus) {
             return
         }
-        val currentState = _uiState.value
+        val currentState = uiState.value
         val text = currentState.heightCmText
         if (text.isEmpty()) {
             resetHeightToDefault()
@@ -546,22 +570,20 @@ class InputViewModel (
         val validValue =
             validateHeightCm(value)
         if (value != validValue) {
-            _uiState.value =
-                currentState.copy(
-                    heightCm = validValue,
-                    heightCmText =
-                        formatHeight(validValue),
-                    heightChanged = true
-                )
+            emitState { copy(
+                heightCm = validValue,
+                heightCmText =
+                    formatHeight(validValue),
+                heightChanged = true
+            ) }
             showInvalidHeightToast()
             return
         }
-        _uiState.value =
-            currentState.copy(
-                heightCm = value,
-                heightCmText =
-                    formatHeight(value)
-            )
+        emitState { copy(
+            heightCm = value,
+            heightCmText =
+                formatHeight(value)
+        ) }
     }
 
     fun onHeightFtFocusChanged(hasFocus: Boolean) {
@@ -584,7 +606,7 @@ class InputViewModel (
 
     private fun validateHeightFtIn() {
 
-        val currentState = _uiState.value
+        val currentState = uiState.value
 
         val feet = currentState.heightFtText
             .toIntOrNull()
@@ -617,12 +639,12 @@ class InputViewModel (
             val (newFeet, newInches) =
                 cmToFtIn(heightCm)
 
-            _uiState.value = currentState.copy(
+            emitState { copy(
                 heightFtText = newFeet.toString(),
                 heightInText = newInches.toString(),
                 heightCm = heightCm,
                 heightChanged = true
-            )
+            ) }
 
             showInvalidHeightToast()
 
@@ -632,12 +654,12 @@ class InputViewModel (
         // FT 或 IN 超出范围
         if (feet != validFeet || inches != validInches) {
 
-            _uiState.value = currentState.copy(
-                heightFtText = validFeet.toString(),
-                heightInText = validInches.toString(),
-                heightCm = heightCm,
-                heightChanged = true
-            )
+            emitState { copy(
+               heightFtText = validFeet.toString(),
+               heightInText = validInches.toString(),
+               heightCm = heightCm,
+               heightChanged = true
+           ) }
 
             showInvalidHeightToast()
 
@@ -645,29 +667,27 @@ class InputViewModel (
         }
 
         // 合法
-        _uiState.value = currentState.copy(
+        emitState { copy(
             heightFtText = validFeet.toString(),
             heightInText = validInches.toString(),
             heightCm = heightCm,
-        )
+        ) }
     }
 
 
     private fun resetHeightToDefault() {
-        val currentState = _uiState.value
+        val currentState = uiState.value
         if (currentState.isHeightCm) {
-            _uiState.value =
-                currentState.copy(
-                    heightCm = 170.0,
-                    heightCmText = "170.0"
-                )
+            emitState { copy(
+                heightCm = 170.0,
+                heightCmText = "170.0"
+            ) }
         } else {
-            _uiState.value =
-                currentState.copy(
-                    heightCm = 170.0,
-                    heightFtText = "5",
-                    heightInText = "7"
-                )
+            emitState { copy(
+                heightCm = 170.0,
+                heightFtText = "5",
+                heightInText = "7"
+            ) }
         }
     }
 
@@ -718,65 +738,61 @@ class InputViewModel (
         month: Int,
         day: Int
     ) {
-        _uiState.value = _uiState.value.copy(
+        emitState { copy(
             year = year,
             month = month,
             day = day
-        )
+        ) }
     }
     fun selectTimeSlot(timeSlot: Int) {
 
-        _uiState.value = _uiState.value.copy(
+        emitState { copy(
             timeSlot = timeSlot
-        )
+        ) }
     }
 
     fun selectAge(age: Int) {
 
-        _uiState.value = _uiState.value.copy(
+        emitState { copy(
             age = age
-        )
+        ) }
     }
     fun selectGender(isMale: Boolean) {
 
-        _uiState.value = _uiState.value.copy(
+        emitState { copy(
             isMale = isMale
-        )
+        ) }
     }
 
     private fun showInvalidWeightToast() {
 
-        val range = if (_uiState.value.isWeightKg) {
+        val range = if (uiState.value.isWeightKg) {
             "1-250 kg"
         } else {
             "2-551 lb"
         }
 
         viewModelScope.launch {
-            _effect.emit(
-                InputEffect.ShowToast(
-                    resId = R.string.input_valid_weight_toast,
-                    range = range
-                )
-            )
+            emitEffect(InputEffect.ShowToast(
+                resId = R.string.input_valid_weight_toast,
+                range = range
+            ))
         }
     }
 
     private fun showInvalidHeightToast() {
 
-        val range = if (_uiState.value.isHeightCm) {
+        val range = if (uiState.value.isHeightCm) {
             "1-250 cm"
         } else {
             "1-8 ft, 0-11 in"
         }
 
         viewModelScope.launch {
-            _effect.emit(
-                InputEffect.ShowToast(
-                    resId = R.string.input_valid_height_toast,
-                    range = range
-                )
-            )
+            emitEffect(InputEffect.ShowToast(
+                resId = R.string.input_valid_height_toast,
+                range = range
+            ))
         }
     }
 
@@ -790,7 +806,7 @@ class InputViewModel (
     }
 
     fun calculateAndSave() {
-        val state = _uiState.value
+        val state = uiState.value
         Log.d(
             "HEIGHT_TEST",
             "保存前 state.heightCm=${state.heightCm}"
@@ -841,12 +857,10 @@ class InputViewModel (
                 ResultMode.NORMAL
             }
 
-            _effect.emit(
-                InputEffect.NavigateToResult(
-                    mode = mode,
-                    recordId = recordId
-                )
-            )
+            emitEffect(InputEffect.NavigateToResult(
+                mode = mode,
+                recordId = recordId
+            ))
 
         }
     }

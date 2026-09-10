@@ -1,41 +1,43 @@
 package com.example.bmi.ui.setting
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.app.framework.base.Effect
+import android.app.framework.base.Event
+import android.app.framework.base.MVIBaseAndroidVm
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.data.repository.BmiRepository
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.android.parcel.Parcelize
+import android.app.framework.base.State
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
-data class SettingUiState(
+@Parcelize
+data class SettingState(
     val isLogin: Boolean = false,
     val isChecked: Boolean = false
-)
+) : State
 
-sealed interface SettingIntent {
+sealed interface SettingEvent : Event {
 
-    data object AdsClick : SettingIntent
+    data object AdsClick : SettingEvent
 
 
-    data object SyncDone : SettingIntent
+    data object SyncDone : SettingEvent
 
     data class CheckedChange(
         val checked: Boolean
-    ) : SettingIntent
+    ) : SettingEvent
 
-    data object LoginClick : SettingIntent
+    data object LoginClick : SettingEvent
 
-    data object LogoutClick : SettingIntent
+    data object LogoutClick : SettingEvent
 
-    data object FeedbackResult : SettingIntent
+    data object FeedbackResult : SettingEvent
 }
 
-sealed interface SettingEffect {
+sealed interface SettingEffect : Effect{
 
     data object SyncSuccess : SettingEffect
 
@@ -43,77 +45,71 @@ sealed interface SettingEffect {
 }
 
 class SettingViewModel(
-    private val repository: BmiRepository
-) : ViewModel() {
-
-    private val _uiState =
-        MutableStateFlow(
-            SettingUiState()
-        )
-
-    val uiState =
-        _uiState.asStateFlow()
-
-
-    private val _effect =
-        MutableSharedFlow<SettingEffect>()
-
-    val effect =
-        _effect.asSharedFlow()
-
-    fun onIntent(intent: SettingIntent) {
-
-        when (intent) {
+    private val repository: BmiRepository,
+    application: Application,
+    savedStateHandle: SavedStateHandle
+) : MVIBaseAndroidVm<
+        SettingState,
+        SettingEvent,
+        SettingEffect
+        >(
+    application,
+    savedStateHandle
+)  {
+    override fun getInitState(): SettingState {
+        return SettingState()
+    }
 
 
 
+    override fun dispatch(event: SettingEvent) {
 
-            SettingIntent.FeedbackResult -> {
-                sendEffect(
+        when (event) {
+
+            SettingEvent.FeedbackResult -> {
+                emitEffect(
                     SettingEffect.FeedbackSuccess
                 )
             }
 
-            SettingIntent.SyncDone -> {
-                sendEffect(
+            SettingEvent.SyncDone -> {
+                emitEffect(
                     SettingEffect.SyncSuccess
                 )
             }
 
-            SettingIntent.AdsClick -> {
+            SettingEvent.AdsClick -> {
 
                 viewModelScope.launch {
 
                     repository.insertRecords(
                         generateDebugRecords()
                     )
-
                 }
             }
 
-            is SettingIntent.CheckedChange -> {
+            is SettingEvent.CheckedChange -> {
 
-                _uiState.update {
-                    it.copy(
-                        isChecked =
-                            intent.checked
+                emitState {
+                    copy(
+                        isChecked = event.checked
                     )
                 }
             }
 
-            SettingIntent.LoginClick -> {
+            SettingEvent.LoginClick -> {
 
-                _uiState.update {
-                    it.copy(
+                emitState {
+                    copy(
                         isLogin = true
                     )
                 }
             }
 
-            SettingIntent.LogoutClick -> {
+            SettingEvent.LogoutClick -> {
 
-                _uiState.update {
-                    it.copy(
+                emitState {
+                    copy(
                         isLogin = false
                     )
                 }
@@ -122,13 +118,6 @@ class SettingViewModel(
     }
 
 
-    private fun sendEffect(
-        effect: SettingEffect
-    ) {
-        viewModelScope.launch {
-            _effect.emit(effect)
-        }
-    }
 
     private fun generateDebugRecords(): List<BmiRecord> {
 

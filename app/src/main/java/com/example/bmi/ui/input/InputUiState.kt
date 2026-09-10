@@ -1,5 +1,9 @@
 package com.example.bmi.ui.input
 
+import android.app.framework.base.State
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class InputUiState(
     //体重
     val weightKg: Double = 140.0 * 0.45359237,
@@ -24,4 +28,4 @@ data class InputUiState(
     val age: Int = 25,
     val isMale: Boolean = true
 
-)
+): State

@@ -1,6 +1,7 @@
 package com.example.bmi.ui.setting
 
 import android.app.Activity
+import android.app.framework.base.collectEffect
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -29,9 +30,36 @@ class SettingActivity : AppCompatActivity() {
         setContent {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+            viewModel.collectEffect{effect ->
+                when (effect) {
+
+                    SettingEffect.SyncSuccess -> {
+                        CustomPopup.show(
+                            this@SettingActivity,
+                            window.decorView,
+                            getString(
+                                R.string.sync_success_toast
+                            ),
+                            R.drawable.success_icon
+                        )
+                    }
+
+                    SettingEffect.FeedbackSuccess -> {
+                        CustomPopup.show(
+                            this@SettingActivity,
+                            window.decorView,
+                            getString(
+                                R.string.toast_feedback_text
+                            ),
+                            R.drawable.success_icon
+                        )
+                    }
+                }
+            }
+
             SettingScreen(
                 uiState = uiState,
-                onIntent = viewModel::onIntent,
+                dispatch = viewModel::dispatch,
                 onBack = {finish()},
                 onFeedback = {
                     resultLauncher.launch(Intent(this@SettingActivity, FeedbackActivity::class.java))
@@ -39,46 +67,8 @@ class SettingActivity : AppCompatActivity() {
                 onLanguage = { startActivity(Intent(this@SettingActivity, LauSettingActivity::class.java)) },
             )
         }
-        observeEffect()
     }
 
-    private fun observeEffect() {
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(
-                Lifecycle.State.STARTED
-            ) {
-
-                viewModel.effect.collect { effect ->
-
-                    when (effect) {
-
-                        SettingEffect.SyncSuccess -> {
-                            CustomPopup.show(
-                                this@SettingActivity,
-                                window.decorView,
-                                getString(
-                                    R.string.sync_success_toast
-                                ),
-                                R.drawable.success_icon
-                            )
-                        }
-
-                        SettingEffect.FeedbackSuccess -> {
-                            CustomPopup.show(
-                                this@SettingActivity,
-                                window.decorView,
-                                getString(
-                                    R.string.toast_feedback_text
-                                ),
-                                R.drawable.success_icon
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
 
 
     override fun onStop() {

@@ -1,19 +1,29 @@
 package com.example.bmi.ui.splash
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.app.framework.base.Effect
+import android.app.framework.base.Event
+import android.app.framework.base.MVIBaseAndroidVm
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.bmi.data.repository.BmiRepository
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import android.app.framework.base.State
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 
-sealed interface SplashIntent {
 
-    data object AnimationEnd : SplashIntent
+@Parcelize
+data class SplashState(
+    val dummy: Boolean = false
+) : State
+
+sealed interface SplashEvent : Event {
+
+    data object AnimationEnd : SplashEvent
 
 }
 
-sealed interface SplashEffect {
+sealed interface SplashEffect : Effect {
 
     data object OpenInput : SplashEffect
 
@@ -22,23 +32,28 @@ sealed interface SplashEffect {
 }
 
 class SplashViewModel(
-    private val repository: BmiRepository
-) : ViewModel() {
+    private val repository: BmiRepository,
+    application: Application,
+    savedStateHandle: SavedStateHandle)
+    : MVIBaseAndroidVm<
+        SplashState,
+        SplashEvent,
+        SplashEffect
+        >(
+    application,
+    savedStateHandle
+)  {
 
-    private val _effect =
-        MutableSharedFlow<SplashEffect>()
-
-    val effect =
-        _effect.asSharedFlow()
-
-    fun onIntent(intent: SplashIntent) {
-
-        when (intent) {
-
-            SplashIntent.AnimationEnd -> {
+    override fun dispatch(event: SplashEvent) {
+        when (event) {
+            is SplashEvent.AnimationEnd -> {
                 checkUser()
             }
         }
+    }
+
+    override fun getInitState(): SplashState {
+        return SplashState()
     }
 
     private fun checkUser() {
@@ -48,13 +63,12 @@ class SplashViewModel(
             val isNewUser =
                 repository.getCount() == 0
 
-            _effect.emit(
-                if (isNewUser) {
-                    SplashEffect.OpenInput
-                } else {
-                    SplashEffect.OpenMain
-                }
-            )
+            if (isNewUser){
+                emitEffect(SplashEffect.OpenInput)
+            }else{
+                emitEffect(SplashEffect.OpenMain)
+            }
+
         }
     }
 }

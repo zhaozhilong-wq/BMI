@@ -39,7 +39,7 @@ class StatisticsFragment : Fragment() {
 
                 StatisticsScreen(
                     uiState,
-                    onIntent = viewModel::onIntent,
+                    dispatch = viewModel::dispatch,
                     onUpdate = {
                         (requireActivity() as MainActivity)
                             .goToInputPage()
