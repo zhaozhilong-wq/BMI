@@ -55,7 +55,7 @@ fun StatisticsScreen(uiState: StatisticsUiState,
         .fillMaxSize()
         .background(color = Color(0xFFEAEAEE))
         .statusBarsPadding()
-        .navigationBarsPadding()
+
     ){
         Column(modifier = Modifier.fillMaxSize()) {
             StatisticsTopBar()
