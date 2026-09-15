@@ -104,7 +104,7 @@ class ResultActivity : BaseActivity() {
                     startActivity(Intent(this, RecentActivity::class.java))
                 },
                 onBackgroundClick = {
-                    (this as MainActivity).goToInputPage()
+
                 },
                 onSave = {
                     startActivity(

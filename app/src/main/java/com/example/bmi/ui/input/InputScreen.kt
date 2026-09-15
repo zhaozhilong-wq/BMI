@@ -133,6 +133,7 @@ fun InputScreen(
                             dispatch(InputEvent.WeightFocusChanged(it))
                         },
                         onWeightUnitSelected = {
+                            focusManager.clearFocus()
                             dispatch(InputEvent.WeightUnitSelected(it))
                         },
                         modifier = Modifier.weight(1f)
@@ -159,6 +160,7 @@ fun InputScreen(
                             dispatch(InputEvent.HeightInFocusChanged(it))
                         },
                         onHeightUnitSelected = {
+                            focusManager.clearFocus()
                             dispatch(InputEvent.HeightUnitSelected(it))
                         },
                         modifier = Modifier.weight(1f)

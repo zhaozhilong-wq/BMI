@@ -111,12 +111,15 @@ class MainActivity : BaseActivity() {
                 when (effect) {
 
                     MainEffect.ShowSaveSuccess -> {
-                        CustomPopup.show(
-                            this@MainActivity,
-                            window.decorView,
-                            getString(R.string.save_successfully),
-                            R.drawable.success_icon
-                        )
+                        if(!isFinishing && !isDestroyed)
+                        {
+                            CustomPopup.show(
+                                this@MainActivity,
+                                window.decorView,
+                                getString(R.string.save_successfully),
+                                R.drawable.success_icon
+                            )
+                        }
                     }
                 }
             }
@@ -127,15 +130,17 @@ class MainActivity : BaseActivity() {
                 when (effect) {
 
                     is InputEffect.ShowToast -> {
-                        CustomPopup.show(
-                            this@MainActivity,
-                            window.decorView,
-                            getString(
-                                effect.resId,
-                                effect.range
-                            ),
-                            R.drawable.warning_icon
-                        )
+                        if (!isFinishing && !isDestroyed) {
+                            CustomPopup.show(
+                                this@MainActivity,
+                                window.decorView,
+                                getString(
+                                    effect.resId,
+                                    effect.range
+                                ),
+                                R.drawable.warning_icon
+                            )
+                        }
                     }
 
                     is InputEffect.NavigateToResult -> {
@@ -241,6 +246,11 @@ class MainActivity : BaseActivity() {
         handleIntent(intent)
     }
 
+    override fun onStop() {
+        CustomPopup.dismiss()
+        super.onStop()
+    }
+
     fun goToInputPage() {
         mainViewModel.dispatch(
             MainEvent.PageChanged(0)
@@ -293,12 +303,14 @@ class MainActivity : BaseActivity() {
 
 
                 if (deleteSuccess ) {
-                    CustomPopup.show(
-                        this,
-                        window.decorView,
-                        getString(R.string.delete_successfully),
-                        R.drawable.success_icon
-                    )
+                    if (!isFinishing && !isDestroyed) {
+                        CustomPopup.show(
+                            this,
+                            window.decorView,
+                            getString(R.string.delete_successfully),
+                            R.drawable.success_icon
+                        )
+                    }
                 }
             }
 

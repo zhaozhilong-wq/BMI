@@ -49,15 +49,18 @@ class InputActivity : BaseActivity(){
                     when (effect) {
 
                         is InputEffect.ShowToast -> {
-                            CustomPopup.show(
-                                this@InputActivity,
-                                window.decorView,
-                                getString(
-                                    effect.resId,
-                                    effect.range
-                                ),
-                                R.drawable.warning_icon
-                            )
+                            if(!isFinishing && !isDestroyed)
+                            {
+                                CustomPopup.show(
+                                    this@InputActivity,
+                                    window.decorView,
+                                    getString(
+                                        effect.resId,
+                                        effect.range
+                                    ),
+                                    R.drawable.warning_icon
+                                )
+                            }
                         }
 
                         is InputEffect.NavigateToResult -> {
@@ -103,6 +106,11 @@ class InputActivity : BaseActivity(){
             intent.removeExtra("show_delete_toast")
         }
 
+    }
+
+    override fun onStop() {
+        CustomPopup.dismiss()
+        super.onStop()
     }
 
     private val resultLauncher =

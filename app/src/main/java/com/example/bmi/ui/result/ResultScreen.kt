@@ -1196,7 +1196,7 @@ private fun bmiToPointerRotation(
                 (config.maxBmi - config.minBmi))
             .coerceIn(0f, 1f)
 
-    return -74.6f + ratio * 191f
+    return -74.6f + ratio * 194f
 }
 
 private fun formatBmiInputData(
