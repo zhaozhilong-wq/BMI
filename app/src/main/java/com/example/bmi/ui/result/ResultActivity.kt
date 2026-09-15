@@ -9,12 +9,13 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.bmi.ui.BaseActivity
 import com.example.bmi.ui.input.InputActivity
 import com.example.bmi.ui.main.MainActivity
 import com.example.bmi.ui.recent.RecentActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class ResultActivity : AppCompatActivity() {
+class ResultActivity : BaseActivity() {
 
     private val viewModel: ResultViewModel by viewModel()
 

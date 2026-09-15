@@ -1,25 +1,45 @@
 package com.example.bmi.ui.main
 
-import android.app.ComponentCaller
+import android.app.Activity
+import android.app.framework.base.collectEffect
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
-import android.view.View
-import android.view.ViewConfiguration
 import android.view.WindowManager
 import android.widget.EditText
-import androidx.core.graphics.Insets
-import androidx.core.view.WindowInsetsCompat
-import androidx.viewpager2.widget.ViewPager2
+import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.bmi.R
-import com.example.bmi.databinding.ActivityMainBinding
 import com.example.bmi.ui.BaseActivity
 import com.example.bmi.ui.CustomPopup
-class MainActivity : BaseActivity<ActivityMainBinding>() {
+import com.example.bmi.ui.input.InputActivity
+import com.example.bmi.ui.input.InputEffect
+import com.example.bmi.ui.input.InputViewModel
+import com.example.bmi.ui.recent.RecentActivity
+import com.example.bmi.ui.result.ResultActivity
+import com.example.bmi.ui.result.ResultEffect
+import com.example.bmi.ui.result.ResultEvent
+import com.example.bmi.ui.result.ResultMode
+import com.example.bmi.ui.result.ResultViewModel
+import com.example.bmi.ui.setting.SettingActivity
+import com.example.bmi.ui.statistics.StatisticsViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-    override fun createBinding(): ActivityMainBinding {
-        return ActivityMainBinding.inflate(layoutInflater)
-    }
+class MainActivity : BaseActivity() {
+
+    private val inputViewModel: InputViewModel by viewModel()
+    private val resultViewModel: ResultViewModel by viewModel()
+    private val statisticsViewModel: StatisticsViewModel by viewModel()
+
+    private val mainViewModel: MainViewModel by viewModel()
+
+    private val currentPage = MutableStateFlow(1)
 
     private var downX = 0f
     private var downY = 0f
@@ -52,17 +72,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         return super.dispatchTouchEvent(ev)
     }
 
-    override fun getInsets(insets: WindowInsetsCompat): Insets {
-        val systemBars = insets.getInsets(
-            WindowInsetsCompat.Type.systemBars()
-        )
-        return Insets.of(
-            systemBars.left,
-            0,
-            systemBars.right,
-            0
-        )
-    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,61 +79,160 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         window.setSoftInputMode(
             WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING
         )//防止键盘弹出时，布局被顶起
-        val viewPager2 = binding.viewPager
-        val bottomNav = binding.bottomNav
-        viewPager2.isUserInputEnabled = false//禁止滑动切换页面
 
-        viewPager2.adapter = Adapter(this)
+        val initialPage = intent.getIntExtra(
+            "open_page",
+            0
+        )
 
-        bottomNav.setOnItemSelectedListener {
-            when (it.itemId) {
-                R.id.navigation_calculator ->
-                    viewPager2.setCurrentItem(0, false)
+        currentPage.value = initialPage
 
-                R.id.navigation_bmi ->
-                    viewPager2.setCurrentItem(1, false)
+        resultViewModel.dispatch(
+            ResultEvent.LoadRecord(
+                mode = ResultMode.LATEST,
+                recordId = -1L
+            )
+        )
 
-                R.id.navigation_statistics ->
-                    viewPager2.setCurrentItem(2, false)
-            }
+        setContent {
+            val inputUiState =
+                inputViewModel.uiState.collectAsStateWithLifecycle()
 
-            true
-        }//底部导航栏监听，用户点击底部导航栏，viewPage2跳转到对应页面：更新页面
+            val resultUiState =
+                resultViewModel.uiState.collectAsStateWithLifecycle()
 
-        //监听页面更新导航栏
-        viewPager2.registerOnPageChangeCallback(
-            object : ViewPager2.OnPageChangeCallback() {
+            val statisticsUiState =
+                statisticsViewModel.uiState.collectAsStateWithLifecycle()
 
-                override fun onPageSelected(position: Int) {
-                    when (position) {
-                        0 -> bottomNav.selectedItemId = R.id.navigation_calculator
+            val page by currentPage.collectAsStateWithLifecycle()
 
-                        1 -> bottomNav.selectedItemId = R.id.navigation_bmi
+            mainViewModel.collectEffect { effect ->
 
-                        2 -> bottomNav.selectedItemId = R.id.navigation_statistics
+                when (effect) {
+
+                    MainEffect.ShowSaveSuccess -> {
+                        CustomPopup.show(
+                            this@MainActivity,
+                            window.decorView,
+                            getString(R.string.save_successfully),
+                            R.drawable.success_icon
+                        )
                     }
                 }
             }
-        )
 
 
-        handleIntent(intent)
+            inputViewModel.collectEffect {effect ->
+
+                when (effect) {
+
+                    is InputEffect.ShowToast -> {
+                        CustomPopup.show(
+                            this@MainActivity,
+                            window.decorView,
+                            getString(
+                                effect.resId,
+                                effect.range
+                            ),
+                            R.drawable.warning_icon
+                        )
+                    }
+
+                    is InputEffect.NavigateToResult -> {
+                        resultLauncher.launch(
+                            ResultActivity.newIntent(
+                                this@MainActivity,
+                                effect.mode,
+                                effect.recordId
+                            )
+                        )
+                    }
+
+                } }
+
+            resultViewModel.collectEffect { effect ->
+
+                when (effect) {
+
+                    ResultEffect.DeleteAndGoToInput -> {
+                        startActivity(
+                            Intent(
+                                this@MainActivity,
+                                InputActivity::class.java
+                            ).apply {
+                                putExtra(
+                                    "show_delete_toast",
+                                    true
+                                )
+                                flags =
+                                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                                            Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            }
+                        )
+
+                        finish()
+                    }
+
+                    ResultEffect.DeleteAndFinish -> {
+
+                        setResult(
+                            Activity.RESULT_OK,
+                            Intent().apply {
+                                putExtra(
+                                    "delete_success",
+                                    true
+                                )
+                            }
+                        )
+
+                        finish()
+                    }
+                    else -> {}
+                }
+            }
 
 
+            MainScreen(
+                currentPage = page,
+                onPageChanged = { page ->
+                    currentPage.value = page
+                },
+                inputUiState = inputUiState.value,
+                inputDispatch = inputViewModel::dispatch,
+                onUserClick = {
+                    startActivity(
+                        Intent(
+                            this@MainActivity,
+                            SettingActivity::class.java
+                        )
+                    )
+                },
+                resultUiState = resultUiState.value,
+                mode = ResultMode.LATEST,
+                resultDispatch = resultViewModel::dispatch,
+                onBack = {finish()},
+                onRecent = {
+                    startActivity(Intent(this, RecentActivity::class.java))
+                },
+                onBackgroundClick = {
+                   goToInputPage()
+                },
+                onSave = {
+                },
+
+                statisticsUiState = statisticsUiState.value,
+                statisticsDispatch = statisticsViewModel::dispatch,
+                onUpdate = {
+                    goToInputPage()
+                }
+            )
 
 
+            window.decorView.post {
+                handleIntent(intent)
+            }
+        }
 
-
-    }
-
-    override fun onNewIntent(
-        intent: Intent,
-        caller: ComponentCaller
-    ) {
-        super.onNewIntent(intent, caller)
-
-        setIntent(intent)
-        handleIntent(intent)
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -133,13 +241,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         handleIntent(intent)
     }
 
-
-
     fun goToInputPage() {
-        if (binding.viewPager.currentItem != 0) {
-            binding.viewPager.setCurrentItem(0, false)
-        }
+        currentPage.value = 0
     }
+
+
+
 
 
     private fun handleIntent(intent: Intent) {
@@ -150,37 +257,48 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         )
 
         if (openPage in 0..2) {
-            binding.viewPager.setCurrentItem(
-                openPage,
-                false
-            )
-
-            binding.bottomNav.selectedItemId = when (openPage) {
-                0 -> R.id.navigation_calculator
-                1 -> R.id.navigation_bmi
-                2 -> R.id.navigation_statistics
-                else -> return
-            }
+            currentPage.value = openPage
         }
 
         val showSavedToast = intent.getBooleanExtra(
             "show_saved_toast",
             false
         )
-        if (showSavedToast && !isFinishing && !isDestroyed) {
-            binding.root.post {
-                    CustomPopup.show(
-                        this,
-                        binding.root,
-                        getString(R.string.save_successfully),
-                        R.drawable.success_icon
-                    )
-
-            }
+        if (showSavedToast) {
+            mainViewModel.dispatch(
+                MainEvent.SaveSuccess
+            )
         }
         intent.removeExtra("show_saved_toast")
         intent.removeExtra("open_page")
     }
 
+    private val resultLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+
+
+            if (result.resultCode == Activity.RESULT_OK) {
+
+                val deleteSuccess =
+                    result.data?.getBooleanExtra(
+                        "delete_success",
+                        false
+                    ) ?: false
+
+
+                if (deleteSuccess ) {
+                    CustomPopup.show(
+                        this,
+                        window.decorView,
+                        getString(R.string.delete_successfully),
+                        R.drawable.success_icon
+                    )
+                }
+            }
+
+
+        }
 
 }

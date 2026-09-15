@@ -13,12 +13,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.bmi.R
+import com.example.bmi.ui.BaseActivity
 import com.example.bmi.ui.CustomPopup
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.jvm.java
 
-class SettingActivity : AppCompatActivity() {
+class SettingActivity : BaseActivity() {
 
     private val viewModel : SettingViewModel by viewModel()
 

@@ -10,13 +10,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.bmi.R
+import com.example.bmi.ui.BaseActivity
 import com.example.bmi.ui.CustomPopup
 import com.example.bmi.ui.result.ResultActivity
 import com.example.bmi.ui.result.ResultMode
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class RecentActivity : AppCompatActivity() {
+class RecentActivity : BaseActivity() {
 
     private val viewModel : RecentViewModel by viewModel()
 

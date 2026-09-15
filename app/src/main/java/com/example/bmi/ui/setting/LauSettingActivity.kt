@@ -5,9 +5,10 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
+import com.example.bmi.ui.BaseActivity
 import java.util.Locale
 
-class LauSettingActivity : AppCompatActivity() {
+class LauSettingActivity : BaseActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

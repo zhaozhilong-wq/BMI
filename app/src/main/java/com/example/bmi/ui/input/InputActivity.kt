@@ -9,11 +9,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
+import androidx.core.graphics.Insets
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.bmi.R
+import com.example.bmi.ui.BaseActivity
 import com.example.bmi.ui.CustomPopup
 import com.example.bmi.ui.result.ResultActivity
 import com.example.bmi.ui.setting.SettingActivity
@@ -21,9 +24,19 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 
-class InputActivity : AppCompatActivity(){
+class InputActivity : BaseActivity(){
 
     private val viewModel : InputViewModel by viewModel()
+
+    override fun getInsets(insets: WindowInsetsCompat): Insets {
+        val systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+        return Insets.of(
+            systemBarInsets.left,
+            0,
+            systemBarInsets.right,
+            systemBarInsets.bottom
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

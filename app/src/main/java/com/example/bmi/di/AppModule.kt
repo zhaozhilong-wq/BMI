@@ -38,7 +38,9 @@ val appModule = module {
 
     viewModel {
         MainViewModel(
-            repository = get()
+            repository = get(),
+            application = get(),
+            savedStateHandle = get()
         )
     }
     viewModel {
