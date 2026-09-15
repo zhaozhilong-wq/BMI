@@ -1,6 +1,9 @@
 package com.example.bmi.ui.result
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,6 +37,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -496,28 +500,33 @@ fun BmiDialViewSection(
             -74.6f
         }
 
-    val rotation = remember {
-        androidx.compose.animation.core.Animatable(-74.6f)
-    }
-
-    LaunchedEffect(record?.id, targetRotation) {
-        if (shouldAnimate)
-        {
-            rotation.snapTo(-74.6f)
-
-            if (record != null && dialConfig != null) {
-                rotation.animateTo(
-                    targetValue = targetRotation,
-                    animationSpec = androidx.compose.animation.core.tween(
-                        durationMillis = 1200
-                    )
-                )
+    var rotationTarget by rememberSaveable(
+        record?.id,
+        mode
+    ) {
+        mutableStateOf(
+            if (shouldAnimate) {
+                -74.6f
+            } else {
+                targetRotation
             }
-        }else {
-            rotation.snapTo(targetRotation)
-        }
-
+        )
     }
+
+    LaunchedEffect(record?.id, targetRotation, shouldAnimate) {
+        rotationTarget = targetRotation
+    }
+
+    val rotation by animateFloatAsState(
+        targetValue = rotationTarget,
+        animationSpec = if (shouldAnimate) {
+            tween(durationMillis = 1200)
+        } else {
+            snap()
+        },
+        label = "bmi_pointer_rotation"
+    )
+
 
     Box(
         modifier = modifier
@@ -563,7 +572,7 @@ fun BmiDialViewSection(
                                     pivotFractionY = 77.617f / 92f
                                 )
 
-                            rotationZ = rotation.value
+                            rotationZ = rotation
                         }
                 )
             }
@@ -701,31 +710,37 @@ private fun BmiDialSection(
         mode == ResultMode.NORMAL ||
                 mode == ResultMode.NEW_USER
 
-    val targetBmi = record?.bmi?.toFloat()
+    val targetBmi =
+        record?.bmi?.toFloat() ?: 0f
 
-    val animatedBmi = remember {
-        androidx.compose.animation.core.Animatable(0f)
+    var animationStarted by rememberSaveable(
+        record?.id,
+        mode
+    ) {
+        mutableStateOf(false)
     }
 
-    LaunchedEffect(record?.id, targetBmi) {
-        if (shouldAnimate)
-        {
-            animatedBmi.snapTo(0f)
+    val animatedBmi by animateFloatAsState(
+        targetValue = if (
+            shouldAnimate && !animationStarted
+        ) {
+            0f
+        } else {
+            targetBmi
+        },
+        animationSpec = if (shouldAnimate) {
+            tween(
+                durationMillis = 1200
+            )
+        } else {
+            snap()
+        },
+        label = "bmi_number"
+    )
 
-            if (targetBmi != null) {
-                animatedBmi.animateTo(
-                    targetValue = targetBmi,
-                    animationSpec = androidx.compose.animation.core.tween(
-                        durationMillis = 1200
-                    )
-                )
-            }
-        }else {
-            if (targetBmi != null) {
-                animatedBmi.snapTo(targetBmi)
-            } else {
-                animatedBmi.snapTo(0f)
-            }
+    LaunchedEffect(record?.id) {
+        if (shouldAnimate) {
+            animationStarted = true
         }
     }
 
@@ -758,7 +773,7 @@ private fun BmiDialSection(
             text = String.format(
                 Locale.US,
                 "%.1f",
-                animatedBmi.value
+                animatedBmi
             ),
             fontSize = 64.sp,
             fontFamily = FontFamily(
