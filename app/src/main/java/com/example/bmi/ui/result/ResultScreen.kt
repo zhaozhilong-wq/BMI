@@ -30,6 +30,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -100,7 +101,6 @@ fun ResultScreen(
         .fillMaxSize()
         .background(Color.White)
         .statusBarsPadding()
-        .navigationBarsPadding()
     )
     {
 
@@ -195,6 +195,9 @@ fun ResultScreen(
             ResultMode.LATEST -> {
                 onBack()
             }
+
+            ResultMode.DIALOG -> {
+            }
         }
     }
 }
@@ -276,6 +279,8 @@ fun ResultTopBar(
                             top = 18.dp
                         )
                 )
+            }
+            else -> {
             }
         }
 
@@ -369,6 +374,7 @@ fun ResultContent(
     ) {
 
         BmiDialSection(record = record,
+            mode = mode,
             dialConfig = dialConfig,
             modifier = Modifier.padding(top = 11.dp)
         )
@@ -471,9 +477,14 @@ fun ResultContent(
 fun BmiDialViewSection(
     record: BmiRecord?,
     dialConfig: BmiDialConfig?,
+    mode: ResultMode,
     modifier: Modifier = Modifier,
     isDialog: Boolean,
 ) {
+
+    val shouldAnimate =
+        mode == ResultMode.NORMAL ||
+                mode == ResultMode.NEW_USER
 
     val targetRotation =
         if (record != null && dialConfig != null) {
@@ -482,16 +493,31 @@ fun BmiDialViewSection(
                 dialConfig
             )
         } else {
-            -68.6f
+            -74.6f
         }
 
-    val animatedRotation by androidx.compose.animation.core.animateFloatAsState(
-        targetValue = targetRotation,
-        animationSpec = androidx.compose.animation.core.tween(
-            durationMillis = 1200
-        ),
-        label = "pointer"
-    )
+    val rotation = remember {
+        androidx.compose.animation.core.Animatable(-74.6f)
+    }
+
+    LaunchedEffect(record?.id, targetRotation) {
+        if (shouldAnimate)
+        {
+            rotation.snapTo(-74.6f)
+
+            if (record != null && dialConfig != null) {
+                rotation.animateTo(
+                    targetValue = targetRotation,
+                    animationSpec = androidx.compose.animation.core.tween(
+                        durationMillis = 1200
+                    )
+                )
+            }
+        }else {
+            rotation.snapTo(targetRotation)
+        }
+
+    }
 
     Box(
         modifier = modifier
@@ -537,7 +563,7 @@ fun BmiDialViewSection(
                                     pivotFractionY = 77.617f / 92f
                                 )
 
-                            rotationZ = animatedRotation
+                            rotationZ = rotation.value
                         }
                 )
             }
@@ -666,22 +692,42 @@ private fun AdviceSection(record: BmiRecord?,
 @Composable
 private fun BmiDialSection(
     record: BmiRecord?,
+    mode: ResultMode,
     dialConfig: BmiDialConfig?,
     modifier: Modifier
 ) {
 
-    val targetBmi =
-        record?.bmi?.toFloat() ?: 0f
+    val shouldAnimate =
+        mode == ResultMode.NORMAL ||
+                mode == ResultMode.NEW_USER
 
-    val animatedBmi by
-    androidx.compose.animation.core.animateFloatAsState(
-        targetValue = targetBmi,
-        animationSpec =
-            androidx.compose.animation.core.tween(
-                durationMillis = 800
-            ),
-        label = "bmi"
-    )
+    val targetBmi = record?.bmi?.toFloat()
+
+    val animatedBmi = remember {
+        androidx.compose.animation.core.Animatable(0f)
+    }
+
+    LaunchedEffect(record?.id, targetBmi) {
+        if (shouldAnimate)
+        {
+            animatedBmi.snapTo(0f)
+
+            if (targetBmi != null) {
+                animatedBmi.animateTo(
+                    targetValue = targetBmi,
+                    animationSpec = androidx.compose.animation.core.tween(
+                        durationMillis = 1200
+                    )
+                )
+            }
+        }else {
+            if (targetBmi != null) {
+                animatedBmi.snapTo(targetBmi)
+            } else {
+                animatedBmi.snapTo(0f)
+            }
+        }
+    }
 
     Column(
         modifier = modifier.fillMaxWidth()
@@ -690,6 +736,7 @@ private fun BmiDialSection(
         BmiDialViewSection(
             record = record,
             dialConfig = dialConfig,
+            mode = mode,
             isDialog = false
         )
 
@@ -711,7 +758,7 @@ private fun BmiDialSection(
             text = String.format(
                 Locale.US,
                 "%.1f",
-                animatedBmi
+                animatedBmi.value
             ),
             fontSize = 64.sp,
             fontFamily = FontFamily(
@@ -1149,7 +1196,7 @@ private fun bmiToPointerRotation(
                 (config.maxBmi - config.minBmi))
             .coerceIn(0f, 1f)
 
-    return -68.6f + ratio * 180f
+    return -74.6f + ratio * 191f
 }
 
 private fun formatBmiInputData(

@@ -140,6 +140,7 @@ class ResultViewModel(
                     updateRecord(record)
                 }
             }
+            else -> {}
         }
     }
 

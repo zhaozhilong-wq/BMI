@@ -1,7 +1,6 @@
 package com.example.bmi.ui.main
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
@@ -11,17 +10,13 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.sp
 import com.example.bmi.R
 import com.example.bmi.ui.input.InputEvent
@@ -34,7 +29,6 @@ import com.example.bmi.ui.result.ResultUiState
 import com.example.bmi.ui.statistics.StatisticsEvent
 import com.example.bmi.ui.statistics.StatisticsScreen
 import com.example.bmi.ui.statistics.StatisticsUiState
-import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(

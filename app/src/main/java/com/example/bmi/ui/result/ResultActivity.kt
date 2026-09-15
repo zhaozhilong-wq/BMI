@@ -8,6 +8,8 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.bmi.ui.BaseActivity
 import com.example.bmi.ui.input.InputActivity
@@ -22,93 +24,103 @@ class ResultActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (savedInstanceState == null) {
-
-            val mode = intent.getStringExtra(EXTRA_MODE)
-                ?.let { ResultMode.valueOf(it) }
-                ?: ResultMode.NEW_USER
-
-            val recordId = intent.getLongExtra(EXTRA_RECORD_ID, 0)
-
-            viewModel.dispatch(
-                ResultEvent.LoadRecord(
-                    mode = mode,
-                    recordId = recordId
-                )
+        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { view, insets ->
+            val systemBars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars()
             )
+            view.setPadding(
+                view.paddingLeft,
+                0,
+                view.paddingRight,
+                systemBars.bottom
+            )
+            insets
+        }
 
-            setContent {
-                val uiState by
-                viewModel.uiState.collectAsStateWithLifecycle()
+        val mode = intent.getStringExtra(EXTRA_MODE)
+            ?.let { ResultMode.valueOf(it) }
+            ?: ResultMode.NEW_USER
 
-                viewModel.collectEffect { effect ->
+        val recordId = intent.getLongExtra(EXTRA_RECORD_ID, 0)
 
-                    when (effect) {
+        viewModel.dispatch(
+            ResultEvent.LoadRecord(
+                mode = mode,
+                recordId = recordId
+            )
+        )
 
-                        ResultEffect.DeleteAndGoToInput -> {
+        setContent {
+            val uiState by
+            viewModel.uiState.collectAsStateWithLifecycle()
 
-                            startActivity(
-                                Intent(
-                                    this,
-                                    InputActivity::class.java
-                                ).apply {
-                                    putExtra(
-                                        "show_delete_toast",
-                                        true
-                                    )
-                                    flags =
-                                        Intent.FLAG_ACTIVITY_NEW_TASK or
-                                                Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                }
-                            )
+            viewModel.collectEffect { effect ->
 
-                            finish()
-                        }
+                when (effect) {
 
-                        ResultEffect.DeleteAndFinish -> {
+                    ResultEffect.DeleteAndGoToInput -> {
 
-                            setResult(
-                                Activity.RESULT_OK,
-                                Intent().apply {
-                                    putExtra(
-                                        "delete_success",
-                                        true
-                                    )
-                                }
-                            )
-
-                            finish()
-                        }
-                        else -> {}
-                    }
-                }
-                ResultScreen(
-                    uiState = uiState,
-                    mode = mode,
-                    dispatch = viewModel::dispatch,
-                    onBack = {finish()},
-                    onRecent = {
-                        startActivity(Intent(this, RecentActivity::class.java))
-                    },
-                    onBackgroundClick = {
-                        (this as MainActivity).goToInputPage()
-                    },
-                    onSave = {
                         startActivity(
                             Intent(
                                 this,
-                                MainActivity::class.java
+                                InputActivity::class.java
                             ).apply {
-                                putExtra("open_page", 2)
-                                putExtra("show_saved_toast", true)
-                                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                putExtra(
+                                    "show_delete_toast",
+                                    true
+                                )
+                                flags =
+                                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                                            Intent.FLAG_ACTIVITY_CLEAR_TASK
                             }
                         )
 
                         finish()
                     }
-                )
+
+                    ResultEffect.DeleteAndFinish -> {
+
+                        setResult(
+                            Activity.RESULT_OK,
+                            Intent().apply {
+                                putExtra(
+                                    "delete_success",
+                                    true
+                                )
+                            }
+                        )
+
+                        finish()
+                    }
+                    else -> {}
+                }
             }
+            ResultScreen(
+                uiState = uiState,
+                mode = mode,
+                dispatch = viewModel::dispatch,
+                onBack = {finish()},
+                onRecent = {
+                    startActivity(Intent(this, RecentActivity::class.java))
+                },
+                onBackgroundClick = {
+                    (this as MainActivity).goToInputPage()
+                },
+                onSave = {
+                    startActivity(
+                        Intent(
+                            this,
+                            MainActivity::class.java
+                        ).apply {
+                            putExtra("open_page", 2)
+                            putExtra("show_saved_toast", true)
+                            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        }
+                    )
+
+                    finish()
+                }
+            )
         }
     }
     companion object {

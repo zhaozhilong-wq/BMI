@@ -4,5 +4,7 @@ enum class ResultMode {
     NEW_USER,
     NORMAL,
     LATEST,
-    HISTORY
+    HISTORY,
+
+    DIALOG
 }

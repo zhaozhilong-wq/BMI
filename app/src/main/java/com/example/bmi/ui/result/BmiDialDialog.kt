@@ -131,6 +131,7 @@ fun BmiDialDialog(
                 record = record,
                 dialConfig = uiState.dialConfig,
                 isDialog = true,
+                mode = ResultMode.DIALOG,
                 modifier = Modifier.padding(
                     top = 10.dp,
                     start = 10.dp,

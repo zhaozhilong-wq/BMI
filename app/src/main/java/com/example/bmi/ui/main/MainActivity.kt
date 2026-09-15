@@ -4,14 +4,11 @@ import android.app.Activity
 import android.app.framework.base.collectEffect
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MotionEvent
 import android.view.WindowManager
 import android.widget.EditText
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.bmi.R
@@ -38,8 +35,6 @@ class MainActivity : BaseActivity() {
     private val statisticsViewModel: StatisticsViewModel by viewModel()
 
     private val mainViewModel: MainViewModel by viewModel()
-
-    private val currentPage = MutableStateFlow(1)
 
     private var downX = 0f
     private var downY = 0f
@@ -80,12 +75,6 @@ class MainActivity : BaseActivity() {
             WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING
         )//防止键盘弹出时，布局被顶起
 
-        val initialPage = intent.getIntExtra(
-            "open_page",
-            0
-        )
-
-        currentPage.value = initialPage
 
         resultViewModel.dispatch(
             ResultEvent.LoadRecord(
@@ -93,6 +82,17 @@ class MainActivity : BaseActivity() {
                 recordId = -1L
             )
         )
+
+        val openPage = intent.getIntExtra(
+            "open_page",
+            -1
+        )
+
+        if (openPage in 0..2) {
+            mainViewModel.dispatch(
+                MainEvent.PageChanged(openPage)
+            )
+        }
 
         setContent {
             val inputUiState =
@@ -104,7 +104,7 @@ class MainActivity : BaseActivity() {
             val statisticsUiState =
                 statisticsViewModel.uiState.collectAsStateWithLifecycle()
 
-            val page by currentPage.collectAsStateWithLifecycle()
+            val mainUiState = mainViewModel.uiState.collectAsStateWithLifecycle()
 
             mainViewModel.collectEffect { effect ->
 
@@ -193,9 +193,9 @@ class MainActivity : BaseActivity() {
 
 
             MainScreen(
-                currentPage = page,
+                currentPage = mainUiState.value.currentPage,
                 onPageChanged = { page ->
-                    currentPage.value = page
+                    mainViewModel.dispatch(MainEvent.PageChanged(page))
                 },
                 inputUiState = inputUiState.value,
                 inputDispatch = inputViewModel::dispatch,
@@ -242,7 +242,9 @@ class MainActivity : BaseActivity() {
     }
 
     fun goToInputPage() {
-        currentPage.value = 0
+        mainViewModel.dispatch(
+            MainEvent.PageChanged(0)
+        )
     }
 
 
@@ -257,7 +259,9 @@ class MainActivity : BaseActivity() {
         )
 
         if (openPage in 0..2) {
-            currentPage.value = openPage
+            mainViewModel.dispatch(
+                MainEvent.PageChanged(openPage)
+            )
         }
 
         val showSavedToast = intent.getBooleanExtra(

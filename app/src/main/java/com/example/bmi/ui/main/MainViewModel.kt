@@ -13,10 +13,14 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class MainUiState(
-    val dummy: Unit = Unit
+    val currentPage: Int = 1
 ): State
 
 sealed interface MainEvent : Event {
+
+    data class PageChanged(
+        val page: Int
+    ) : MainEvent
 
     data object SaveSuccess : MainEvent
 
@@ -52,6 +56,13 @@ class MainViewModel(
             MainEvent.SaveSuccess -> {
                 showSaveSuccess()
             }
+
+            is MainEvent.PageChanged -> {
+                emitState {
+                    copy(currentPage = event.page)
+                }
+            }
+
 
         }
     }

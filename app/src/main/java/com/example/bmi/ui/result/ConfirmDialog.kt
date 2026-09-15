@@ -86,7 +86,7 @@ fun ConfirmDeleteDialog(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(
-                        end = 84.dp,
+                        end = 95.dp,
                         bottom = 19.5.dp
                     )
                     .clickable(
