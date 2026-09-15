@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
 import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -28,18 +29,23 @@ class InputActivity : BaseActivity(){
 
     private val viewModel : InputViewModel by viewModel()
 
-    override fun getInsets(insets: WindowInsetsCompat): Insets {
-        val systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-        return Insets.of(
-            systemBarInsets.left,
-            0,
-            systemBarInsets.right,
-            systemBarInsets.bottom
-        )
-    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { view, insets ->
+            val systemBars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars()
+            )
+            view.setPadding(
+                view.paddingLeft,
+                0,
+                view.paddingRight,
+                systemBars.bottom
+            )
+            insets
+        }
         setContent {
             MaterialTheme {
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()

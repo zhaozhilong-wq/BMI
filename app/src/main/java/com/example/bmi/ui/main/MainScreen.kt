@@ -15,6 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
@@ -107,7 +108,14 @@ fun MainScreen(
                         painter = painterResource(
                             R.drawable.calculator
                         ),
-                        contentDescription = null
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(
+                            if (pagerState.currentPage == 0) {
+                                selectedColor
+                            } else {
+                                unselectedColor
+                            }
+                        )
                     )
                 },
                 label = {
@@ -135,13 +143,20 @@ fun MainScreen(
                         painter = painterResource(
                             R.drawable.bmi
                         ),
-                        contentDescription = null
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(
+                            if (pagerState.currentPage == 1) {
+                                selectedColor
+                            } else {
+                                unselectedColor
+                            }
+                        )
                     )
                 },
                 label = {
                     Text(
                         text = "BMI",
-                        color = if (pagerState.currentPage == 0) {
+                        color = if (pagerState.currentPage == 1) {
                             selectedColor
                         } else {
                             unselectedColor
@@ -163,20 +178,27 @@ fun MainScreen(
                         painter = painterResource(
                             R.drawable.statistics
                         ),
-                        contentDescription = null
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(
+                            if (pagerState.currentPage == 2) {
+                                selectedColor
+                            } else {
+                                unselectedColor
+                            }
+                        )
                     )
                 },
                 label = {
                     Text(
                         text = "Statistics",
-                        color = if (pagerState.currentPage == 0) {
+                        fontSize = 12.sp,
+                        fontFamily = FontFamily(Font(R.font.montserrat_regular)),
+                        letterSpacing = (-0.01).sp,
+                        color = if (pagerState.currentPage == 2) {
                             selectedColor
                         } else {
                             unselectedColor
                         },
-                        fontSize = 12.sp,
-                        fontFamily = FontFamily(Font(R.font.montserrat_regular)),
-                        letterSpacing = (-0.01).sp
                     )
                 }
             )

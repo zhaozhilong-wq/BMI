@@ -27,31 +27,6 @@ abstract class BaseActivity : AppCompatActivity() {
                 Color.TRANSPARENT
             )
         )
-        setupWindowInsets(window.decorView)
     }
 
-    protected open fun getInsets(
-        insets: WindowInsetsCompat
-    ): Insets {
-        return insets.getInsets(
-            WindowInsetsCompat.Type.systemBars()
-        )
-    }
-
-    protected fun setupWindowInsets(view: View) {
-
-        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
-
-            val systemBars = getInsets(insets)
-
-            v.setPadding(
-                systemBars.left,
-                systemBars.top,
-                systemBars.right,
-                systemBars.bottom
-            )
-
-            insets
-        }
-    }
 }
