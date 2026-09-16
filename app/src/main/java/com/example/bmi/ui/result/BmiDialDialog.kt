@@ -27,7 +27,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberModalBottomSheetState
 import com.example.bmi.R
 
@@ -44,16 +43,13 @@ fun BmiDialDialog(
         sheetState = sheetState,
         onDismissRequest = onDismiss,
 
-        // 原来的 XML 是 24dp 顶部圆角
         shape = RoundedCornerShape(
             topStart = 24.dp,
             topEnd = 24.dp
         ),
 
-        // 白色背景
         containerColor = Color.White,
 
-        // 原来的 XML 没有顶部拖拽条
         dragHandle = null,
     ) {
 
@@ -66,11 +62,7 @@ fun BmiDialDialog(
                     rememberScrollState()
                 )
         ) {
-
-            // =========================
             // 标题
-            // =========================
-
             Text(
                 text = stringResource(
                     if (record?.isChild == true) {
@@ -91,10 +83,7 @@ fun BmiDialDialog(
                 )
             )
 
-            // =========================
             // 儿童副标题
-            // =========================
-
             if (record?.isChild == true) {
 
                 val gender =
@@ -123,9 +112,7 @@ fun BmiDialDialog(
                 )
             }
 
-            // =========================
             // 表盘
-            // =========================
 
             BmiDialViewSection(
                 record = record,
@@ -139,9 +126,7 @@ fun BmiDialDialog(
                 )
             )
 
-            // =========================
             // BMI 分类列表
-            // =========================
 
             BmiCategoryList(
                 modifier = Modifier.padding(
@@ -152,9 +137,7 @@ fun BmiDialDialog(
                 childThreshold = uiState.childThreshold
             )
 
-            // =========================
             // GOT IT
-            // =========================
 
             Text(
                 text = "GOT IT",

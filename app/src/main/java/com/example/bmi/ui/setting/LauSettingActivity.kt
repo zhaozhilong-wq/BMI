@@ -2,7 +2,6 @@ package com.example.bmi.ui.setting
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import com.example.bmi.ui.BaseActivity

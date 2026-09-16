@@ -5,9 +5,7 @@ import android.app.framework.base.Effect
 import android.app.framework.base.Event
 import android.app.framework.base.MVIBaseAndroidVm
 import android.app.framework.base.State
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
-import com.example.bmi.R
 import com.example.bmi.data.repository.BmiRepository
 import kotlinx.parcelize.Parcelize
 

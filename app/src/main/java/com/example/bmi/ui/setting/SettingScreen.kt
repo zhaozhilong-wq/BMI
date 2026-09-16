@@ -43,11 +43,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.example.bmi.R
 
-//@Preview
-//@Composable
-//fun SettingScreenPreview() {
-//    SettingScreen()
-//}
+
 
 
 

@@ -72,7 +72,7 @@ fun DatePickerBottomSheet(
 
     val sheetState =
         rememberModalBottomSheetState(
-            skipPartiallyExpanded = true
+            skipPartiallyExpanded = true//直接完全展开，直接隐藏
         )
 
     ModalBottomSheet(

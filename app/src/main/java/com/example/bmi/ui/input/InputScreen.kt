@@ -60,12 +60,6 @@ import androidx.compose.ui.unit.sp
 import com.example.bmi.R
 import kotlinx.coroutines.launch
 
-//@Preview
-//@Composable
-//fun InputScreenPreview() {
-////传入空值看效果
-//    InputScreen(InputUiState(), onWeightChanged = {}, onWeightFocusChanged = {}, onWeightUnitSelected = {}, onHeightCmChanged = {}, onHeightFtChanged = {}, onHeightInChanged = {}, onHeightCmFocusChanged = {}, onHeightFtFocusChanged = {}, onHeightInFocusChanged = {}, onHeightUnitSelected = {}, onDateSelected = { _, _, _ -> }, onTimeSelected = {  }, onAgeSelected = {}, onGenderSelected = {}, onCalculateClick = {}, onUserClick = {})
-//}
 
 
 @Composable
@@ -677,8 +671,8 @@ private fun DateItem(
             .clip(RoundedCornerShape(15.dp))
             .background(Color.White)
             .clickable(
-                indication = null,
-                interactionSource = remember {
+                indication = null,//要不要给反馈结果
+                interactionSource = remember {//交互状态从哪里产生
                     MutableInteractionSource()
                 },
                 onClick = onClick
@@ -761,11 +755,11 @@ private fun AgePicker(
 
     val flingBehavior = rememberSnapFlingBehavior(
         lazyListState = listState
-    )
+    )//让列表滑动时能吸附
 
     val scope = rememberCoroutineScope()
 
-    BoxWithConstraints(
+    BoxWithConstraints(//可以获取box的maxwidth，minwidth等布局属性
         modifier = Modifier
             .fillMaxWidth()
             .height(72.dp)
@@ -840,7 +834,7 @@ private fun AgePicker(
 
                 val center =
                     (layoutInfo.viewportStartOffset +
-                            layoutInfo.viewportEndOffset) / 2
+                            layoutInfo.viewportEndOffset) / 2//找到中心
 
                 val centerItem =
                     layoutInfo.visibleItemsInfo.minByOrNull { item ->
@@ -848,7 +842,7 @@ private fun AgePicker(
                         kotlin.math.abs(
                             (item.offset + item.size / 2) - center
                         )
-                    }
+                    }//计算可视item的中心，并拿距离中心最短的
 
                 centerItem?.let { item ->
 

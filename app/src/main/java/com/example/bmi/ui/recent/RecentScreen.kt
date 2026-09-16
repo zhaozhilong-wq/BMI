@@ -39,16 +39,6 @@ import com.example.bmi.R
 import com.example.bmi.data.entity.BmiRecord
 import com.example.bmi.ui.result.category.BmiClassifier
 
-//@Preview
-//@Composable
-//fun PreviewRecentScreen() {
-//    RecentScreen(onBackClick = {}, onItemClick = {}, recordLists = listOf(
-//        BmiRecord(1, 70.0, 170.0, "kg", "cm", 22.0, 25, "1", false, 10, 10, 1, 1,1),
-//        BmiRecord(2, 80.0, 180.0, "kg", "cm", 26.0, 25, "1", false, 10, 10, 1, 1,1),
-//        BmiRecord(3, 90.0, 190.0, "kg", "cm", 24.0, 25, "1", false, 10, 10, 1, 1,1)
-//    ))
-//}
-
 
 @Composable
 fun RecentScreen(

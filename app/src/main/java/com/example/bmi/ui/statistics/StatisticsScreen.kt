@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -38,12 +37,6 @@ import com.example.bmi.R
 import com.example.bmi.ui.ChartType
 import com.example.bmi.ui.StatisticsChartView
 
-//@Preview
-//@Composable
-//fun StatisticsPreview()
-//{
-//    StatisticsScreen(onUpdateClick = {}, currentInterval = ChartInterval.DAY, onIntervalClick = {}, dailyBmi = emptyList(), dailyWeight = emptyList(), weeklyBmi = emptyList(), weeklyWeight = emptyList(), monthlyBmi = emptyList(), monthlyWeight = emptyList(), timeMarkers = emptyList())
-//}
 
 
 @Composable

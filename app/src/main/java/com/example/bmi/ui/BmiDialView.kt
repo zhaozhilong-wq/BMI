@@ -192,52 +192,25 @@ fun BmiDialView(
 
     val density = LocalDensity.current
 
-    /*
-     * BMI 数字的字体
-     *
-     * 对应原来的：
-     *
-     * ResourcesCompat.getFont(
-     *     context,
-     *     R.font.montserrat_extrabold
-     * )
-     */
+
     val fontFamily = remember {
         FontFamily(
             Font(R.font.montserrat_extrabold)
         )
     }
 
-    /*
-     * Compose 画文字需要 TextMeasurer。
-     */
+    // Compose 画文字需要 TextMeasurer。
     val textMeasurer = rememberTextMeasurer()
 
-    /*
-     * 原来的：
-     *
-     * strokeWidth = 90f.dp
-     *
-     * 转换成 px。
-     */
     val strokeWidth = with(density) {
         90.dp.toPx()
     }
 
-    /*
-     * 原来的：
-     *
-     * radius = 115f.dp
-     */
+
     val radius = with(density) {
         115.dp.toPx()
     }
 
-    /*
-     * 原来的：
-     *
-     * textRadius = radius + 55f.dp
-     */
     val textRadius = radius + with(density) {
         55.dp.toPx()
     }
@@ -249,26 +222,10 @@ fun BmiDialView(
         modifier = modifier
     ) {
 
-        /*
-         * ============================
-         * 1. 计算中心点
-         * ============================
-         *
-         * 原来的：
-         *
-         * val viewWidth = width.toFloat()
-         * val viewHeight = height.toFloat()
-         *
-         * val centerX = viewWidth / 2f
-         * val centerY = viewHeight
-         */
         val centerX = size.width / 2f
         val centerY = size.height
 
 
-        /*
-         * 真正画弧线。
-         */
         drawSections(
             config = config,
             centerX = centerX,
@@ -278,11 +235,7 @@ fun BmiDialView(
             sectionColors = sectionColors
         )
 
-        /*
-         * ============================
-         * 3. 画 BMI 数字
-         * ============================
-         */
+
         drawTicks(
             config = config,
             centerX = centerX,
@@ -295,9 +248,7 @@ fun BmiDialView(
 }
 
 
-/**
- * 画 BMI 彩色区域。
- */
+
 private fun DrawScope.drawSections(
     config: BmiDialConfig,
     centerX: Float,
@@ -317,9 +268,6 @@ private fun DrawScope.drawSections(
         height = radius * 2f
     )
 
-    /*
-     * 每一个 section 单独画。
-     */
     for ((index, section) in config.sections.withIndex()) {
 
         val startAngle = bmiToAngle(
@@ -350,9 +298,7 @@ private fun DrawScope.drawSections(
 }
 
 
-/**
- * 画 BMI 刻度文字。
- */
+
 private fun DrawScope.drawTicks(
     config: BmiDialConfig,
     centerX: Float,
@@ -371,33 +317,18 @@ private fun DrawScope.drawTicks(
 
     for (bmi in config.ticks) {
 
-        /*
-         * 根据 BMI 得到角度。
-         */
         val angleDegrees = bmiToAngle(
             bmi,
             config
         )
 
-        /*
-         * 角度转弧度。
-         */
+        //角度转弧度
         val angleRadians =
             Math.toRadians(
                 angleDegrees.toDouble()
             )
 
-        /*
-         * 原来的：
-         *
-         * val x = centerX +
-         *     textRadius *
-         *     cos(angleRadians)
-         *
-         * val y = centerY +
-         *     textRadius *
-         *     sin(angleRadians)
-         */
+
         val x =
             centerX +
                     textRadius *
@@ -408,9 +339,7 @@ private fun DrawScope.drawTicks(
                     textRadius *
                     sin(angleRadians).toFloat()
 
-        /*
-         * BMI 是整数就不显示 .0
-         */
+        // BMI 是整数就不显示 .0
         val text =
             if (bmi % 1f == 0f) {
                 bmi.toInt().toString()
@@ -418,31 +347,21 @@ private fun DrawScope.drawTicks(
                 bmi.toString()
             }
 
-        /*
-         * 测量文字。
-         */
+
         val textLayoutResult =
             textMeasurer.measure(
                 text = text,
                 style = textStyle
             )
 
-        /*
-         * 让文字中心落在 x/y。
-         */
+
         val textWidth =
             textLayoutResult.size.width
 
         val textHeight =
             textLayoutResult.size.height
 
-        /*
-         * 原来的：
-         *
-         * canvas.translate(x, y)
-         *
-         * canvas.rotate(angleDegrees - 270f)
-         */
+
         rotate(
             degrees = angleDegrees - 270f,
             pivot = Offset(x, y)
