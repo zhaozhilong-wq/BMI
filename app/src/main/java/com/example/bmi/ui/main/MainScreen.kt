@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
@@ -114,7 +115,7 @@ fun MainScreen(
                 },
                 label = {
                     Text(
-                        text = "Calculator",
+                        text = stringResource(R.string.calculator),
                         color = if (pagerState.currentPage == 0) {
                             selectedColor
                         } else {
@@ -149,7 +150,7 @@ fun MainScreen(
                 },
                 label = {
                     Text(
-                        text = "BMI",
+                        text = stringResource(R.string.bmi),
                         color = if (pagerState.currentPage == 1) {
                             selectedColor
                         } else {
@@ -184,7 +185,7 @@ fun MainScreen(
                 },
                 label = {
                     Text(
-                        text = "Statistics",
+                        text = stringResource(R.string.statistics),
                         fontSize = 12.sp,
                         fontFamily = FontFamily(Font(R.font.montserrat_regular)),
                         letterSpacing = (-0.01).sp,

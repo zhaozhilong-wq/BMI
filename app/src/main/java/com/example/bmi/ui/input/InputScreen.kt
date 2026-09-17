@@ -304,8 +304,9 @@ fun WeightSection(
             ),
             color = Color.Black,
             letterSpacing = (-0.01).em,
+            textAlign = TextAlign.Center,
             modifier = Modifier
-                .padding(start = 52.dp)
+                .fillMaxWidth()
                 .padding(bottom = 15.dp)
         )
 
@@ -447,8 +448,9 @@ fun HeightSection(
             ),
             color = Color.Black,
             letterSpacing = (-0.01).em,
+            textAlign = TextAlign.Center,
             modifier = Modifier
-                .padding(start = 56.dp)
+                .fillMaxWidth()
                 .padding(bottom = 15.dp)
         )
 
